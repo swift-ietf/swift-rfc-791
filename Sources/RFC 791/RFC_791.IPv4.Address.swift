@@ -18,8 +18,11 @@ extension RFC_791.IPv4 {
     ///
     /// ## Storage
     ///
-    /// Internally stored as a single `UInt32` in network byte order (big-endian),
-    /// providing efficient comparisons and operations.
+    /// Internally stored as a single `UInt32` in host byte order (the
+    /// integer's most significant byte corresponds to the first octet of the
+    /// dotted-decimal representation). Network-order bytes are produced by
+    /// `Binary.Serializable.serialize(_:into:)` and `[UInt8](address)` at
+    /// serialization boundaries, not at the storage layer.
     ///
     /// ## Example
     ///
@@ -37,7 +40,12 @@ extension RFC_791.IPv4 {
     /// let bytes = [UInt8](address)
     /// ```
     public struct Address: Hashable, Sendable, Codable {
-        /// The 32-bit address value in network byte order (big-endian)
+        /// The 32-bit address value in host byte order.
+        ///
+        /// The most significant byte corresponds to the first octet of the
+        /// dotted-decimal representation. For example, `192.168.1.1` has
+        /// `rawValue == 0xC0A80101`, regardless of the host machine's
+        /// endianness.
         public let rawValue: UInt32
 
         /// Creates an IPv4 address WITHOUT validation
@@ -50,9 +58,10 @@ extension RFC_791.IPv4 {
             self.rawValue = rawValue
         }
 
-        /// Creates an IPv4 address from a 32-bit value
+        /// Creates an IPv4 address from a 32-bit value.
         ///
-        /// - Parameter rawValue: The 32-bit address in network byte order
+        /// - Parameter rawValue: The 32-bit address in host byte order
+        ///   (most significant byte is the first dotted-decimal octet).
         public init(rawValue: UInt32) {
             self.init(__unchecked: (), rawValue: rawValue)
         }

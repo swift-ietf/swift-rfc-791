@@ -19,8 +19,8 @@ struct PrecedenceTests {
 
     // MARK: - Initialization Tests
 
-    @Test("Precedence from raw value - valid")
-    func initFromRawValueValid() {
+    @Test
+    func `Precedence from raw value - valid`() {
         for value: UInt8 in 0...7 {
             let precedence = RFC_791.Precedence(rawValue: value)
             #expect(precedence != nil)
@@ -28,16 +28,16 @@ struct PrecedenceTests {
         }
     }
 
-    @Test("Precedence from raw value - invalid")
-    func initFromRawValueInvalid() {
+    @Test
+    func `Precedence from raw value - invalid`() {
         #expect(RFC_791.Precedence(rawValue: 8) == nil)
         #expect(RFC_791.Precedence(rawValue: 255) == nil)
     }
 
     // MARK: - Static Constants Tests
 
-    @Test("Precedence static constants")
-    func staticConstants() {
+    @Test
+    func `Precedence static constants`() {
         #expect(RFC_791.Precedence.routine.rawValue == 0)
         #expect(RFC_791.Precedence.priority.rawValue == 1)
         #expect(RFC_791.Precedence.immediate.rawValue == 2)
@@ -50,21 +50,21 @@ struct PrecedenceTests {
 
     // MARK: - Byte Parsing Tests
 
-    @Test("Precedence from bytes - valid")
-    func initFromBytesValid() throws {
+    @Test
+    func `Precedence from bytes - valid`() throws {
         let precedence = try RFC_791.Precedence(bytes: [0x03])
         #expect(precedence == .flash)
     }
 
-    @Test("Precedence from bytes - empty")
-    func initFromBytesEmpty() {
+    @Test
+    func `Precedence from bytes - empty`() {
         #expect(throws: RFC_791.Precedence.Error.self) {
             _ = try RFC_791.Precedence(bytes: [] as [UInt8])
         }
     }
 
-    @Test("Precedence from bytes - out of range")
-    func initFromBytesOutOfRange() {
+    @Test
+    func `Precedence from bytes - out of range`() {
         #expect(throws: RFC_791.Precedence.Error.self) {
             _ = try RFC_791.Precedence(bytes: [0x08])
         }
@@ -72,24 +72,24 @@ struct PrecedenceTests {
 
     // MARK: - Serialization Tests
 
-    @Test("Precedence serialization")
-    func serialization() {
+    @Test
+    func `Precedence serialization`() {
         let precedence = RFC_791.Precedence.immediate
         var buffer: [UInt8] = []
         precedence.serialize(into: &buffer)
         #expect(buffer == [0x02])
     }
 
-    @Test("Precedence bytes property")
-    func bytesProperty() {
+    @Test
+    func `Precedence bytes property`() {
         let precedence = RFC_791.Precedence.flash
         #expect(precedence.bytes == [0x03])
     }
 
     // MARK: - Comparable Tests
 
-    @Test("Precedence comparable")
-    func comparable() {
+    @Test
+    func `Precedence comparable`() {
         #expect(RFC_791.Precedence.routine < .priority)
         #expect(RFC_791.Precedence.priority < .immediate)
         #expect(RFC_791.Precedence.immediate < .flash)
@@ -101,8 +101,8 @@ struct PrecedenceTests {
 
     // MARK: - Description Tests
 
-    @Test("Precedence description")
-    func description() {
+    @Test
+    func `Precedence description`() {
         #expect(RFC_791.Precedence.routine.description == "Routine")
         #expect(RFC_791.Precedence.priority.description == "Priority")
         #expect(RFC_791.Precedence.immediate.description == "Immediate")
@@ -115,8 +115,8 @@ struct PrecedenceTests {
 
     // MARK: - Equality Tests
 
-    @Test("Precedence equality")
-    func equality() {
+    @Test
+    func `Precedence equality`() {
         let prec1 = RFC_791.Precedence.flash
         let prec2 = RFC_791.Precedence(rawValue: 3)!
         let prec3 = RFC_791.Precedence.immediate
@@ -127,8 +127,8 @@ struct PrecedenceTests {
 
     // MARK: - Hashable Tests
 
-    @Test("Precedence hashable")
-    func hashable() {
+    @Test
+    func `Precedence hashable`() {
         var set: Set<RFC_791.Precedence> = []
         set.insert(.routine)
         set.insert(.priority)

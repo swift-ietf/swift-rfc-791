@@ -19,8 +19,8 @@ struct HeaderChecksumTests {
 
     // MARK: - Raw Value Initialization
 
-    @Test("All 16-bit values are valid checksums")
-    func allValuesValid() {
+    @Test
+    func `All 16-bit values are valid checksums`() {
         #expect(RFC_791.HeaderChecksum(rawValue: 0).rawValue == 0)
         #expect(RFC_791.HeaderChecksum(rawValue: 0xFFFF).rawValue == 65535)
         #expect(RFC_791.HeaderChecksum(rawValue: 0xB861).rawValue == 0xB861)
@@ -28,15 +28,15 @@ struct HeaderChecksumTests {
 
     // MARK: - Static Constants
 
-    @Test("Zero constant")
-    func zeroConstant() {
+    @Test
+    func `Zero constant`() {
         #expect(RFC_791.HeaderChecksum.zero.rawValue == 0)
     }
 
     // MARK: - Checksum Computation
 
-    @Test("Compute checksum for simple header")
-    func computeChecksum() {
+    @Test
+    func `Compute checksum for simple header`() {
         // Example from RFC 1071: Simple header with checksum field zeroed
         // 4500 0073 0000 4000 4011 [0000] c0a8 0001 c0a8 00c7
         let header: [UInt8] = [
@@ -54,8 +54,8 @@ struct HeaderChecksumTests {
         #expect(checksum.rawValue == 0xB861)
     }
 
-    @Test("Verify valid checksum")
-    func verifyValidChecksum() {
+    @Test
+    func `Verify valid checksum`() {
         // Same header with correct checksum included
         let header: [UInt8] = [
             0x45, 0x00,
@@ -71,8 +71,8 @@ struct HeaderChecksumTests {
         #expect(RFC_791.HeaderChecksum.verify(header: header))
     }
 
-    @Test("Verify invalid checksum")
-    func verifyInvalidChecksum() {
+    @Test
+    func `Verify invalid checksum`() {
         let header: [UInt8] = [
             0x45, 0x00,
             0x00, 0x73,
@@ -87,15 +87,15 @@ struct HeaderChecksumTests {
         #expect(!RFC_791.HeaderChecksum.verify(header: header))
     }
 
-    @Test("Compute checksum for all zeros")
-    func computeAllZeros() {
+    @Test
+    func `Compute checksum for all zeros`() {
         let header: [UInt8] = Array(repeating: 0, count: 20)
         let checksum = RFC_791.HeaderChecksum.compute(over: header)
         #expect(checksum.rawValue == 0xFFFF)
     }
 
-    @Test("Compute checksum for all ones")
-    func computeAllOnes() {
+    @Test
+    func `Compute checksum for all ones`() {
         var header: [UInt8] = Array(repeating: 0xFF, count: 20)
         // Zero out checksum field (bytes 10-11)
         header[10] = 0
@@ -110,23 +110,23 @@ struct HeaderChecksumTests {
 
     // MARK: - Byte Parsing
 
-    @Test("Parse checksum from bytes (big-endian)")
-    func parseFromBytes() throws {
+    @Test
+    func `Parse checksum from bytes (big-endian)`() throws {
         let bytes: [UInt8] = [0xB8, 0x61]
         let checksum = try RFC_791.HeaderChecksum(bytes: bytes)
         #expect(checksum.rawValue == 0xB861)
     }
 
-    @Test("Parse from empty bytes throws error")
-    func parseEmptyBytesThrows() {
+    @Test
+    func `Parse from empty bytes throws error`() {
         let bytes: [UInt8] = []
         #expect(throws: RFC_791.HeaderChecksum.Error.empty) {
             try RFC_791.HeaderChecksum(bytes: bytes)
         }
     }
 
-    @Test("Parse from insufficient bytes throws error")
-    func parseInsufficientBytesThrows() {
+    @Test
+    func `Parse from insufficient bytes throws error`() {
         let bytes: [UInt8] = [0xB8]
         #expect(throws: RFC_791.HeaderChecksum.Error.insufficientBytes) {
             try RFC_791.HeaderChecksum(bytes: bytes)
@@ -135,15 +135,15 @@ struct HeaderChecksumTests {
 
     // MARK: - Serialization
 
-    @Test("Serialize checksum to bytes (big-endian)")
-    func serializeToBytes() {
+    @Test
+    func `Serialize checksum to bytes (big-endian)`() {
         var buffer: [UInt8] = []
         RFC_791.HeaderChecksum(rawValue: 0xB861).serialize(into: &buffer)
         #expect(buffer == [0xB8, 0x61])
     }
 
-    @Test("Round-trip serialization")
-    func roundTripSerialization() throws {
+    @Test
+    func `Round-trip serialization`() throws {
         let original = RFC_791.HeaderChecksum(rawValue: 0x1234)
         var buffer: [UInt8] = []
         original.serialize(into: &buffer)
@@ -154,8 +154,8 @@ struct HeaderChecksumTests {
 
     // MARK: - CustomStringConvertible
 
-    @Test("Description format (hexadecimal)")
-    func descriptionFormat() {
+    @Test
+    func `Description format (hexadecimal)`() {
         #expect(RFC_791.HeaderChecksum(rawValue: 0xB861).description == "0xB861")
         #expect(RFC_791.HeaderChecksum(rawValue: 0x0001).description == "0x1")
         #expect(RFC_791.HeaderChecksum(rawValue: 0xFFFF).description == "0xFFFF")
@@ -163,8 +163,8 @@ struct HeaderChecksumTests {
 
     // MARK: - Error Tests
 
-    @Test("Error descriptions")
-    func errorDescriptions() {
+    @Test
+    func `Error descriptions`() {
         let emptyDesc = RFC_791.HeaderChecksum.Error.empty.description
         #expect(emptyDesc == "HeaderChecksum data cannot be empty")
         let insufficientDesc = RFC_791.HeaderChecksum.Error.insufficientBytes.description

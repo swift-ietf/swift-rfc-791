@@ -23,15 +23,15 @@ struct ProtocolTests {
 
     // MARK: - Initialization Tests
 
-    @Test("Protocol from raw value")
-    func initFromRawValue() {
+    @Test
+    func `Protocol from raw value`() {
         let proto = IPProtocol(rawValue: 6)
         #expect(proto.rawValue == 6)
         #expect(proto == .tcp)
     }
 
-    @Test("Protocol all values valid")
-    func allValuesValid() {
+    @Test
+    func `Protocol all values valid`() {
         // All UInt8 values are valid protocol numbers
         for value: UInt8 in 0...255 {
             let proto = IPProtocol(rawValue: value)
@@ -41,8 +41,8 @@ struct ProtocolTests {
 
     // MARK: - Static Constants Tests
 
-    @Test("Protocol static constants")
-    func staticConstants() {
+    @Test
+    func `Protocol static constants`() {
         #expect(IPProtocol.icmp.rawValue == 1)
         #expect(IPProtocol.igmp.rawValue == 2)
         #expect(IPProtocol.tcp.rawValue == 6)
@@ -57,27 +57,27 @@ struct ProtocolTests {
 
     // MARK: - Byte Parsing Tests
 
-    @Test("Protocol from bytes - valid")
-    func initFromBytesValid() throws {
+    @Test
+    func `Protocol from bytes - valid`() throws {
         let proto = try IPProtocol(bytes: [0x06])
         #expect(proto == .tcp)
     }
 
-    @Test("Protocol from bytes - UDP")
-    func initFromBytesUDP() throws {
+    @Test
+    func `Protocol from bytes - UDP`() throws {
         let proto = try IPProtocol(bytes: [0x11])
         #expect(proto == .udp)
     }
 
-    @Test("Protocol from bytes - empty")
-    func initFromBytesEmpty() {
+    @Test
+    func `Protocol from bytes - empty`() {
         #expect(throws: IPProtocol.Error.self) {
             _ = try IPProtocol(bytes: [] as [UInt8])
         }
     }
 
-    @Test("Protocol from bytes - multiple bytes (uses first)")
-    func initFromBytesMultiple() throws {
+    @Test
+    func `Protocol from bytes - multiple bytes (uses first)`() throws {
         // Should only use first byte
         let proto = try IPProtocol(bytes: [0x06, 0x11, 0x01])
         #expect(proto == .tcp)
@@ -85,32 +85,32 @@ struct ProtocolTests {
 
     // MARK: - Serialization Tests
 
-    @Test("Protocol serialization")
-    func serialization() {
+    @Test
+    func `Protocol serialization`() {
         let proto = IPProtocol.tcp
         var buffer: [UInt8] = []
         proto.serialize(into: &buffer)
         #expect(buffer == [0x06])
     }
 
-    @Test("Protocol bytes property")
-    func bytesProperty() {
+    @Test
+    func `Protocol bytes property`() {
         let proto = IPProtocol.udp
         #expect(proto.bytes == [0x11])
     }
 
     // MARK: - Round Trip Tests
 
-    @Test("Protocol round trip")
-    func roundTrip() throws {
+    @Test
+    func `Protocol round trip`() throws {
         let original = IPProtocol.icmp
         let bytes = original.bytes
         let parsed = try IPProtocol(bytes: bytes)
         #expect(parsed == original)
     }
 
-    @Test("Protocol round trip all values")
-    func roundTripAllValues() throws {
+    @Test
+    func `Protocol round trip all values`() throws {
         for value: UInt8 in 0...255 {
             let original = IPProtocol(rawValue: value)
             let bytes = original.bytes
@@ -121,8 +121,8 @@ struct ProtocolTests {
 
     // MARK: - Equality Tests
 
-    @Test("Protocol equality")
-    func equality() {
+    @Test
+    func `Protocol equality`() {
         let proto1 = IPProtocol.tcp
         let proto2 = IPProtocol(rawValue: 6)
         let proto3 = IPProtocol.udp
@@ -133,8 +133,8 @@ struct ProtocolTests {
 
     // MARK: - Hashable Tests
 
-    @Test("Protocol hashable")
-    func hashable() {
+    @Test
+    func `Protocol hashable`() {
         var set: Set<IPProtocol> = []
         set.insert(.tcp)
         set.insert(.udp)
@@ -147,8 +147,8 @@ struct ProtocolTests {
 
     // MARK: - Description Tests
 
-    @Test("Protocol description - known protocols")
-    func descriptionKnown() {
+    @Test
+    func `Protocol description - known protocols`() {
         #expect(IPProtocol.icmp.description == "ICMP")
         #expect(IPProtocol.igmp.description == "IGMP")
         #expect(IPProtocol.tcp.description == "TCP")
@@ -161,8 +161,8 @@ struct ProtocolTests {
         #expect(IPProtocol.sctp.description == "SCTP")
     }
 
-    @Test("Protocol description - unknown protocols")
-    func descriptionUnknown() {
+    @Test
+    func `Protocol description - unknown protocols`() {
         let proto = IPProtocol(rawValue: 99)
         #expect(proto.description == "Protocol(99)")
 
@@ -172,8 +172,8 @@ struct ProtocolTests {
 
     // MARK: - Codable Tests
 
-    @Test("Protocol codable")
-    func codable() throws {
+    @Test
+    func `Protocol codable`() throws {
         let original = IPProtocol.tcp
 
         // Encode

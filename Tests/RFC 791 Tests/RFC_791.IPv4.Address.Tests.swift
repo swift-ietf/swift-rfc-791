@@ -19,8 +19,8 @@ struct IPv4AddressTests {
 
     // MARK: - Initialization Tests
 
-    @Test("IPv4 Address from octets")
-    func initFromOctets() throws {
+    @Test
+    func `IPv4 Address from octets`() throws {
         let address = RFC_791.IPv4.Address(192, 168, 1, 1)
 
         #expect(address.octets.0 == 192)
@@ -29,8 +29,8 @@ struct IPv4AddressTests {
         #expect(address.octets.3 == 1)
     }
 
-    @Test("IPv4 Address from raw value")
-    func initFromRawValue() throws {
+    @Test
+    func `IPv4 Address from raw value`() throws {
         // 192.168.1.1 = 0xC0A80101
         let address = RFC_791.IPv4.Address(rawValue: 0xC0A8_0101)
 
@@ -41,8 +41,8 @@ struct IPv4AddressTests {
         #expect(d == 1)
     }
 
-    @Test("IPv4 Address from string - valid")
-    func initFromStringValid() throws {
+    @Test
+    func `IPv4 Address from string - valid`() throws {
         let address: RFC_791.IPv4.Address = try .init("192.168.1.1")
 
         #expect(address.octets.0 == 192)
@@ -51,8 +51,8 @@ struct IPv4AddressTests {
         #expect(address.octets.3 == 1)
     }
 
-    @Test("IPv4 Address from string - edge cases")
-    func initFromStringEdgeCases() throws {
+    @Test
+    func `IPv4 Address from string - edge cases`() throws {
         // All zeros
         let zeros: RFC_791.IPv4.Address = try .init("0.0.0.0")
         #expect(zeros.rawValue == 0)
@@ -67,8 +67,8 @@ struct IPv4AddressTests {
         #expect(localhost.octets.3 == 1)
     }
 
-    @Test("IPv4 Address from string - invalid format")
-    func initFromStringInvalidFormat() throws {
+    @Test
+    func `IPv4 Address from string - invalid format`() throws {
         let invalid1 = "192.168.1"
         #expect(throws: RFC_791.IPv4.Address.Error.self) {
             let _: RFC_791.IPv4.Address = try .init(invalid1)
@@ -85,8 +85,8 @@ struct IPv4AddressTests {
         }
     }
 
-    @Test("IPv4 Address from string - out of range")
-    func initFromStringOutOfRange() throws {
+    @Test
+    func `IPv4 Address from string - out of range`() throws {
         let outOfRange1 = "256.0.0.1"
         #expect(throws: RFC_791.IPv4.Address.Error.self) {
             let _: RFC_791.IPv4.Address = try .init(outOfRange1)
@@ -103,16 +103,16 @@ struct IPv4AddressTests {
         }
     }
 
-    @Test("IPv4 Address from string literal")
-    func initStringLiteral() throws {
+    @Test
+    func `IPv4 Address from string literal`() throws {
         let address: RFC_791.IPv4.Address = "192.168.1.1"
         #expect(address.description == "192.168.1.1")
     }
 
     // MARK: - String Conversion Tests
 
-    @Test("IPv4 Address description")
-    func description() throws {
+    @Test
+    func `IPv4 Address description`() throws {
         let address = RFC_791.IPv4.Address(192, 168, 1, 1)
         #expect(address.description == "192.168.1.1")
 
@@ -123,8 +123,8 @@ struct IPv4AddressTests {
         #expect(broadcast.description == "255.255.255.255")
     }
 
-    @Test("IPv4 Address round-trip through string")
-    func roundTripString() throws {
+    @Test
+    func `IPv4 Address round-trip through string`() throws {
         let original = "192.168.1.1"
         let address: RFC_791.IPv4.Address = try .init(original)
         let serialized = address.description
@@ -134,8 +134,8 @@ struct IPv4AddressTests {
 
     // MARK: - Equality Tests
 
-    @Test("IPv4 Address equality")
-    func equality() throws {
+    @Test
+    func `IPv4 Address equality`() throws {
         let addr1 = RFC_791.IPv4.Address(192, 168, 1, 1)
         let addr2 = RFC_791.IPv4.Address(192, 168, 1, 1)
         let addr3 = RFC_791.IPv4.Address(192, 168, 1, 2)
@@ -144,8 +144,8 @@ struct IPv4AddressTests {
         #expect(addr1 != addr3)
     }
 
-    @Test("IPv4 Address hashable")
-    func hashable() throws {
+    @Test
+    func `IPv4 Address hashable`() throws {
         let addr1 = RFC_791.IPv4.Address(192, 168, 1, 1)
         let addr2 = RFC_791.IPv4.Address(192, 168, 1, 1)
         let addr3 = RFC_791.IPv4.Address(192, 168, 1, 2)
@@ -162,8 +162,8 @@ struct IPv4AddressTests {
 
     // MARK: - Comparison Tests
 
-    @Test("IPv4 Address comparable")
-    func comparable() throws {
+    @Test
+    func `IPv4 Address comparable`() throws {
         let addr1 = RFC_791.IPv4.Address(192, 168, 1, 1)
         let addr2 = RFC_791.IPv4.Address(192, 168, 1, 10)
         let addr3 = RFC_791.IPv4.Address(192, 168, 2, 1)
@@ -173,8 +173,8 @@ struct IPv4AddressTests {
         #expect(addr1 < addr3)
     }
 
-    @Test("IPv4 Address sorting")
-    func sorting() throws {
+    @Test
+    func `IPv4 Address sorting`() throws {
         let addresses = [
             RFC_791.IPv4.Address(192, 168, 1, 100),
             RFC_791.IPv4.Address(192, 168, 1, 1),
@@ -190,8 +190,8 @@ struct IPv4AddressTests {
         #expect(sorted[3].description == "192.168.1.100")
     }
 
-    @Test("IPv4 Address range operations")
-    func rangeOperations() throws {
+    @Test
+    func `IPv4 Address range operations`() throws {
         let start = RFC_791.IPv4.Address(192, 168, 1, 1)
         let end = RFC_791.IPv4.Address(192, 168, 1, 255)
         let inRange = RFC_791.IPv4.Address(192, 168, 1, 100)
@@ -208,8 +208,8 @@ struct IPv4AddressTests {
 
     // MARK: - Special Addresses Tests
 
-    @Test("IPv4 Address special addresses")
-    func specialAddresses() throws {
+    @Test
+    func `IPv4 Address special addresses`() throws {
         // Loopback
         let loopback = RFC_791.IPv4.Address(127, 0, 0, 1)
         #expect(loopback.description == "127.0.0.1")
@@ -235,8 +235,8 @@ struct IPv4AddressTests {
 
     // MARK: - Raw Value Tests
 
-    @Test("IPv4 Address raw value consistency")
-    func rawValueConsistency() throws {
+    @Test
+    func `IPv4 Address raw value consistency`() throws {
         let address = RFC_791.IPv4.Address(192, 168, 1, 1)
         let fromRaw = RFC_791.IPv4.Address(rawValue: address.rawValue)
 
@@ -244,8 +244,8 @@ struct IPv4AddressTests {
         #expect(address.octets == fromRaw.octets)
     }
 
-    @Test("IPv4 Address octet extraction")
-    func octetExtraction() throws {
+    @Test
+    func `IPv4 Address octet extraction`() throws {
         let address = RFC_791.IPv4.Address(rawValue: 0xC0A8_0101)
         let (a, b, c, d) = address.octets
 

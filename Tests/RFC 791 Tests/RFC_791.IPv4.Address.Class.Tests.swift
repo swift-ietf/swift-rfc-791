@@ -19,8 +19,8 @@ struct IPv4AddressClassTests {
 
     // MARK: - Class A Tests
 
-    @Test("Class A detection - first octet 0-127")
-    func classADetection() {
+    @Test
+    func `Class A detection - first octet 0-127`() {
         // Class A: leading bit 0 (0.x.x.x - 127.x.x.x)
         let addr0 = RFC_791.IPv4.Address(0, 0, 0, 1)
         #expect(addr0.class == .a)
@@ -34,8 +34,8 @@ struct IPv4AddressClassTests {
 
     // MARK: - Class B Tests
 
-    @Test("Class B detection - first octet 128-191")
-    func classBDetection() {
+    @Test
+    func `Class B detection - first octet 128-191`() {
         // Class B: leading bits 10 (128.x.x.x - 191.x.x.x)
         let addr128 = RFC_791.IPv4.Address(128, 0, 0, 1)
         #expect(addr128.class == .b)
@@ -49,8 +49,8 @@ struct IPv4AddressClassTests {
 
     // MARK: - Class C Tests
 
-    @Test("Class C detection - first octet 192-223")
-    func classCDetection() {
+    @Test
+    func `Class C detection - first octet 192-223`() {
         // Class C: leading bits 110 (192.x.x.x - 223.x.x.x)
         let addr192 = RFC_791.IPv4.Address(192, 0, 0, 1)
         #expect(addr192.class == .c)
@@ -64,8 +64,8 @@ struct IPv4AddressClassTests {
 
     // MARK: - Class D Tests (Multicast)
 
-    @Test("Class D detection - first octet 224-239 (multicast)")
-    func classDDetection() {
+    @Test
+    func `Class D detection - first octet 224-239 (multicast)`() {
         // Class D: leading bits 1110 (224.x.x.x - 239.x.x.x)
         let addr224 = RFC_791.IPv4.Address(224, 0, 0, 1)
         #expect(addr224.class == .d)
@@ -78,8 +78,8 @@ struct IPv4AddressClassTests {
 
     // MARK: - Class E Tests (Reserved)
 
-    @Test("Class E detection - first octet 240-255 (reserved)")
-    func classEDetection() {
+    @Test
+    func `Class E detection - first octet 240-255 (reserved)`() {
         // Class E: leading bits 1111 (240.x.x.x - 255.x.x.x)
         let addr240 = RFC_791.IPv4.Address(240, 0, 0, 1)
         #expect(addr240.class == .e)
@@ -92,8 +92,8 @@ struct IPv4AddressClassTests {
 
     // MARK: - Boundary Tests
 
-    @Test("Class boundaries")
-    func classBoundaries() {
+    @Test
+    func `Class boundaries`() {
         // A/B boundary at 127/128
         #expect(RFC_791.IPv4.Address(127, 0, 0, 0).class == .a)
         #expect(RFC_791.IPv4.Address(128, 0, 0, 0).class == .b)
@@ -113,15 +113,15 @@ struct IPv4AddressClassTests {
 
     // MARK: - Helper Property Tests
 
-    @Test("is.multicast property")
-    func isMulticastProperty() {
+    @Test
+    func `is.multicast property`() {
         #expect(!RFC_791.IPv4.Address(192, 168, 1, 1).is.multicast)
         #expect(RFC_791.IPv4.Address(224, 0, 0, 1).is.multicast)
         #expect(!RFC_791.IPv4.Address(255, 255, 255, 255).is.multicast)
     }
 
-    @Test("is.reserved property")
-    func isReservedProperty() {
+    @Test
+    func `is.reserved property`() {
         #expect(!RFC_791.IPv4.Address(192, 168, 1, 1).is.reserved)
         #expect(!RFC_791.IPv4.Address(224, 0, 0, 1).is.reserved)
         #expect(RFC_791.IPv4.Address(240, 0, 0, 1).is.reserved)
@@ -130,8 +130,8 @@ struct IPv4AddressClassTests {
 
     // MARK: - Description Tests
 
-    @Test("Class description")
-    func classDescription() {
+    @Test
+    func `Class description`() {
         #expect(RFC_791.IPv4.Address.Class.a.description == "Class A")
         #expect(RFC_791.IPv4.Address.Class.b.description == "Class B")
         #expect(RFC_791.IPv4.Address.Class.c.description == "Class C")

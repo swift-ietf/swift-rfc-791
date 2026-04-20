@@ -19,8 +19,8 @@ struct IHLTests {
 
     // MARK: - Raw Value Initialization
 
-    @Test("Valid IHL values (5-15) are accepted")
-    func validRawValues() {
+    @Test
+    func `Valid IHL values (5-15) are accepted`() {
         for value: UInt8 in 5...15 {
             let ihl = RFC_791.IHL(rawValue: value)
             #expect(ihl != nil)
@@ -28,16 +28,16 @@ struct IHLTests {
         }
     }
 
-    @Test("Invalid IHL values (<5) are rejected")
-    func invalidRawValuesTooSmall() {
+    @Test
+    func `Invalid IHL values (<5) are rejected`() {
         for value: UInt8 in 0..<5 {
             let ihl = RFC_791.IHL(rawValue: value)
             #expect(ihl == nil)
         }
     }
 
-    @Test("Invalid IHL values (>15) are rejected")
-    func invalidRawValuesTooLarge() {
+    @Test
+    func `Invalid IHL values (>15) are rejected`() {
         for value: UInt8 in 16...255 {
             let ihl = RFC_791.IHL(rawValue: value)
             #expect(ihl == nil)
@@ -46,38 +46,38 @@ struct IHLTests {
 
     // MARK: - Static Constants
 
-    @Test("Minimum IHL constant")
-    func minimumConstant() {
+    @Test
+    func `Minimum IHL constant`() {
         #expect(RFC_791.IHL.minimum.rawValue == 5)
         #expect(RFC_791.IHL.minimum.byteLength == 20)
     }
 
-    @Test("Maximum IHL constant")
-    func maximumConstant() {
+    @Test
+    func `Maximum IHL constant`() {
         #expect(RFC_791.IHL.maximum.rawValue == 15)
         #expect(RFC_791.IHL.maximum.byteLength == 60)
     }
 
     // MARK: - Computed Properties
 
-    @Test("byteLength calculation")
-    func byteLengthCalculation() {
+    @Test
+    func `byteLength calculation`() {
         #expect(RFC_791.IHL(rawValue: 5)?.byteLength == 20)
         #expect(RFC_791.IHL(rawValue: 6)?.byteLength == 24)
         #expect(RFC_791.IHL(rawValue: 10)?.byteLength == 40)
         #expect(RFC_791.IHL(rawValue: 15)?.byteLength == 60)
     }
 
-    @Test("optionsLength calculation")
-    func optionsLengthCalculation() {
+    @Test
+    func `optionsLength calculation`() {
         #expect(RFC_791.IHL(rawValue: 5)?.optionsLength == 0)
         #expect(RFC_791.IHL(rawValue: 6)?.optionsLength == 4)
         #expect(RFC_791.IHL(rawValue: 10)?.optionsLength == 20)
         #expect(RFC_791.IHL(rawValue: 15)?.optionsLength == 40)
     }
 
-    @Test("hasOptions property")
-    func hasOptionsProperty() {
+    @Test
+    func `hasOptions property`() {
         #expect(RFC_791.IHL(rawValue: 5)?.hasOptions == false)
         #expect(RFC_791.IHL(rawValue: 6)?.hasOptions == true)
         #expect(RFC_791.IHL(rawValue: 15)?.hasOptions == true)
@@ -85,15 +85,15 @@ struct IHLTests {
 
     // MARK: - Factory Methods
 
-    @Test("Create from byte length")
-    func createFromByteLength() {
+    @Test
+    func `Create from byte length`() {
         #expect(RFC_791.IHL.fromByteLength(20)?.rawValue == 5)
         #expect(RFC_791.IHL.fromByteLength(24)?.rawValue == 6)
         #expect(RFC_791.IHL.fromByteLength(60)?.rawValue == 15)
     }
 
-    @Test("Create from invalid byte length")
-    func createFromInvalidByteLength() {
+    @Test
+    func `Create from invalid byte length`() {
         #expect(RFC_791.IHL.fromByteLength(16) == nil)  // Too small
         #expect(RFC_791.IHL.fromByteLength(64) == nil)  // Too large
         #expect(RFC_791.IHL.fromByteLength(21) == nil)  // Not divisible by 4
@@ -101,31 +101,31 @@ struct IHLTests {
 
     // MARK: - Byte Parsing
 
-    @Test("Parse IHL from bytes")
-    func parseFromBytes() throws {
+    @Test
+    func `Parse IHL from bytes`() throws {
         // IHL is in lower 4 bits
         let bytes: [UInt8] = [0x45]  // Version 4, IHL 5
         let ihl = try RFC_791.IHL(bytes: bytes)
         #expect(ihl.rawValue == 5)
     }
 
-    @Test("Parse IHL 15 from bytes")
-    func parseMaxFromBytes() throws {
+    @Test
+    func `Parse IHL 15 from bytes`() throws {
         let bytes: [UInt8] = [0x4F]  // Version 4, IHL 15
         let ihl = try RFC_791.IHL(bytes: bytes)
         #expect(ihl.rawValue == 15)
     }
 
-    @Test("Parse from empty bytes throws error")
-    func parseEmptyBytesThrows() {
+    @Test
+    func `Parse from empty bytes throws error`() {
         let bytes: [UInt8] = []
         #expect(throws: RFC_791.IHL.Error.empty) {
             try RFC_791.IHL(bytes: bytes)
         }
     }
 
-    @Test("Parse invalid IHL from bytes throws error")
-    func parseInvalidBytesThrows() {
+    @Test
+    func `Parse invalid IHL from bytes throws error`() {
         let bytes: [UInt8] = [0x43]  // Version 4, IHL 3 (invalid)
         #expect(throws: RFC_791.IHL.Error.tooSmall(3)) {
             try RFC_791.IHL(bytes: bytes)
@@ -134,15 +134,15 @@ struct IHLTests {
 
     // MARK: - Serialization
 
-    @Test("Serialize IHL to bytes")
-    func serializeToBytes() {
+    @Test
+    func `Serialize IHL to bytes`() {
         var buffer: [UInt8] = []
         RFC_791.IHL.minimum.serialize(into: &buffer)
         #expect(buffer == [0x05])  // Lower nibble only
     }
 
-    @Test("Round-trip serialization")
-    func roundTripSerialization() throws {
+    @Test
+    func `Round-trip serialization`() throws {
         let original = RFC_791.IHL(rawValue: 10)!
         var buffer: [UInt8] = []
         original.serialize(into: &buffer)
@@ -153,24 +153,24 @@ struct IHLTests {
 
     // MARK: - CustomStringConvertible
 
-    @Test("Description format")
-    func descriptionFormat() {
+    @Test
+    func `Description format`() {
         #expect(RFC_791.IHL(rawValue: 5)?.description == "IHL(5 words, 20 bytes)")
         #expect(RFC_791.IHL(rawValue: 15)?.description == "IHL(15 words, 60 bytes)")
     }
 
     // MARK: - Comparable
 
-    @Test("IHL values are comparable")
-    func comparable() {
+    @Test
+    func `IHL values are comparable`() {
         #expect(RFC_791.IHL.minimum < RFC_791.IHL.maximum)
         #expect(RFC_791.IHL(rawValue: 6)! < RFC_791.IHL(rawValue: 10)!)
     }
 
     // MARK: - Error Tests
 
-    @Test("Error descriptions")
-    func errorDescriptions() {
+    @Test
+    func `Error descriptions`() {
         #expect(RFC_791.IHL.Error.empty.description == "IHL data cannot be empty")
         let tooSmallDesc = RFC_791.IHL.Error.tooSmall(3).description
         #expect(tooSmallDesc == "IHL value 3 is too small (minimum is 5)")

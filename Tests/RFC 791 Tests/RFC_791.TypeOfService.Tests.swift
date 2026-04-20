@@ -19,16 +19,16 @@ struct TypeOfServiceTests {
 
     // MARK: - Initialization Tests
 
-    @Test("TypeOfService from raw value - valid")
-    func initFromRawValueValid() {
+    @Test
+    func `TypeOfService from raw value - valid`() {
         // Valid: reserved bits (6-7) are zero
         let tos = RFC_791.TypeOfService(rawValue: 0b1110_0100)
         #expect(tos != nil)
         #expect(tos?.rawValue == 0b1110_0100)
     }
 
-    @Test("TypeOfService from raw value - invalid (reserved bits set)")
-    func initFromRawValueInvalid() {
+    @Test
+    func `TypeOfService from raw value - invalid (reserved bits set)`() {
         // Invalid: reserved bit 0 set
         #expect(RFC_791.TypeOfService(rawValue: 0b0000_0001) == nil)
         // Invalid: reserved bit 1 set
@@ -37,8 +37,8 @@ struct TypeOfServiceTests {
         #expect(RFC_791.TypeOfService(rawValue: 0b0000_0011) == nil)
     }
 
-    @Test("TypeOfService from components")
-    func initFromComponents() {
+    @Test
+    func `TypeOfService from components`() {
         let tos = RFC_791.TypeOfService(
             precedence: .immediate,
             lowDelay: true,
@@ -52,8 +52,8 @@ struct TypeOfServiceTests {
         #expect(tos.highReliability == true)
     }
 
-    @Test("TypeOfService default values")
-    func initDefaultValues() {
+    @Test
+    func `TypeOfService default values`() {
         let tos = RFC_791.TypeOfService()
 
         #expect(tos.precedence == .routine)
@@ -64,8 +64,8 @@ struct TypeOfServiceTests {
 
     // MARK: - Component Access Tests
 
-    @Test("TypeOfService precedence extraction")
-    func precedenceExtraction() {
+    @Test
+    func `TypeOfService precedence extraction`() {
         // Precedence in bits 0-2 (most significant)
         // 0b111_00000 = Network Control (7)
         let tos = RFC_791.TypeOfService(rawValue: 0b1110_0000)!
@@ -76,8 +76,8 @@ struct TypeOfServiceTests {
         #expect(tos2.precedence == .immediate)
     }
 
-    @Test("TypeOfService flag extraction")
-    func flagExtraction() {
+    @Test
+    func `TypeOfService flag extraction`() {
         // Bit 3 = Low Delay (0b0001_0000)
         let lowDelay = RFC_791.TypeOfService(rawValue: 0b0001_0000)!
         #expect(lowDelay.lowDelay == true)
@@ -105,8 +105,8 @@ struct TypeOfServiceTests {
 
     // MARK: - Static Constants Tests
 
-    @Test("TypeOfService static constants")
-    func staticConstants() {
+    @Test
+    func `TypeOfService static constants`() {
         #expect(RFC_791.TypeOfService.default.rawValue == 0)
         #expect(RFC_791.TypeOfService.minimizeDelay.lowDelay == true)
         #expect(RFC_791.TypeOfService.maximizeThroughput.highThroughput == true)
@@ -115,8 +115,8 @@ struct TypeOfServiceTests {
 
     // MARK: - Byte Parsing Tests
 
-    @Test("TypeOfService from bytes - valid")
-    func initFromBytesValid() throws {
+    @Test
+    func `TypeOfService from bytes - valid`() throws {
         let tos = try RFC_791.TypeOfService(bytes: [0b0101_1100])
         #expect(tos.precedence == .immediate)
         #expect(tos.lowDelay == true)
@@ -124,15 +124,15 @@ struct TypeOfServiceTests {
         #expect(tos.highReliability == true)
     }
 
-    @Test("TypeOfService from bytes - empty")
-    func initFromBytesEmpty() {
+    @Test
+    func `TypeOfService from bytes - empty`() {
         #expect(throws: RFC_791.TypeOfService.Error.self) {
             _ = try RFC_791.TypeOfService(bytes: [] as [UInt8])
         }
     }
 
-    @Test("TypeOfService from bytes - reserved bits set")
-    func initFromBytesReservedBits() {
+    @Test
+    func `TypeOfService from bytes - reserved bits set`() {
         #expect(throws: RFC_791.TypeOfService.Error.self) {
             _ = try RFC_791.TypeOfService(bytes: [0b0000_0001])
         }
@@ -140,8 +140,8 @@ struct TypeOfServiceTests {
 
     // MARK: - Serialization Tests
 
-    @Test("TypeOfService serialization")
-    func serialization() {
+    @Test
+    func `TypeOfService serialization`() {
         let tos = RFC_791.TypeOfService(
             precedence: .flash,
             lowDelay: true,
@@ -156,16 +156,16 @@ struct TypeOfServiceTests {
         #expect(buffer == [0x70])
     }
 
-    @Test("TypeOfService bytes property")
-    func bytesProperty() {
+    @Test
+    func `TypeOfService bytes property`() {
         let tos = RFC_791.TypeOfService.minimizeDelay
         #expect(tos.bytes == [0b0001_0000])
     }
 
     // MARK: - Round Trip Tests
 
-    @Test("TypeOfService round trip")
-    func roundTrip() throws {
+    @Test
+    func `TypeOfService round trip`() throws {
         let original = RFC_791.TypeOfService(
             precedence: .criticEcp,
             lowDelay: true,
@@ -185,8 +185,8 @@ struct TypeOfServiceTests {
 
     // MARK: - Equality Tests
 
-    @Test("TypeOfService equality")
-    func equality() {
+    @Test
+    func `TypeOfService equality`() {
         let tos1 = RFC_791.TypeOfService(precedence: .flash, lowDelay: true)
         let tos2 = RFC_791.TypeOfService(precedence: .flash, lowDelay: true)
         let tos3 = RFC_791.TypeOfService(precedence: .flash, lowDelay: false)
@@ -197,8 +197,8 @@ struct TypeOfServiceTests {
 
     // MARK: - Hashable Tests
 
-    @Test("TypeOfService hashable")
-    func hashable() {
+    @Test
+    func `TypeOfService hashable`() {
         var set: Set<RFC_791.TypeOfService> = []
         set.insert(.default)
         set.insert(.minimizeDelay)
@@ -209,8 +209,8 @@ struct TypeOfServiceTests {
 
     // MARK: - Description Tests
 
-    @Test("TypeOfService description")
-    func description() {
+    @Test
+    func `TypeOfService description`() {
         let tos = RFC_791.TypeOfService(
             precedence: .immediate,
             lowDelay: true,

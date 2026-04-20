@@ -19,8 +19,8 @@ struct VersionTests {
 
     // MARK: - Raw Value Initialization
 
-    @Test("Valid version values (0-15) are accepted")
-    func validRawValues() {
+    @Test
+    func `Valid version values (0-15) are accepted`() {
         for value: UInt8 in 0...15 {
             let version = RFC_791.Version(rawValue: value)
             #expect(version != nil)
@@ -28,8 +28,8 @@ struct VersionTests {
         }
     }
 
-    @Test("Invalid version values (>15) are rejected")
-    func invalidRawValues() {
+    @Test
+    func `Invalid version values (>15) are rejected`() {
         for value: UInt8 in 16...255 {
             let version = RFC_791.Version(rawValue: value)
             #expect(version == nil)
@@ -38,29 +38,29 @@ struct VersionTests {
 
     // MARK: - Static Constants
 
-    @Test("IPv4 version constant")
-    func ipv4Constant() {
+    @Test
+    func `IPv4 version constant`() {
         #expect(RFC_791.Version.v4.rawValue == 4)
         #expect(RFC_791.Version.v4.isIPv4)
     }
 
-    @Test("IPv6 version constant")
-    func ipv6Constant() {
+    @Test
+    func `IPv6 version constant`() {
         #expect(RFC_791.Version.v6.rawValue == 6)
         #expect(RFC_791.Version.v6.isIPv6)
     }
 
     // MARK: - Computed Properties
 
-    @Test("isIPv4 property")
-    func isIPv4Property() {
+    @Test
+    func `isIPv4 property`() {
         #expect(RFC_791.Version(rawValue: 4)?.isIPv4 == true)
         #expect(RFC_791.Version(rawValue: 6)?.isIPv4 == false)
         #expect(RFC_791.Version(rawValue: 0)?.isIPv4 == false)
     }
 
-    @Test("isIPv6 property")
-    func isIPv6Property() {
+    @Test
+    func `isIPv6 property`() {
         #expect(RFC_791.Version(rawValue: 6)?.isIPv6 == true)
         #expect(RFC_791.Version(rawValue: 4)?.isIPv6 == false)
         #expect(RFC_791.Version(rawValue: 0)?.isIPv6 == false)
@@ -68,23 +68,23 @@ struct VersionTests {
 
     // MARK: - Byte Parsing
 
-    @Test("Parse version from bytes")
-    func parseFromBytes() throws {
+    @Test
+    func `Parse version from bytes`() throws {
         // Version is in upper 4 bits
         let bytes: [UInt8] = [0x45]  // Version 4, IHL 5
         let version = try RFC_791.Version(bytes: bytes)
         #expect(version.rawValue == 4)
     }
 
-    @Test("Parse version 6 from bytes")
-    func parseVersion6FromBytes() throws {
+    @Test
+    func `Parse version 6 from bytes`() throws {
         let bytes: [UInt8] = [0x60]  // Version 6
         let version = try RFC_791.Version(bytes: bytes)
         #expect(version.rawValue == 6)
     }
 
-    @Test("Parse from empty bytes throws error")
-    func parseEmptyBytesThrows() {
+    @Test
+    func `Parse from empty bytes throws error`() {
         let bytes: [UInt8] = []
         #expect(throws: RFC_791.Version.Error.empty) {
             try RFC_791.Version(bytes: bytes)
@@ -93,15 +93,15 @@ struct VersionTests {
 
     // MARK: - Serialization
 
-    @Test("Serialize version to bytes")
-    func serializeToBytes() {
+    @Test
+    func `Serialize version to bytes`() {
         var buffer: [UInt8] = []
         RFC_791.Version.v4.serialize(into: &buffer)
         #expect(buffer == [0x40])  // Upper nibble only
     }
 
-    @Test("Round-trip serialization")
-    func roundTripSerialization() throws {
+    @Test
+    func `Round-trip serialization`() throws {
         let original = RFC_791.Version.v4
         var buffer: [UInt8] = []
         original.serialize(into: &buffer)
@@ -112,8 +112,8 @@ struct VersionTests {
 
     // MARK: - CustomStringConvertible
 
-    @Test("Description format")
-    func descriptionFormat() {
+    @Test
+    func `Description format`() {
         #expect(RFC_791.Version.v4.description == "IPv4")
         #expect(RFC_791.Version.v6.description == "IPv6")
         #expect(RFC_791.Version(rawValue: 0)?.description == "Version(0)")
@@ -121,24 +121,24 @@ struct VersionTests {
 
     // MARK: - Comparable
 
-    @Test("Versions are comparable")
-    func comparable() {
+    @Test
+    func `Versions are comparable`() {
         #expect(RFC_791.Version.v4 < RFC_791.Version.v6)
         #expect(RFC_791.Version(rawValue: 0)! < RFC_791.Version.v4)
     }
 
     // MARK: - Equatable
 
-    @Test("Versions are equatable")
-    func equatable() {
+    @Test
+    func `Versions are equatable`() {
         #expect(RFC_791.Version.v4 == RFC_791.Version(rawValue: 4))
         #expect(RFC_791.Version.v6 == RFC_791.Version(rawValue: 6))
     }
 
     // MARK: - Error Tests
 
-    @Test("Error descriptions")
-    func errorDescriptions() {
+    @Test
+    func `Error descriptions`() {
         #expect(RFC_791.Version.Error.empty.description == "Version data cannot be empty")
     }
 }

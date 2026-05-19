@@ -32,10 +32,11 @@ struct ProtocolTests {
 
     @Test
     func `Protocol all values valid`() {
-        // All UInt8 values are valid protocol numbers
+        // All Byte values are valid protocol numbers
         for value: UInt8 in 0...255 {
-            let proto = IPProtocol(rawValue: value)
-            #expect(proto.rawValue == value)
+            let typed = Byte(value)
+            let proto = IPProtocol(rawValue: typed)
+            #expect(proto.rawValue == typed)
         }
     }
 
@@ -72,7 +73,7 @@ struct ProtocolTests {
     @Test
     func `Protocol from bytes - empty`() {
         #expect(throws: IPProtocol.Error.self) {
-            _ = try IPProtocol(bytes: [] as [UInt8])
+            _ = try IPProtocol(bytes: [] as [Byte])
         }
     }
 
@@ -88,7 +89,7 @@ struct ProtocolTests {
     @Test
     func `Protocol serialization`() {
         let proto = IPProtocol.tcp
-        var buffer: [UInt8] = []
+        var buffer: [Byte] = []
         proto.serialize(into: &buffer)
         #expect(buffer == [0x06])
     }
@@ -112,7 +113,7 @@ struct ProtocolTests {
     @Test
     func `Protocol round trip all values`() throws {
         for value: UInt8 in 0...255 {
-            let original = IPProtocol(rawValue: value)
+            let original = IPProtocol(rawValue: Byte(value))
             let bytes = original.bytes
             let parsed = try IPProtocol(bytes: bytes)
             #expect(parsed == original)

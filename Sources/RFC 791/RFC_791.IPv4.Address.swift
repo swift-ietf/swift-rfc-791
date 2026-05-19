@@ -73,7 +73,7 @@ extension RFC_791.IPv4 {
 extension RFC_791.IPv4.Address {
     /// Creates an IPv4 address from four octets
     ///
-    /// Constructs the address from four 8-bit values in standard dotted-decimal order.
+    /// Constructs the address from four byte-domain values in standard dotted-decimal order.
     ///
     /// - Parameters:
     ///   - octet1: First octet (most significant byte)
@@ -86,6 +86,19 @@ extension RFC_791.IPv4.Address {
     /// ```swift
     /// let address = RFC_791.IPv4.Address(192, 168, 1, 1)
     /// ```
+    public init(_ octet1: Byte, _ octet2: Byte, _ octet3: Byte, _ octet4: Byte) {
+        // UInt32 storage is arithmetic-domain; cross the byte-domain boundary
+        // via .underlying.
+        let value =
+            UInt32(octet1.underlying) << 24
+            | UInt32(octet2.underlying) << 16
+            | UInt32(octet3.underlying) << 8
+            | UInt32(octet4.underlying)
+        self.init(__unchecked: (), rawValue: value)
+    }
+
+    /// Stdlib-interop forwarder: construction from four `UInt8` octets.
+    @_disfavoredOverload
     public init(_ octet1: UInt8, _ octet2: UInt8, _ octet3: UInt8, _ octet4: UInt8) {
         let value =
             UInt32(octet1) << 24
@@ -101,7 +114,7 @@ extension RFC_791.IPv4.Address {
 extension RFC_791.IPv4.Address {
     /// The four octets of the address in standard order
     ///
-    /// Returns the address as a tuple of four 8-bit values in the order
+    /// Returns the address as a tuple of four byte-domain values in the order
     /// they appear in dotted-decimal notation.
     ///
     /// ## Example
@@ -111,22 +124,22 @@ extension RFC_791.IPv4.Address {
     /// let (a, b, c, d) = address.octets
     /// // a = 192, b = 168, c = 1, d = 1
     /// ```
-    public var octets: (UInt8, UInt8, UInt8, UInt8) {
+    public var octets: (Byte, Byte, Byte, Byte) {
         (
-            UInt8((rawValue >> 24) & 0xFF),
-            UInt8((rawValue >> 16) & 0xFF),
-            UInt8((rawValue >> 8) & 0xFF),
-            UInt8(rawValue & 0xFF)
+            Byte(UInt8((rawValue >> 24) & 0xFF)),
+            Byte(UInt8((rawValue >> 16) & 0xFF)),
+            Byte(UInt8((rawValue >> 8) & 0xFF)),
+            Byte(UInt8(rawValue & 0xFF))
         )
     }
 }
 
-// MARK: - Binary.ASCII.Serializable Conformance
+// MARK: - Binary.Serializable Conformance
 extension RFC_791.IPv4.Address: Binary.Serializable {
     static public func serialize<Buffer>(
         _ address: RFC_791.IPv4.Address,
         into buffer: inout Buffer
-    ) where Buffer: RangeReplaceableCollection, Buffer.Element == UInt8 {
+    ) where Buffer: RangeReplaceableCollection, Buffer.Element == Byte {
         let (a, b, c, d) = address.octets
         buffer.append(a)
         buffer.append(b)
@@ -139,7 +152,7 @@ extension RFC_791.IPv4.Address: Binary.Serializable {
     /// - Parameter bytes: Exactly 4 bytes in network byte order
     /// - Throws: `Error.invalidFormat` if not exactly 4 bytes
     public init<Bytes: Collection>(binary bytes: Bytes) throws(Error)
-    where Bytes.Element == UInt8 {
+    where Bytes.Element == Byte {
         guard bytes.count == 4 else {
             throw .invalidFormat("Expected 4 bytes, got \(bytes.count)")
         }
@@ -197,14 +210,15 @@ extension RFC_791.IPv4.Address: Binary.ASCII.Serializable {
             buffer.append(Byte(ASCII.Code.`0`.underlying &+ ones))
         }
 
-        // Serialize: <a>.<b>.<c>.<d>
-        appendDecimal(a)
+        // Serialize: <a>.<b>.<c>.<d>. octets are Byte; bridge via .underlying
+        // at the conformance boundary for arithmetic-domain digit calculation.
+        appendDecimal(a.underlying)
         buffer.append(ASCII.Code.period)
-        appendDecimal(b)
+        appendDecimal(b.underlying)
         buffer.append(ASCII.Code.period)
-        appendDecimal(c)
+        appendDecimal(c.underlying)
         buffer.append(ASCII.Code.period)
-        appendDecimal(d)
+        appendDecimal(d.underlying)
     }
 
     /// Creates an IPv4 address from ASCII bytes in dotted-decimal notation

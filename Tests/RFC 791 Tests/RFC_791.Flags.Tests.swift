@@ -115,7 +115,7 @@ struct FlagsTests {
     @Test
     func `Flags from bytes - empty`() {
         #expect(throws: RFC_791.Flags.Error.self) {
-            _ = try RFC_791.Flags(bytes: [] as [UInt8])
+            _ = try RFC_791.Flags(bytes: [] as [Byte])
         }
     }
 
@@ -132,7 +132,7 @@ struct FlagsTests {
     @Test
     func `Flags serialization`() {
         let flags = RFC_791.Flags(dontFragment: true, moreFragments: false)
-        var buffer: [UInt8] = []
+        var buffer: [Byte] = []
         flags.serialize(into: &buffer)
 
         // DF = bit 1 = 0b010, shifted left 5 = 0b0100_0000

@@ -31,28 +31,28 @@ struct IdentificationTests {
 
     @Test
     func `Parse identification from bytes (big-endian)`() throws {
-        let bytes: [UInt8] = [0x12, 0x34]
+        let bytes: [Byte] = [0x12, 0x34]
         let id = try RFC_791.Identification(bytes: bytes)
         #expect(id.rawValue == 0x1234)
     }
 
     @Test
     func `Parse maximum value from bytes`() throws {
-        let bytes: [UInt8] = [0xFF, 0xFF]
+        let bytes: [Byte] = [0xFF, 0xFF]
         let id = try RFC_791.Identification(bytes: bytes)
         #expect(id.rawValue == 65535)
     }
 
     @Test
     func `Parse zero from bytes`() throws {
-        let bytes: [UInt8] = [0x00, 0x00]
+        let bytes: [Byte] = [0x00, 0x00]
         let id = try RFC_791.Identification(bytes: bytes)
         #expect(id.rawValue == 0)
     }
 
     @Test
     func `Parse from empty bytes throws error`() {
-        let bytes: [UInt8] = []
+        let bytes: [Byte] = []
         #expect(throws: RFC_791.Identification.Error.empty) {
             try RFC_791.Identification(bytes: bytes)
         }
@@ -60,7 +60,7 @@ struct IdentificationTests {
 
     @Test
     func `Parse from insufficient bytes throws error`() {
-        let bytes: [UInt8] = [0x12]
+        let bytes: [Byte] = [0x12]
         #expect(throws: RFC_791.Identification.Error.insufficientBytes) {
             try RFC_791.Identification(bytes: bytes)
         }
@@ -70,14 +70,14 @@ struct IdentificationTests {
 
     @Test
     func `Serialize identification to bytes (big-endian)`() {
-        var buffer: [UInt8] = []
+        var buffer: [Byte] = []
         RFC_791.Identification(rawValue: 0x1234).serialize(into: &buffer)
         #expect(buffer == [0x12, 0x34])
     }
 
     @Test
     func `Serialize maximum value`() {
-        var buffer: [UInt8] = []
+        var buffer: [Byte] = []
         RFC_791.Identification(rawValue: 0xFFFF).serialize(into: &buffer)
         #expect(buffer == [0xFF, 0xFF])
     }
@@ -85,7 +85,7 @@ struct IdentificationTests {
     @Test
     func `Round-trip serialization`() throws {
         let original = RFC_791.Identification(rawValue: 0xABCD)
-        var buffer: [UInt8] = []
+        var buffer: [Byte] = []
         original.serialize(into: &buffer)
 
         let parsed = try RFC_791.Identification(bytes: buffer)

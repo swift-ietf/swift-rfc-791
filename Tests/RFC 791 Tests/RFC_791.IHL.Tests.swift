@@ -21,6 +21,7 @@ struct IHLTests {
 
     @Test
     func `Valid IHL values (5-15) are accepted`() {
+        // IHL.rawValue stays UInt8 (arithmetic-domain: × 4 multiplier).
         for value: UInt8 in 5...15 {
             let ihl = RFC_791.IHL(rawValue: value)
             #expect(ihl != nil)
@@ -104,21 +105,21 @@ struct IHLTests {
     @Test
     func `Parse IHL from bytes`() throws {
         // IHL is in lower 4 bits
-        let bytes: [UInt8] = [0x45]  // Version 4, IHL 5
+        let bytes: [Byte] = [0x45]  // Version 4, IHL 5
         let ihl = try RFC_791.IHL(bytes: bytes)
         #expect(ihl.rawValue == 5)
     }
 
     @Test
     func `Parse IHL 15 from bytes`() throws {
-        let bytes: [UInt8] = [0x4F]  // Version 4, IHL 15
+        let bytes: [Byte] = [0x4F]  // Version 4, IHL 15
         let ihl = try RFC_791.IHL(bytes: bytes)
         #expect(ihl.rawValue == 15)
     }
 
     @Test
     func `Parse from empty bytes throws error`() {
-        let bytes: [UInt8] = []
+        let bytes: [Byte] = []
         #expect(throws: RFC_791.IHL.Error.empty) {
             try RFC_791.IHL(bytes: bytes)
         }
@@ -126,7 +127,7 @@ struct IHLTests {
 
     @Test
     func `Parse invalid IHL from bytes throws error`() {
-        let bytes: [UInt8] = [0x43]  // Version 4, IHL 3 (invalid)
+        let bytes: [Byte] = [0x43]  // Version 4, IHL 3 (invalid)
         #expect(throws: RFC_791.IHL.Error.tooSmall(3)) {
             try RFC_791.IHL(bytes: bytes)
         }
@@ -136,7 +137,7 @@ struct IHLTests {
 
     @Test
     func `Serialize IHL to bytes`() {
-        var buffer: [UInt8] = []
+        var buffer: [Byte] = []
         RFC_791.IHL.minimum.serialize(into: &buffer)
         #expect(buffer == [0x05])  // Lower nibble only
     }
@@ -144,7 +145,7 @@ struct IHLTests {
     @Test
     func `Round-trip serialization`() throws {
         let original = RFC_791.IHL(rawValue: 10)!
-        var buffer: [UInt8] = []
+        var buffer: [Byte] = []
         original.serialize(into: &buffer)
 
         let parsed = try RFC_791.IHL(bytes: buffer)

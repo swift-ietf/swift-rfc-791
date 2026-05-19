@@ -67,7 +67,7 @@ extension RFC_791.Identification {
     /// - Parameter bytes: Binary data containing the identification (2 bytes, big-endian)
     /// - Throws: `Error` if there are insufficient bytes
     public init<Bytes: Collection>(bytes: Bytes) throws(Error)
-    where Bytes.Element == UInt8 {
+    where Bytes.Element == Byte {
         var iterator = bytes.makeIterator()
 
         guard let high = iterator.next() else {
@@ -77,7 +77,9 @@ extension RFC_791.Identification {
             throw .insufficientBytes
         }
 
-        let value = UInt16(high) << 8 | UInt16(low)
+        // UInt16 storage is arithmetic-domain; cross the byte-domain boundary
+        // via .underlying at the conformance boundary.
+        let value = UInt16(high.underlying) << 8 | UInt16(low.underlying)
         self.init(__unchecked: (), rawValue: value)
     }
 }
@@ -88,27 +90,35 @@ extension RFC_791.Identification: Binary.Serializable {
     public static func serialize<Buffer: RangeReplaceableCollection>(
         _ identification: Self,
         into buffer: inout Buffer
-    ) where Buffer.Element == UInt8 {
-        buffer.append(UInt8(identification.rawValue >> 8))
-        buffer.append(UInt8(identification.rawValue & 0xFF))
+    ) where Buffer.Element == Byte {
+        // UInt16 → [Byte] via Byte-primary BinaryInteger.bytes(endianness:).
+        buffer.append(contentsOf: identification.rawValue.bytes(endianness: .big))
     }
 }
 
-// MARK: - [UInt8] Conversion
+// MARK: - [Byte] Conversion
 
-extension [UInt8] {
+extension [Byte] {
     /// Creates byte representation of an Identification field (big-endian)
     ///
     /// ## Category Theory
     ///
-    /// Natural transformation: RFC_791.Identification → [UInt8]
+    /// Natural transformation: RFC_791.Identification → [Byte]
     ///
     /// - Parameter identification: The Identification value to serialize
     public init(_ identification: RFC_791.Identification) {
-        self = [
-            UInt8(identification.rawValue >> 8),
-            UInt8(identification.rawValue & 0xFF),
-        ]
+        self = identification.rawValue.bytes(endianness: .big)
+    }
+}
+
+// MARK: - Stdlib-Interop [UInt8] Forwarder
+
+extension [UInt8] {
+    /// Stdlib-interop forwarder: byte representation as `[UInt8]`.
+    @_disfavoredOverload
+    public init(_ identification: RFC_791.Identification) {
+        let typed: [Byte] = identification.rawValue.bytes(endianness: .big)
+        self = typed.underlying
     }
 }
 

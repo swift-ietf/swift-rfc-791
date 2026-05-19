@@ -34,7 +34,7 @@ extension RFC_791 {
     /// ```
     public struct Version: RawRepresentable, Hashable, Sendable, Codable {
         /// The 4-bit raw value (0-15)
-        public let rawValue: UInt8
+        public let rawValue: Byte
 
         /// Creates a Version value WITHOUT validation
         ///
@@ -42,7 +42,7 @@ extension RFC_791 {
         /// - Static constants
         /// - Pre-validated values
         /// - Internal construction after validation
-        init(__unchecked: Void, rawValue: UInt8) {
+        init(__unchecked: Void, rawValue: Byte) {
             self.rawValue = rawValue
         }
 
@@ -50,7 +50,7 @@ extension RFC_791 {
         ///
         /// - Parameter rawValue: The version number (0-15)
         /// - Returns: `nil` if the value exceeds 15
-        public init?(rawValue: UInt8) {
+        public init?(rawValue: Byte) {
             guard rawValue <= 15 else {
                 return nil
             }
@@ -84,7 +84,7 @@ extension RFC_791.Version {
     /// - Parameter bytes: Binary data containing the version
     /// - Throws: `Error` if the input is empty
     public init<Bytes: Collection>(bytes: Bytes) throws(Error)
-    where Bytes.Element == UInt8 {
+    where Bytes.Element == Byte {
         guard let firstByte = bytes.first else {
             throw .empty
         }
@@ -102,7 +102,7 @@ extension RFC_791.Version: Binary.Serializable {
     static public func serialize<Buffer>(
         _ version: RFC_791.Version,
         into buffer: inout Buffer
-    ) where Buffer: RangeReplaceableCollection, Buffer.Element == UInt8 {
+    ) where Buffer: RangeReplaceableCollection, Buffer.Element == Byte {
         buffer.append(version.rawValue << 4)
     }
 }

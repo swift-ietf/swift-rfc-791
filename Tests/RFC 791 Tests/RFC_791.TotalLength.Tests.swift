@@ -78,21 +78,21 @@ struct TotalLengthTests {
 
     @Test
     func `Parse total length from bytes (big-endian)`() throws {
-        let bytes: [UInt8] = [0x05, 0xDC]  // 1500
+        let bytes: [Byte] = [0x05, 0xDC]  // 1500
         let length = try RFC_791.TotalLength(bytes: bytes)
         #expect(length.rawValue == 1500)
     }
 
     @Test
     func `Parse minimum from bytes`() throws {
-        let bytes: [UInt8] = [0x00, 0x14]  // 20
+        let bytes: [Byte] = [0x00, 0x14]  // 20
         let length = try RFC_791.TotalLength(bytes: bytes)
         #expect(length.rawValue == 20)
     }
 
     @Test
     func `Parse from empty bytes throws error`() {
-        let bytes: [UInt8] = []
+        let bytes: [Byte] = []
         #expect(throws: RFC_791.TotalLength.Error.empty) {
             try RFC_791.TotalLength(bytes: bytes)
         }
@@ -100,7 +100,7 @@ struct TotalLengthTests {
 
     @Test
     func `Parse from insufficient bytes throws error`() {
-        let bytes: [UInt8] = [0x05]
+        let bytes: [Byte] = [0x05]
         #expect(throws: RFC_791.TotalLength.Error.insufficientBytes) {
             try RFC_791.TotalLength(bytes: bytes)
         }
@@ -108,7 +108,7 @@ struct TotalLengthTests {
 
     @Test
     func `Parse too small value throws error`() {
-        let bytes: [UInt8] = [0x00, 0x10]  // 16 (less than minimum 20)
+        let bytes: [Byte] = [0x00, 0x10]  // 16 (less than minimum 20)
         #expect(throws: RFC_791.TotalLength.Error.tooSmall(16)) {
             try RFC_791.TotalLength(bytes: bytes)
         }
@@ -118,7 +118,7 @@ struct TotalLengthTests {
 
     @Test
     func `Serialize total length to bytes (big-endian)`() {
-        var buffer: [UInt8] = []
+        var buffer: [Byte] = []
         RFC_791.TotalLength(rawValue: 1500)!.serialize(into: &buffer)
         #expect(buffer == [0x05, 0xDC])
     }
@@ -126,7 +126,7 @@ struct TotalLengthTests {
     @Test
     func `Round-trip serialization`() throws {
         let original = RFC_791.TotalLength(rawValue: 576)!
-        var buffer: [UInt8] = []
+        var buffer: [Byte] = []
         original.serialize(into: &buffer)
 
         let parsed = try RFC_791.TotalLength(bytes: buffer)

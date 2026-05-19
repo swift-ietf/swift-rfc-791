@@ -22,7 +22,7 @@ extension RFC_791.Precedence {
         /// The value exceeds the valid range (0-7)
         ///
         /// - Parameter value: The invalid value
-        case valueOutOfRange(_ value: UInt8)
+        case valueOutOfRange(_ value: Byte)
     }
 }
 

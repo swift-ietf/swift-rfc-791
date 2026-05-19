@@ -127,7 +127,7 @@ struct TypeOfServiceTests {
     @Test
     func `TypeOfService from bytes - empty`() {
         #expect(throws: RFC_791.TypeOfService.Error.self) {
-            _ = try RFC_791.TypeOfService(bytes: [] as [UInt8])
+            _ = try RFC_791.TypeOfService(bytes: [] as [Byte])
         }
     }
 
@@ -148,7 +148,7 @@ struct TypeOfServiceTests {
             highThroughput: false,
             highReliability: false
         )
-        var buffer: [UInt8] = []
+        var buffer: [Byte] = []
         tos.serialize(into: &buffer)
 
         // Flash (3) = 0b011, Low Delay = 0b1

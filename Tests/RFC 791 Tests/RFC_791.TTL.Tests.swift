@@ -90,14 +90,14 @@ struct TTLTests {
 
     @Test
     func `Parse TTL from bytes`() throws {
-        let bytes: [UInt8] = [64]
+        let bytes: [Byte] = [64]
         let ttl = try RFC_791.TTL(bytes: bytes)
         #expect(ttl.rawValue == 64)
     }
 
     @Test
     func `Parse from empty bytes throws error`() {
-        let bytes: [UInt8] = []
+        let bytes: [Byte] = []
         #expect(throws: RFC_791.TTL.Error.empty) {
             try RFC_791.TTL(bytes: bytes)
         }
@@ -107,7 +107,7 @@ struct TTLTests {
 
     @Test
     func `Serialize TTL to bytes`() {
-        var buffer: [UInt8] = []
+        var buffer: [Byte] = []
         RFC_791.TTL.default64.serialize(into: &buffer)
         #expect(buffer == [64])
     }
@@ -115,7 +115,7 @@ struct TTLTests {
     @Test
     func `Round-trip serialization`() throws {
         let original = RFC_791.TTL(rawValue: 128)
-        var buffer: [UInt8] = []
+        var buffer: [Byte] = []
         original.serialize(into: &buffer)
 
         let parsed = try RFC_791.TTL(bytes: buffer)

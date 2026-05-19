@@ -86,7 +86,7 @@ struct FragmentOffsetTests {
     @Test
     func `Parse fragment offset from bytes`() throws {
         // Fragment offset is in lower 13 bits
-        let bytes: [UInt8] = [0x00, 0xB9]  // Offset 185
+        let bytes: [Byte] = [0x00, 0xB9]  // Offset 185
         let offset = try RFC_791.FragmentOffset(bytes: bytes)
         #expect(offset.rawValue == 185)
     }
@@ -94,21 +94,21 @@ struct FragmentOffsetTests {
     @Test
     func `Parse with flags in upper bits`() throws {
         // Flags DF=1, MF=0 in upper 3 bits, offset 185
-        let bytes: [UInt8] = [0x40, 0xB9]  // DF set, offset 185
+        let bytes: [Byte] = [0x40, 0xB9]  // DF set, offset 185
         let offset = try RFC_791.FragmentOffset(bytes: bytes)
         #expect(offset.rawValue == 185)  // Flags should be masked out
     }
 
     @Test
     func `Parse maximum offset from bytes`() throws {
-        let bytes: [UInt8] = [0x1F, 0xFF]  // Maximum 13-bit value
+        let bytes: [Byte] = [0x1F, 0xFF]  // Maximum 13-bit value
         let offset = try RFC_791.FragmentOffset(bytes: bytes)
         #expect(offset.rawValue == 8191)
     }
 
     @Test
     func `Parse from empty bytes throws error`() {
-        let bytes: [UInt8] = []
+        let bytes: [Byte] = []
         #expect(throws: RFC_791.FragmentOffset.Error.empty) {
             try RFC_791.FragmentOffset(bytes: bytes)
         }
@@ -116,7 +116,7 @@ struct FragmentOffsetTests {
 
     @Test
     func `Parse from insufficient bytes throws error`() {
-        let bytes: [UInt8] = [0x00]
+        let bytes: [Byte] = [0x00]
         #expect(throws: RFC_791.FragmentOffset.Error.insufficientBytes) {
             try RFC_791.FragmentOffset(bytes: bytes)
         }
@@ -126,14 +126,14 @@ struct FragmentOffsetTests {
 
     @Test
     func `Serialize fragment offset to bytes`() {
-        var buffer: [UInt8] = []
+        var buffer: [Byte] = []
         RFC_791.FragmentOffset(rawValue: 185)!.serialize(into: &buffer)
         #expect(buffer == [0x00, 0xB9])
     }
 
     @Test
     func `Serialize maximum offset`() {
-        var buffer: [UInt8] = []
+        var buffer: [Byte] = []
         RFC_791.FragmentOffset.maximum.serialize(into: &buffer)
         #expect(buffer == [0x1F, 0xFF])
     }
@@ -141,7 +141,7 @@ struct FragmentOffsetTests {
     @Test
     func `Round-trip serialization`() throws {
         let original = RFC_791.FragmentOffset(rawValue: 370)!  // 2960 bytes
-        var buffer: [UInt8] = []
+        var buffer: [Byte] = []
         original.serialize(into: &buffer)
 
         let parsed = try RFC_791.FragmentOffset(bytes: buffer)

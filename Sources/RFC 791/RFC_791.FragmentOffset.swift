@@ -116,7 +116,7 @@ extension RFC_791.FragmentOffset {
     /// - Parameter bytes: Binary data containing the offset (2 bytes, big-endian)
     /// - Throws: `Error` if there are insufficient bytes
     public init<Bytes: Collection>(bytes: Bytes) throws(Error)
-    where Bytes.Element == UInt8 {
+    where Bytes.Element == Byte {
         var iterator = bytes.makeIterator()
 
         guard let high = iterator.next() else {
@@ -126,8 +126,10 @@ extension RFC_791.FragmentOffset {
             throw .insufficientBytes
         }
 
-        // Extract lower 13 bits (mask out flags in upper 3 bits)
-        let value = (UInt16(high) << 8 | UInt16(low)) & 0x1FFF
+        // UInt16 storage is arithmetic-domain; cross the byte-domain boundary
+        // via .underlying at the conformance boundary. Extract lower 13 bits
+        // (mask out flags in upper 3 bits).
+        let value = (UInt16(high.underlying) << 8 | UInt16(low.underlying)) & 0x1FFF
         self.init(__unchecked: (), rawValue: value)
     }
 }
@@ -138,9 +140,11 @@ extension RFC_791.FragmentOffset: Binary.Serializable {
     static public func serialize<Buffer>(
         _ fragmentOffset: RFC_791.FragmentOffset,
         into buffer: inout Buffer
-    ) where Buffer: RangeReplaceableCollection, Buffer.Element == UInt8 {
-        buffer.append(UInt8((fragmentOffset.rawValue >> 8) & 0x1F))  // Upper 5 bits of offset
-        buffer.append(UInt8(fragmentOffset.rawValue & 0xFF))  // Lower 8 bits of offset
+    ) where Buffer: RangeReplaceableCollection, Buffer.Element == Byte {
+        // Lower 13 bits (upper 3 bits reserved for Flags); manual 2-byte split
+        // because we mask the upper byte to 5 bits before serializing.
+        buffer.append(Byte(UInt8((fragmentOffset.rawValue >> 8) & 0x1F)))
+        buffer.append(Byte(UInt8(fragmentOffset.rawValue & 0xFF)))
     }
 }
 

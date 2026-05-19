@@ -101,7 +101,7 @@ extension RFC_791.TotalLength {
     /// - Parameter bytes: Binary data containing the total length (2 bytes, big-endian)
     /// - Throws: `Error` if there are insufficient bytes or value is invalid
     public init<Bytes: Collection>(bytes: Bytes) throws(Error)
-    where Bytes.Element == UInt8 {
+    where Bytes.Element == Byte {
         var iterator = bytes.makeIterator()
 
         guard let high = iterator.next() else {
@@ -111,7 +111,9 @@ extension RFC_791.TotalLength {
             throw .insufficientBytes
         }
 
-        let value = UInt16(high) << 8 | UInt16(low)
+        // UInt16 storage is arithmetic-domain; cross the byte-domain boundary
+        // via .underlying at the conformance boundary.
+        let value = UInt16(high.underlying) << 8 | UInt16(low.underlying)
         guard value >= 20 else {
             throw .tooSmall(value)
         }
@@ -126,9 +128,9 @@ extension RFC_791.TotalLength: Binary.Serializable {
     static public func serialize<Buffer>(
         _ totalLength: RFC_791.TotalLength,
         into buffer: inout Buffer
-    ) where Buffer: RangeReplaceableCollection, Buffer.Element == UInt8 {
-        buffer.append(UInt8(totalLength.rawValue >> 8))
-        buffer.append(UInt8(totalLength.rawValue & 0xFF))
+    ) where Buffer: RangeReplaceableCollection, Buffer.Element == Byte {
+        // UInt16 → [Byte] via Byte-primary BinaryInteger.bytes(endianness:).
+        buffer.append(contentsOf: totalLength.rawValue.bytes(endianness: .big))
     }
 }
 

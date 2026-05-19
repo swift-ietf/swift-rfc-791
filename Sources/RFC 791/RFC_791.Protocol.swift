@@ -44,7 +44,7 @@ extension RFC_791 {
     ///   when using this type directly.
     public struct `Protocol`: RawRepresentable, Hashable, Sendable, Codable {
         /// The 8-bit protocol number
-        public let rawValue: UInt8
+        public let rawValue: Byte
 
         /// Creates a Protocol value WITHOUT validation
         ///
@@ -52,7 +52,7 @@ extension RFC_791 {
         /// - Static constants
         /// - Pre-validated values
         /// - Internal construction after validation
-        init(__unchecked: Void, rawValue: UInt8) {
+        init(__unchecked: Void, rawValue: Byte) {
             self.rawValue = rawValue
         }
 
@@ -61,7 +61,7 @@ extension RFC_791 {
         /// All 8-bit values are valid protocol numbers.
         ///
         /// - Parameter rawValue: The protocol number (0-255)
-        public init(rawValue: UInt8) {
+        public init(rawValue: Byte) {
             self.init(__unchecked: (), rawValue: rawValue)
         }
     }
@@ -144,7 +144,7 @@ extension RFC_791.`Protocol` {
     /// - Parameter bytes: Binary data containing the protocol number
     /// - Throws: `Error` if the input is empty
     public init<Bytes: Collection>(bytes: Bytes) throws(Error)
-    where Bytes.Element == UInt8 {
+    where Bytes.Element == Byte {
         guard let firstByte = bytes.first else {
             throw .empty
         }
@@ -159,7 +159,7 @@ extension RFC_791.`Protocol`: Binary.Serializable {
     public static func serialize<Buffer: RangeReplaceableCollection>(
         _ proto: Self,
         into buffer: inout Buffer
-    ) where Buffer.Element == UInt8 {
+    ) where Buffer.Element == Byte {
         buffer.append(proto.rawValue)
     }
 }
@@ -184,19 +184,30 @@ extension RFC_791.`Protocol`: CustomStringConvertible {
     }
 }
 
-// MARK: - [UInt8] Conversion
+// MARK: - [Byte] Conversion
 
-extension [UInt8] {
+extension [Byte] {
     /// Creates byte representation of a Protocol field
     ///
     /// Writes the protocol number.
     ///
     /// ## Category Theory
     ///
-    /// Natural transformation: RFC_791.Protocol → [UInt8]
+    /// Natural transformation: RFC_791.Protocol → [Byte]
     ///
     /// - Parameter proto: The Protocol value to serialize
     public init(_ proto: RFC_791.`Protocol`) {
         self = [proto.rawValue]
+    }
+}
+
+// MARK: - Stdlib-Interop [UInt8] Forwarder
+
+extension [UInt8] {
+    /// Stdlib-interop forwarder: byte representation as `[UInt8]`.
+    @_disfavoredOverload
+    public init(_ proto: RFC_791.`Protocol`) {
+        let typed: [Byte] = [proto.rawValue]
+        self = typed.underlying
     }
 }

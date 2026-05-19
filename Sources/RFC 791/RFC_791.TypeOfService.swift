@@ -57,7 +57,7 @@ extension RFC_791 {
     /// ```
     public struct TypeOfService: Hashable, Sendable, Codable {
         /// The raw 8-bit value
-        public let rawValue: UInt8
+        public let rawValue: Byte
 
         /// Creates a Type of Service value WITHOUT validation
         ///
@@ -65,7 +65,7 @@ extension RFC_791 {
         /// - Static constants
         /// - Pre-validated values
         /// - Internal construction after validation
-        init(__unchecked: Void, rawValue: UInt8) {
+        init(__unchecked: Void, rawValue: Byte) {
             self.rawValue = rawValue
         }
 
@@ -73,7 +73,7 @@ extension RFC_791 {
         ///
         /// - Parameter rawValue: The raw TOS byte
         /// - Returns: `nil` if reserved bits are set
-        public init?(rawValue: UInt8) {
+        public init?(rawValue: Byte) {
             // Reserved bits (6-7) must be zero
             guard rawValue & 0b0000_0011 == 0 else {
                 return nil
@@ -94,7 +94,7 @@ extension RFC_791 {
             highThroughput: Bool = false,
             highReliability: Bool = false
         ) {
-            var value = precedence.rawValue << 5
+            var value: Byte = precedence.rawValue << 5
             if lowDelay { value |= 0b0001_0000 }
             if highThroughput { value |= 0b0000_1000 }
             if highReliability { value |= 0b0000_0100 }
@@ -181,7 +181,7 @@ extension RFC_791.TypeOfService {
     /// - Parameter bytes: Binary data containing the TOS byte
     /// - Throws: `Error` if the format is invalid
     public init<Bytes: Collection>(bytes: Bytes) throws(Error)
-    where Bytes.Element == UInt8 {
+    where Bytes.Element == Byte {
         guard let firstByte = bytes.first else {
             throw .empty
         }
@@ -201,21 +201,34 @@ extension RFC_791.TypeOfService: Binary.Serializable {
     public static func serialize<Buffer: RangeReplaceableCollection>(
         _ tos: Self,
         into buffer: inout Buffer
-    ) where Buffer.Element == UInt8 {
+    ) where Buffer.Element == Byte {
         buffer.append(tos.rawValue)
     }
 }
 
-extension [UInt8] {
+// MARK: - [Byte] Conversion
+
+extension [Byte] {
     /// Creates byte representation of a Type of Service field
     ///
     /// ## Category Theory
     ///
-    /// Natural transformation: RFC_791.TypeOfService → [UInt8]
+    /// Natural transformation: RFC_791.TypeOfService → [Byte]
     ///
     /// - Parameter tos: The Type of Service value to serialize
     public init(_ tos: RFC_791.TypeOfService) {
         self = [tos.rawValue]
+    }
+}
+
+// MARK: - Stdlib-Interop [UInt8] Forwarder
+
+extension [UInt8] {
+    /// Stdlib-interop forwarder: byte representation as `[UInt8]`.
+    @_disfavoredOverload
+    public init(_ tos: RFC_791.TypeOfService) {
+        let typed: [Byte] = [tos.rawValue]
+        self = typed.underlying
     }
 }
 

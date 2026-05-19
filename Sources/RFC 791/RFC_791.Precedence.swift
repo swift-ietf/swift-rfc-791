@@ -48,7 +48,7 @@ extension RFC_791 {
     /// ```
     public struct Precedence: RawRepresentable, Hashable, Sendable, Codable {
         /// The 3-bit raw value (0-7)
-        public let rawValue: UInt8
+        public let rawValue: Byte
 
         /// Creates a precedence value WITHOUT validation
         ///
@@ -56,7 +56,7 @@ extension RFC_791 {
         /// - Static constants
         /// - Pre-validated values
         /// - Internal construction after validation
-        init(__unchecked: Void, rawValue: UInt8) {
+        init(__unchecked: Void, rawValue: Byte) {
             self.rawValue = rawValue
         }
 
@@ -64,7 +64,7 @@ extension RFC_791 {
         ///
         /// - Parameter rawValue: The precedence value (0-7)
         /// - Returns: `nil` if the value exceeds 7
-        public init?(rawValue: UInt8) {
+        public init?(rawValue: Byte) {
             guard rawValue <= 7 else {
                 return nil
             }
@@ -140,7 +140,7 @@ extension RFC_791.Precedence {
     /// - Parameter bytes: Binary data containing the precedence value
     /// - Throws: `Error` if the format is invalid
     public init<Bytes: Collection>(bytes: Bytes) throws(Error)
-    where Bytes.Element == UInt8 {
+    where Bytes.Element == Byte {
         guard let firstByte = bytes.first else {
             throw .empty
         }
@@ -159,7 +159,7 @@ extension RFC_791.Precedence: Binary.Serializable {
     public static func serialize<Buffer: RangeReplaceableCollection>(
         _ precedence: Self,
         into buffer: inout Buffer
-    ) where Buffer.Element == UInt8 {
+    ) where Buffer.Element == Byte {
         buffer.append(precedence.rawValue)
     }
 }
@@ -190,19 +190,30 @@ extension RFC_791.Precedence: Comparable {
     }
 }
 
-// MARK: - [UInt8] Conversion
+// MARK: - [Byte] Conversion
 
-extension [UInt8] {
+extension [Byte] {
     /// Creates byte representation of a Precedence value
     ///
     /// Writes the raw precedence value.
     ///
     /// ## Category Theory
     ///
-    /// Natural transformation: RFC_791.Precedence → [UInt8]
+    /// Natural transformation: RFC_791.Precedence → [Byte]
     ///
     /// - Parameter precedence: The Precedence value to serialize
     public init(_ precedence: RFC_791.Precedence) {
         self = [precedence.rawValue]
+    }
+}
+
+// MARK: - Stdlib-Interop [UInt8] Forwarder
+
+extension [UInt8] {
+    /// Stdlib-interop forwarder: byte representation as `[UInt8]`.
+    @_disfavoredOverload
+    public init(_ precedence: RFC_791.Precedence) {
+        let typed: [Byte] = [precedence.rawValue]
+        self = typed.underlying
     }
 }

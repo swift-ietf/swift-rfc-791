@@ -122,13 +122,15 @@ extension RFC_791.IHL {
     /// - Parameter bytes: Binary data containing the IHL
     /// - Throws: `Error` if the format is invalid
     public init<Bytes: Collection>(bytes: Bytes) throws(Error)
-    where Bytes.Element == UInt8 {
+    where Bytes.Element == Byte {
         guard let firstByte = bytes.first else {
             throw .empty
         }
 
-        // IHL is in lower 4 bits
-        let ihl = firstByte & 0x0F
+        // IHL.rawValue is arithmetic-domain UInt8 (× 4 multiplier per Section
+        // 3.1); cross the byte-domain boundary via .underlying. IHL is in
+        // lower 4 bits.
+        let ihl = firstByte.underlying & 0x0F
 
         guard ihl >= 5 else {
             throw .tooSmall(ihl)
@@ -144,8 +146,10 @@ extension RFC_791.IHL: Binary.Serializable {
     static public func serialize<Buffer>(
         _ ihl: RFC_791.IHL,
         into buffer: inout Buffer
-    ) where Buffer: RangeReplaceableCollection, Buffer.Element == UInt8 {
-        buffer.append(ihl.rawValue)
+    ) where Buffer: RangeReplaceableCollection, Buffer.Element == Byte {
+        // IHL.rawValue is arithmetic-domain UInt8; serialize via the
+        // Byte-primary BinaryInteger.bytes(endianness:) (returns single-element [Byte]).
+        buffer.append(contentsOf: ihl.rawValue.bytes(endianness: .big))
     }
 }
 

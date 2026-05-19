@@ -46,14 +46,15 @@ struct ReadmeVerificationTests {
 
     @Test
     func `Quick Start - Serialize to ASCII bytes`() {
-        var buffer: [UInt8] = []
+        var buffer: [Byte] = []
 
         // Address serializes to ASCII (dotted-decimal)
         let address: RFC_791.IPv4.Address = "192.168.1.1"
         address.ascii.serialize(into: &buffer)
 
-        // Verify it produces ASCII dotted-decimal
-        #expect(String(ascii: buffer) == "192.168.1.1")
+        // Verify it produces ASCII dotted-decimal. Bridge via .underlying
+        // for the stdlib UTF-8 idiom.
+        #expect(String(decoding: buffer.underlying, as: UTF8.self) == "192.168.1.1")
     }
 
     // MARK: - IPv4 Addresses Examples
@@ -206,7 +207,7 @@ struct ReadmeVerificationTests {
     @Test
     func `Header Checksum - Compute`() {
         // Compute checksum for a header (with checksum field zeroed)
-        let header: [UInt8] = [
+        let header: [Byte] = [
             0x45, 0x00,  // Version, IHL, TOS
             0x00, 0x73,  // Total Length
             0x00, 0x00,  // Identification
@@ -224,7 +225,7 @@ struct ReadmeVerificationTests {
     @Test
     func `Header Checksum - Verify`() {
         // Verify a header with checksum included
-        let completeHeader: [UInt8] = [
+        let completeHeader: [Byte] = [
             0x45, 0x00, 0x00, 0x73, 0x00, 0x00, 0x40, 0x00,
             0x40, 0x11, 0xB8, 0x61,  // Checksum at bytes 10-11
             0xC0, 0xA8, 0x00, 0x01, 0xC0, 0xA8, 0x00, 0xC7,
@@ -237,7 +238,7 @@ struct ReadmeVerificationTests {
 
     @Test
     func `Binary Serialization - 16-bit and 8-bit fields`() {
-        var buffer: [UInt8] = []
+        var buffer: [Byte] = []
 
         // 16-bit fields (2 bytes each, big-endian)
         RFC_791.TotalLength(rawValue: 1500)!.serialize(into: &buffer)
@@ -258,10 +259,11 @@ struct ReadmeVerificationTests {
     func `Binary Serialization - Address to ASCII`() {
         // Address serializes to ASCII dotted-decimal (variable length)
         let address: RFC_791.IPv4.Address = "192.168.1.1"
-        let bytes = [UInt8](ascii: address)
+        let bytes = [Byte](ascii: address)
 
-        // Verify ASCII output
-        #expect(String(ascii: bytes) == "192.168.1.1")
+        // Verify ASCII output. Bridge via .underlying for the stdlib
+        // UTF-8 idiom.
+        #expect(String(decoding: bytes.underlying, as: UTF8.self) == "192.168.1.1")
     }
 
     // MARK: - Binary Parsing Examples
@@ -269,7 +271,7 @@ struct ReadmeVerificationTests {
     @Test
     func `Binary Parsing - Address from ASCII`() throws {
         // Parse address from ASCII dotted-decimal bytes
-        let addrBytes: [UInt8] = Array("192.168.1.1".utf8)
+        let addrBytes: [Byte] = Array("192.168.1.1".utf8)
         let address = try RFC_791.IPv4.Address(ascii: addrBytes, in: ())
         #expect(address.octets == (192, 168, 1, 1))
     }
@@ -277,7 +279,7 @@ struct ReadmeVerificationTests {
     @Test
     func `Binary Parsing - 16-bit fields`() throws {
         // Parse 16-bit fields from binary
-        let lengthBytes: [UInt8] = [0x05, 0xDC]  // 1500
+        let lengthBytes: [Byte] = [0x05, 0xDC]  // 1500
         let length = try RFC_791.TotalLength(bytes: lengthBytes)
         #expect(length.rawValue == 1500)
     }
@@ -286,7 +288,7 @@ struct ReadmeVerificationTests {
     func `Binary Parsing - Error handling`() {
         // Parse with error handling
         #expect(throws: RFC_791.TTL.Error.empty) {
-            _ = try RFC_791.TTL(bytes: [] as [UInt8])
+            _ = try RFC_791.TTL(bytes: [] as [Byte])
         }
     }
 }

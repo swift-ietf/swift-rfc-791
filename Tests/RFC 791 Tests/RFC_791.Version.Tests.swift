@@ -22,16 +22,17 @@ struct VersionTests {
     @Test
     func `Valid version values (0-15) are accepted`() {
         for value: UInt8 in 0...15 {
-            let version = RFC_791.Version(rawValue: value)
+            let typed = Byte(value)
+            let version = RFC_791.Version(rawValue: typed)
             #expect(version != nil)
-            #expect(version?.rawValue == value)
+            #expect(version?.rawValue == typed)
         }
     }
 
     @Test
     func `Invalid version values (>15) are rejected`() {
         for value: UInt8 in 16...255 {
-            let version = RFC_791.Version(rawValue: value)
+            let version = RFC_791.Version(rawValue: Byte(value))
             #expect(version == nil)
         }
     }
@@ -71,21 +72,21 @@ struct VersionTests {
     @Test
     func `Parse version from bytes`() throws {
         // Version is in upper 4 bits
-        let bytes: [UInt8] = [0x45]  // Version 4, IHL 5
+        let bytes: [Byte] = [0x45]  // Version 4, IHL 5
         let version = try RFC_791.Version(bytes: bytes)
         #expect(version.rawValue == 4)
     }
 
     @Test
     func `Parse version 6 from bytes`() throws {
-        let bytes: [UInt8] = [0x60]  // Version 6
+        let bytes: [Byte] = [0x60]  // Version 6
         let version = try RFC_791.Version(bytes: bytes)
         #expect(version.rawValue == 6)
     }
 
     @Test
     func `Parse from empty bytes throws error`() {
-        let bytes: [UInt8] = []
+        let bytes: [Byte] = []
         #expect(throws: RFC_791.Version.Error.empty) {
             try RFC_791.Version(bytes: bytes)
         }
@@ -95,7 +96,7 @@ struct VersionTests {
 
     @Test
     func `Serialize version to bytes`() {
-        var buffer: [UInt8] = []
+        var buffer: [Byte] = []
         RFC_791.Version.v4.serialize(into: &buffer)
         #expect(buffer == [0x40])  // Upper nibble only
     }
@@ -103,7 +104,7 @@ struct VersionTests {
     @Test
     func `Round-trip serialization`() throws {
         let original = RFC_791.Version.v4
-        var buffer: [UInt8] = []
+        var buffer: [Byte] = []
         original.serialize(into: &buffer)
 
         let parsed = try RFC_791.Version(bytes: buffer)

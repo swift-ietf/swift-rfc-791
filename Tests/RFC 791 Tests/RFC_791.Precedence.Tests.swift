@@ -22,9 +22,10 @@ struct PrecedenceTests {
     @Test
     func `Precedence from raw value - valid`() {
         for value: UInt8 in 0...7 {
-            let precedence = RFC_791.Precedence(rawValue: value)
+            let typed = Byte(value)
+            let precedence = RFC_791.Precedence(rawValue: typed)
             #expect(precedence != nil)
-            #expect(precedence?.rawValue == value)
+            #expect(precedence?.rawValue == typed)
         }
     }
 
@@ -59,7 +60,7 @@ struct PrecedenceTests {
     @Test
     func `Precedence from bytes - empty`() {
         #expect(throws: RFC_791.Precedence.Error.self) {
-            _ = try RFC_791.Precedence(bytes: [] as [UInt8])
+            _ = try RFC_791.Precedence(bytes: [] as [Byte])
         }
     }
 
@@ -75,7 +76,7 @@ struct PrecedenceTests {
     @Test
     func `Precedence serialization`() {
         let precedence = RFC_791.Precedence.immediate
-        var buffer: [UInt8] = []
+        var buffer: [Byte] = []
         precedence.serialize(into: &buffer)
         #expect(buffer == [0x02])
     }

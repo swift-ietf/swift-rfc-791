@@ -75,14 +75,15 @@ extension RFC_791.HeaderChecksum {
     /// - Returns: The computed checksum
     public static func compute<Bytes: Collection>(
         over header: Bytes
-    ) -> RFC_791.HeaderChecksum where Bytes.Element == UInt8 {
+    ) -> RFC_791.HeaderChecksum where Bytes.Element == Byte {
         var sum: UInt32 = 0
         var iterator = header.makeIterator()
 
-        // Sum all 16-bit words
+        // Sum all 16-bit words. UInt32 accumulator is arithmetic-domain;
+        // cross the byte-domain boundary via .underlying.
         while let high = iterator.next() {
-            let low = iterator.next() ?? 0
-            sum += UInt32(high) << 8 | UInt32(low)
+            let low = iterator.next()?.underlying ?? 0
+            sum += UInt32(high.underlying) << 8 | UInt32(low)
         }
 
         // Fold 32-bit sum to 16 bits (add carry bits)
@@ -101,14 +102,15 @@ extension RFC_791.HeaderChecksum {
     /// - Returns: `true` if the checksum is valid
     public static func verify<Bytes: Collection>(
         header: Bytes
-    ) -> Bool where Bytes.Element == UInt8 {
+    ) -> Bool where Bytes.Element == Byte {
         var sum: UInt32 = 0
         var iterator = header.makeIterator()
 
-        // Sum all 16-bit words including checksum
+        // Sum all 16-bit words including checksum. UInt32 accumulator is
+        // arithmetic-domain; cross the byte-domain boundary via .underlying.
         while let high = iterator.next() {
-            let low = iterator.next() ?? 0
-            sum += UInt32(high) << 8 | UInt32(low)
+            let low = iterator.next()?.underlying ?? 0
+            sum += UInt32(high.underlying) << 8 | UInt32(low)
         }
 
         // Fold 32-bit sum to 16 bits
@@ -129,7 +131,7 @@ extension RFC_791.HeaderChecksum {
     /// - Parameter bytes: Binary data containing the checksum (2 bytes, big-endian)
     /// - Throws: `Error` if there are insufficient bytes
     public init<Bytes: Collection>(bytes: Bytes) throws(Error)
-    where Bytes.Element == UInt8 {
+    where Bytes.Element == Byte {
         var iterator = bytes.makeIterator()
 
         guard let high = iterator.next() else {
@@ -139,7 +141,9 @@ extension RFC_791.HeaderChecksum {
             throw .insufficientBytes
         }
 
-        let value = UInt16(high) << 8 | UInt16(low)
+        // UInt16 storage is arithmetic-domain; cross the byte-domain boundary
+        // via .underlying at the conformance boundary.
+        let value = UInt16(high.underlying) << 8 | UInt16(low.underlying)
         self.init(__unchecked: (), rawValue: value)
     }
 }
@@ -150,9 +154,9 @@ extension RFC_791.HeaderChecksum: Binary.Serializable {
     static public func serialize<Buffer>(
         _ headerChecksum: RFC_791.HeaderChecksum,
         into buffer: inout Buffer
-    ) where Buffer: RangeReplaceableCollection, Buffer.Element == UInt8 {
-        buffer.append(UInt8(headerChecksum.rawValue >> 8))
-        buffer.append(UInt8(headerChecksum.rawValue & 0xFF))
+    ) where Buffer: RangeReplaceableCollection, Buffer.Element == Byte {
+        // UInt16 → [Byte] via Byte-primary BinaryInteger.bytes(endianness:).
+        buffer.append(contentsOf: headerChecksum.rawValue.bytes(endianness: .big))
     }
 }
 

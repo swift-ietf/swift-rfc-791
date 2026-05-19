@@ -28,7 +28,7 @@ extension RFC_791.IPv4 {
     ///
     /// ```swift
     /// // Parse from ASCII bytes (canonical)
-    /// let address = try RFC_791.IPv4.Address(ascii: Array("192.168.1.1".utf8))
+    /// let address = try RFC_791.IPv4.Address(ascii: Array<Byte>("192.168.1.1".utf8))
     ///
     /// // Parse from string (convenience)
     /// let address = try RFC_791.IPv4.Address("192.168.1.1")
@@ -158,7 +158,7 @@ extension RFC_791.IPv4.Address: Binary.ASCII.Serializable {
     public static func serialize<Buffer>(
         ascii address: RFC_791.IPv4.Address,
         into buffer: inout Buffer
-    ) where Buffer: RangeReplaceableCollection, Buffer.Element == UInt8 {
+    ) where Buffer: RangeReplaceableCollection, Buffer.Element == Byte {
         let (a, b, c, d) = address.octets
 
         buffer.reserveCapacity(15)
@@ -167,7 +167,8 @@ extension RFC_791.IPv4.Address: Binary.ASCII.Serializable {
         func appendDecimal(_ value: UInt8) {
             // Fast path for single digit (0-9)
             if value < 10 {
-                buffer.append(UInt8.ascii.`0` + value)
+                // audit: underlying — pending byte-arithmetic decision
+                buffer.append(Byte(ASCII.Code.`0`.underlying &+ value))
                 return
             }
 
@@ -175,8 +176,10 @@ extension RFC_791.IPv4.Address: Binary.ASCII.Serializable {
             if value < 100 {
                 let tens = value / 10
                 let ones = value % 10
-                buffer.append(UInt8.ascii.`0` + tens)
-                buffer.append(UInt8.ascii.`0` + ones)
+                // audit: underlying — pending byte-arithmetic decision
+                buffer.append(Byte(ASCII.Code.`0`.underlying &+ tens))
+                // audit: underlying — pending byte-arithmetic decision
+                buffer.append(Byte(ASCII.Code.`0`.underlying &+ ones))
                 return
             }
 
@@ -186,18 +189,21 @@ extension RFC_791.IPv4.Address: Binary.ASCII.Serializable {
             let tens = remainder / 10
             let ones = remainder % 10
 
-            buffer.append(UInt8.ascii.`0` + hundreds)
-            buffer.append(UInt8.ascii.`0` + tens)
-            buffer.append(UInt8.ascii.`0` + ones)
+            // audit: underlying — pending byte-arithmetic decision
+            buffer.append(Byte(ASCII.Code.`0`.underlying &+ hundreds))
+            // audit: underlying — pending byte-arithmetic decision
+            buffer.append(Byte(ASCII.Code.`0`.underlying &+ tens))
+            // audit: underlying — pending byte-arithmetic decision
+            buffer.append(Byte(ASCII.Code.`0`.underlying &+ ones))
         }
 
         // Serialize: <a>.<b>.<c>.<d>
         appendDecimal(a)
-        buffer.append(UInt8.ascii.period)
+        buffer.append(ASCII.Code.period)
         appendDecimal(b)
-        buffer.append(UInt8.ascii.period)
+        buffer.append(ASCII.Code.period)
         appendDecimal(c)
-        buffer.append(UInt8.ascii.period)
+        buffer.append(ASCII.Code.period)
         appendDecimal(d)
     }
 
@@ -206,13 +212,13 @@ extension RFC_791.IPv4.Address: Binary.ASCII.Serializable {
     /// This is the canonical parsing transformation per STANDARD_IMPLEMENTATION_PATTERNS.md.
     /// String parsing is derived from this as composition:
     /// ```
-    /// String → [UInt8] (UTF-8) → IPv4.Address
+    /// String → [Byte] (UTF-8) → IPv4.Address
     /// ```
     ///
     /// ## Category Theory
     ///
     /// Parsing transformation:
-    /// - **Domain**: [UInt8] (ASCII bytes)
+    /// - **Domain**: [Byte] (ASCII bytes)
     /// - **Codomain**: RFC_791.IPv4.Address (structured data)
     ///
     /// ## Constraints
@@ -225,7 +231,7 @@ extension RFC_791.IPv4.Address: Binary.ASCII.Serializable {
     /// ## Example
     ///
     /// ```swift
-    /// let bytes = Array("192.168.1.1".utf8)
+    /// let bytes = Array<Byte>("192.168.1.1".utf8)
     /// let address = try RFC_791.IPv4.Address(ascii: bytes)
     /// ```
     ///
@@ -234,10 +240,15 @@ extension RFC_791.IPv4.Address: Binary.ASCII.Serializable {
     ///   - context: Parsing context (unused for context-free parsing)
     /// - Throws: `Error` if the format is invalid
     public init<Bytes: Collection>(ascii bytes: Bytes, in context: Void) throws(Error)
-    where Bytes.Element == UInt8 {
+    where Bytes.Element == Byte {
         guard !bytes.isEmpty else {
             throw .empty
         }
+
+        // Type-up: lift to ASCII.Code at the entry boundary so the body works
+        // against ASCII.Code constants directly (RFC 791 dotted-decimal grammar
+        // is strict ASCII; non-ASCII bytes are fail-state).
+        let arr = Array<ASCII.Code>(bytes)
 
         var octets: [UInt8] = []
         octets.reserveCapacity(4)
@@ -246,8 +257,8 @@ extension RFC_791.IPv4.Address: Binary.ASCII.Serializable {
         var digitCount = 0
         var position = 0
 
-        for byte in bytes {
-            if byte == UInt8.ascii.period {
+        for code in arr {
+            if code == ASCII.Code.period {
                 // End of octet
                 guard digitCount > 0 else {
                     throw .invalidFormat(String(decoding: bytes, as: UTF8.self))
@@ -259,12 +270,13 @@ extension RFC_791.IPv4.Address: Binary.ASCII.Serializable {
                 currentOctet = 0
                 digitCount = 0
                 position += 1
-            } else if byte.ascii.isDigit {
+            } else if code.isDigit {
                 // Check for leading zeros (except for "0" itself)
                 if digitCount == 1, currentOctet == 0 {
                     throw .leadingZero(String(decoding: bytes, as: UTF8.self), position: position)
                 }
-                currentOctet = currentOctet * 10 + Int(byte - UInt8.ascii.`0`)
+                // audit: underlying — pending byte-arithmetic decision
+                currentOctet = currentOctet * 10 + Int(code.underlying &- ASCII.Code.`0`.underlying)
                 digitCount += 1
 
                 // Early overflow check
@@ -274,7 +286,7 @@ extension RFC_791.IPv4.Address: Binary.ASCII.Serializable {
             } else {
                 throw .invalidCharacter(
                     String(decoding: bytes, as: UTF8.self),
-                    byte: byte,
+                    code: code,
                     position: position
                 )
             }

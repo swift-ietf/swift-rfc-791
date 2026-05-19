@@ -28,9 +28,9 @@ extension RFC_791.IPv4.Address {
         ///
         /// - Parameters:
         ///   - value: The full input string
-        ///   - byte: The invalid byte encountered
+        ///   - code: The invalid ASCII code encountered
         ///   - position: The octet position (0-3)
-        case invalidCharacter(_ value: String, byte: UInt8, position: Int)
+        case invalidCharacter(_ value: String, code: ASCII.Code, position: Int)
 
         /// An octet value is out of the valid range (0-255)
         ///
@@ -57,8 +57,8 @@ extension RFC_791.IPv4.Address.Error: CustomStringConvertible {
         case .invalidFormat(let value):
             return "Invalid IPv4 address format '\(value)': expected dotted-decimal"
 
-        case .invalidCharacter(let value, let byte, let position):
-            let hex = String(byte, radix: 16, uppercase: true)
+        case .invalidCharacter(let value, let code, let position):
+            let hex = String(code, radix: 16).uppercased()
             return "Invalid character 0x\(hex) in octet \(position + 1) of '\(value)'"
 
         case .octetOutOfRange(let value, let position):

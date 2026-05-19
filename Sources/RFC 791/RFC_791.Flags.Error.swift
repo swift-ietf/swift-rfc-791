@@ -22,7 +22,7 @@ extension RFC_791.Flags {
         /// The reserved bit (bit 0) is set when it must be zero
         ///
         /// - Parameter value: The invalid raw value
-        case reservedBitSet(_ value: UInt8)
+        case reservedBitSet(_ value: Byte)
     }
 }
 
@@ -33,7 +33,7 @@ extension RFC_791.Flags.Error: CustomStringConvertible {
             return "IP Flags data cannot be empty"
 
         case .reservedBitSet(let value):
-            let hex = String(value, radix: 16, uppercase: true)
+            let hex = String(value.underlying, radix: 16, uppercase: true)
             return "IP Flags value 0x\(hex) has reserved bit set (bit 0 must be zero)"
         }
     }

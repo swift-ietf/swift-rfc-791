@@ -111,12 +111,14 @@ extension RFC_791.TTL {
     /// - Parameter bytes: Binary data containing the TTL
     /// - Throws: `Error` if the input is empty
     public init<Bytes: Collection>(bytes: Bytes) throws(Error)
-    where Bytes.Element == UInt8 {
+    where Bytes.Element == Byte {
         guard let firstByte = bytes.first else {
             throw .empty
         }
 
-        self.init(__unchecked: (), rawValue: firstByte)
+        // TTL.rawValue is arithmetic-domain UInt8 (decremented per hop); cross
+        // the byte-domain boundary via .underlying.
+        self.init(__unchecked: (), rawValue: firstByte.underlying)
     }
 }
 
@@ -126,8 +128,10 @@ extension RFC_791.TTL: Binary.Serializable {
     public static func serialize<Buffer>(
         _ ttl: RFC_791.TTL,
         into buffer: inout Buffer
-    ) where Buffer: RangeReplaceableCollection, Buffer.Element == UInt8 {
-        buffer.append(ttl.rawValue)
+    ) where Buffer: RangeReplaceableCollection, Buffer.Element == Byte {
+        // TTL.rawValue is arithmetic-domain UInt8; serialize via the
+        // Byte-primary `bytes(endianness:)` (returns single-element [Byte]).
+        buffer.append(contentsOf: ttl.rawValue.bytes(endianness: .big))
     }
 }
 

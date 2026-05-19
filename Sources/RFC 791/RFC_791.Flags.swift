@@ -51,7 +51,7 @@ extension RFC_791 {
     /// ```
     public struct Flags: Hashable, Sendable, Codable {
         /// The raw 3-bit value (stored in upper 3 bits)
-        public let rawValue: UInt8
+        public let rawValue: Byte
 
         /// Creates a Flags value WITHOUT validation
         ///
@@ -59,7 +59,7 @@ extension RFC_791 {
         /// - Static constants
         /// - Pre-validated values
         /// - Internal construction after validation
-        init(__unchecked: Void, rawValue: UInt8) {
+        init(__unchecked: Void, rawValue: Byte) {
             self.rawValue = rawValue
         }
 
@@ -67,7 +67,7 @@ extension RFC_791 {
         ///
         /// - Parameter rawValue: The flags byte (upper 3 bits significant)
         /// - Returns: `nil` if reserved bit is set
-        public init?(rawValue: UInt8) {
+        public init?(rawValue: Byte) {
             // Reserved bit (0) must be zero when in 3-bit position
             // Since we store with DF in bit 1, MF in bit 2, check bit 0
             guard rawValue & 0b100 == 0 else {
@@ -85,7 +85,7 @@ extension RFC_791 {
             dontFragment: Bool = false,
             moreFragments: Bool = false
         ) {
-            var value: UInt8 = 0
+            var value: Byte = 0
             if dontFragment { value |= 0b010 }
             if moreFragments { value |= 0b001 }
             self.init(__unchecked: (), rawValue: value)
@@ -160,7 +160,7 @@ extension RFC_791.Flags {
     /// - Parameter bytes: Binary data containing the flags
     /// - Throws: `Error` if the format is invalid
     public init<Bytes: Collection>(bytes: Bytes) throws(Error)
-    where Bytes.Element == UInt8 {
+    where Bytes.Element == Byte {
         guard let firstByte = bytes.first else {
             throw .empty
         }
@@ -183,7 +183,7 @@ extension RFC_791.Flags: Binary.Serializable {
     static public func serialize<Buffer>(
         _ flags: RFC_791.Flags,
         into buffer: inout Buffer
-    ) where Buffer: RangeReplaceableCollection, Buffer.Element == UInt8 {
+    ) where Buffer: RangeReplaceableCollection, Buffer.Element == Byte {
         buffer.append(contentsOf: [flags.rawValue << 5])
     }
 }
@@ -203,19 +203,30 @@ extension RFC_791.Flags: CustomStringConvertible {
     }
 }
 
-// MARK: - [UInt8] Conversion
+// MARK: - [Byte] Conversion
 
-extension [UInt8] {
+extension [Byte] {
     /// Creates byte representation of IP Flags
     ///
     /// Writes the flags as a single byte with flags in upper 3 bits.
     ///
     /// ## Category Theory
     ///
-    /// Natural transformation: RFC_791.Flags → [UInt8]
+    /// Natural transformation: RFC_791.Flags → [Byte]
     ///
     /// - Parameter flags: The Flags value to serialize
     public init(_ flags: RFC_791.Flags) {
         self = [flags.rawValue << 5]
+    }
+}
+
+// MARK: - Stdlib-Interop [UInt8] Forwarder
+
+extension [UInt8] {
+    /// Stdlib-interop forwarder: byte representation as `[UInt8]`.
+    @_disfavoredOverload
+    public init(_ flags: RFC_791.Flags) {
+        let typed: [Byte] = [flags.rawValue << 5]
+        self = typed.underlying
     }
 }

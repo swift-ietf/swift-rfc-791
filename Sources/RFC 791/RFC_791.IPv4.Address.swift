@@ -176,11 +176,12 @@ extension RFC_791.IPv4.Address: Binary.ASCII.Serializable {
 
         buffer.reserveCapacity(15)
 
-        // Helper to append decimal ASCII digits for a UInt8
+        // Helper to append decimal ASCII digits for a UInt8.
+        // Arithmetic-domain construction: bridge digit value (UInt8) → ASCII byte
+        // via .underlying offset from '0'; Byte has no arithmetic by design ([API-BYTE-002]).
         func appendDecimal(_ value: UInt8) {
             // Fast path for single digit (0-9)
             if value < 10 {
-                // audit: underlying — pending byte-arithmetic decision
                 buffer.append(Byte(ASCII.Code.`0`.underlying &+ value))
                 return
             }
@@ -189,9 +190,7 @@ extension RFC_791.IPv4.Address: Binary.ASCII.Serializable {
             if value < 100 {
                 let tens = value / 10
                 let ones = value % 10
-                // audit: underlying — pending byte-arithmetic decision
                 buffer.append(Byte(ASCII.Code.`0`.underlying &+ tens))
-                // audit: underlying — pending byte-arithmetic decision
                 buffer.append(Byte(ASCII.Code.`0`.underlying &+ ones))
                 return
             }
@@ -202,11 +201,8 @@ extension RFC_791.IPv4.Address: Binary.ASCII.Serializable {
             let tens = remainder / 10
             let ones = remainder % 10
 
-            // audit: underlying — pending byte-arithmetic decision
             buffer.append(Byte(ASCII.Code.`0`.underlying &+ hundreds))
-            // audit: underlying — pending byte-arithmetic decision
             buffer.append(Byte(ASCII.Code.`0`.underlying &+ tens))
-            // audit: underlying — pending byte-arithmetic decision
             buffer.append(Byte(ASCII.Code.`0`.underlying &+ ones))
         }
 
@@ -289,8 +285,7 @@ extension RFC_791.IPv4.Address: Binary.ASCII.Serializable {
                 if digitCount == 1, currentOctet == 0 {
                     throw .leadingZero(String(decoding: bytes, as: UTF8.self), position: position)
                 }
-                // audit: underlying — pending byte-arithmetic decision
-                currentOctet = currentOctet * 10 + Int(code.underlying &- ASCII.Code.`0`.underlying)
+                currentOctet = currentOctet * 10 + Int(code.digitValue!)
                 digitCount += 1
 
                 // Early overflow check

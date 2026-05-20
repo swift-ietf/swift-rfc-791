@@ -250,7 +250,12 @@ extension RFC_791.IPv4.Address: Binary.ASCII.Serializable {
         // Type-up: lift to ASCII.Code at the entry boundary so the body works
         // against ASCII.Code constants directly (RFC 791 dotted-decimal grammar
         // is strict ASCII; non-ASCII bytes are fail-state).
-        let arr = Array<ASCII.Code>(bytes)
+        let arr: [ASCII.Code]
+        do {
+            arr = try Array<ASCII.Code>(bytes)
+        } catch {
+            throw .invalidFormat(String(decoding: bytes, as: UTF8.self))
+        }
 
         var octets: [UInt8] = []
         octets.reserveCapacity(4)

@@ -221,16 +221,8 @@ extension [Byte] {
     }
 }
 
-// MARK: - Stdlib-Interop [UInt8] Forwarder
-
-extension [UInt8] {
-    /// Stdlib-interop forwarder: byte representation as `[UInt8]`.
-    @_disfavoredOverload
-    public init(_ tos: RFC_791.TypeOfService) {
-        let typed: [Byte] = [tos.rawValue]
-        self = typed.underlying
-    }
-}
+// Stdlib-interop UInt8 forwarder lives in `RFC 791 Standard Library
+// Integration` per [API-BYTE-007].
 
 // MARK: - CustomStringConvertible
 

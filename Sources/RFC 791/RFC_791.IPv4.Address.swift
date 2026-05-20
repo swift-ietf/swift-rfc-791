@@ -97,16 +97,8 @@ extension RFC_791.IPv4.Address {
         self.init(__unchecked: (), rawValue: value)
     }
 
-    /// Stdlib-interop forwarder: construction from four `UInt8` octets.
-    @_disfavoredOverload
-    public init(_ octet1: UInt8, _ octet2: UInt8, _ octet3: UInt8, _ octet4: UInt8) {
-        let value =
-            UInt32(octet1) << 24
-            | UInt32(octet2) << 16
-            | UInt32(octet3) << 8
-            | UInt32(octet4)
-        self.init(__unchecked: (), rawValue: value)
-    }
+    // Stdlib-interop UInt8 forwarder lives in `RFC 791 Standard Library
+    // Integration` per [API-BYTE-007].
 }
 
 // MARK: - Octet Access
@@ -315,7 +307,10 @@ extension RFC_791.IPv4.Address: Binary.ASCII.Serializable {
             throw .invalidFormat(String(decoding: bytes, as: UTF8.self))
         }
 
-        self.init(octets[0], octets[1], octets[2], octets[3])
+        // Bridge inline at the call site: parse arithmetic-domain `[UInt8]`
+        // → byte-domain octets via `Byte.init` (UInt8 forwarder lives in SLI
+        // target per [API-BYTE-007]).
+        self.init(Byte(octets[0]), Byte(octets[1]), Byte(octets[2]), Byte(octets[3]))
     }
 }
 

@@ -46,15 +46,16 @@ struct ReadmeVerificationTests {
 
     @Test
     func `Quick Start - Serialize to ASCII bytes`() {
-        var buffer: [Byte] = []
-
-        // Address serializes to ASCII (dotted-decimal)
+        // Address serializes via two format siblings: ASCII text (dotted-decimal)
+        // and binary wire (4 octets).
         let address: RFC_791.IPv4.Address = "192.168.1.1"
-        address.ascii.serialize(into: &buffer)
+        let text: [Byte] = address.serialized
+        let wire: [Byte] = address.bytes
 
         // Verify it produces ASCII dotted-decimal. Bridge via .underlying
         // for the stdlib UTF-8 idiom.
-        #expect(String(decoding: buffer.underlying, as: UTF8.self) == "192.168.1.1")
+        #expect(String(decoding: text.underlying, as: UTF8.self) == "192.168.1.1")
+        #expect(wire == [192, 168, 1, 1])
     }
 
     // MARK: - IPv4 Addresses Examples
@@ -259,7 +260,7 @@ struct ReadmeVerificationTests {
     func `Binary Serialization - Address to ASCII`() {
         // Address serializes to ASCII dotted-decimal (variable length)
         let address: RFC_791.IPv4.Address = "192.168.1.1"
-        let bytes = [Byte](ascii: address)
+        let bytes: [Byte] = address.serialized
 
         // Verify ASCII output. Bridge via .underlying for the stdlib
         // UTF-8 idiom.
@@ -272,7 +273,7 @@ struct ReadmeVerificationTests {
     func `Binary Parsing - Address from ASCII`() throws {
         // Parse address from ASCII dotted-decimal bytes
         let addrBytes: [Byte] = Array("192.168.1.1".utf8)
-        let address = try RFC_791.IPv4.Address(ascii: addrBytes, in: ())
+        let address = try RFC_791.IPv4.Address(ascii: addrBytes)
         #expect(address.octets == (192, 168, 1, 1))
     }
 

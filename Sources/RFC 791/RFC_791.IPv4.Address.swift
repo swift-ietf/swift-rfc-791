@@ -10,6 +10,14 @@
 //
 // ===----------------------------------------------------------------------===//
 
+public import Parseable_ASCII_Primitives
+// `Binary_Parseable_Primitives` re-exports a `Collection` / buffer-protocol
+// family that shadows the stdlib protocols within this file's scope. Every
+// collection-protocol reference below is therefore `Swift.`-qualified so the
+// shadow is harmless — qualify the name, don't isolate the conformance into a
+// separate file (principal directive; the file-scoped import shadows only here).
+public import Binary_Parseable_Primitives
+
 extension RFC_791.IPv4 {
     /// IPv4 Address (RFC 791)
     ///
@@ -131,7 +139,7 @@ extension RFC_791.IPv4.Address: Binary.Serializable {
     static public func serialize<Buffer>(
         _ address: RFC_791.IPv4.Address,
         into buffer: inout Buffer
-    ) where Buffer: RangeReplaceableCollection, Buffer.Element == Byte {
+    ) where Buffer: Swift.RangeReplaceableCollection, Buffer.Element == Byte {
         let (a, b, c, d) = address.octets
         buffer.append(a)
         buffer.append(b)
@@ -143,7 +151,7 @@ extension RFC_791.IPv4.Address: Binary.Serializable {
     ///
     /// - Parameter bytes: Exactly 4 bytes in network byte order
     /// - Throws: `Error.invalidFormat` if not exactly 4 bytes
-    public init<Bytes: Collection>(binary bytes: Bytes) throws(Error)
+    public init<Bytes: Swift.Collection>(binary bytes: Bytes) throws(Error)
     where Bytes.Element == Byte {
         guard bytes.count == 4 else {
             throw .invalidFormat("Expected 4 bytes, got \(bytes.count)")
@@ -159,22 +167,61 @@ extension RFC_791.IPv4.Address: Binary.Serializable {
     }
 }
 
-extension RFC_791.IPv4.Address: Binary.ASCII.Serializable {
+// MARK: - Binary.Parseable Conformance (4-octet wire — network byte order)
+
+extension RFC_791.IPv4.Address: Binary.Parseable {
+    /// Parses a 4-octet IPv4 address from the front of `source` (network order).
+    ///
+    /// [FAM-012] wire sibling carrying the fixed-concrete `Binary.Parse.Failure`
+    /// (minimal-B): the binary form's only structural defect is insufficient
+    /// input — any four bytes are a valid address. Consumes exactly four bytes
+    /// from the front of `source` on success (cursor semantics); leaves `source`
+    /// unmodified on failure.
+    public static func parse<Source>(
+        from source: inout Source
+    ) throws(Binary.Parse.Failure) -> RFC_791.IPv4.Address
+    where Source: Swift.RangeReplaceableCollection, Source.Element == Byte {
+        guard source.count >= 4 else {
+            throw .insufficient(needed: 4)
+        }
+
+        var iterator = source.makeIterator()
+        let a = iterator.next()!
+        let b = iterator.next()!
+        let c = iterator.next()!
+        let d = iterator.next()!
+        source.removeFirst(4)
+
+        return RFC_791.IPv4.Address(a, b, c, d)
+    }
+}
+
+// MARK: - ASCII.Serializable Conformance (dotted-decimal text — RFC 791 §3.2)
+
+extension RFC_791.IPv4.Address: ASCII.Serializable {
+    /// Serializes `address` as dotted-decimal ASCII text (e.g. "192.168.1.1").
+    ///
+    /// [FAM-012] text sibling. **Source-defect-1 fix**: the dotted-decimal form
+    /// now emits the typed text substrate `ASCII.Code` directly — it formerly
+    /// rode the deprecated `Binary.ASCII.Serializable`, serialising into a
+    /// `Byte` buffer (the defect the model §6 corrects). The decimal-digit
+    /// arithmetic stays in the `UInt8` arithmetic domain ([API-BYTE-002]); each
+    /// digit is lifted to `ASCII.Code` at the append boundary.
     public static func serialize<Buffer>(
-        ascii address: RFC_791.IPv4.Address,
+        _ address: RFC_791.IPv4.Address,
         into buffer: inout Buffer
-    ) where Buffer: RangeReplaceableCollection, Buffer.Element == Byte {
+    ) where Buffer: Swift.RangeReplaceableCollection, Buffer.Element == ASCII.Code {
         let (a, b, c, d) = address.octets
 
         buffer.reserveCapacity(15)
 
         // Helper to append decimal ASCII digits for a UInt8.
-        // Arithmetic-domain construction: bridge digit value (UInt8) → ASCII byte
-        // via .underlying offset from '0'; Byte has no arithmetic by design ([API-BYTE-002]).
+        // Arithmetic-domain construction ([API-BYTE-002]): digit math stays in
+        // UInt8, lifted to `ASCII.Code` via the `'0'` underlying byte offset.
         func appendDecimal(_ value: UInt8) {
             // Fast path for single digit (0-9)
             if value < 10 {
-                buffer.append(Byte(ASCII.Code.`0`.underlying &+ value))
+                buffer.append(ASCII.Code(ASCII.Code.`0`.underlying &+ value))
                 return
             }
 
@@ -182,8 +229,8 @@ extension RFC_791.IPv4.Address: Binary.ASCII.Serializable {
             if value < 100 {
                 let tens = value / 10
                 let ones = value % 10
-                buffer.append(Byte(ASCII.Code.`0`.underlying &+ tens))
-                buffer.append(Byte(ASCII.Code.`0`.underlying &+ ones))
+                buffer.append(ASCII.Code(ASCII.Code.`0`.underlying &+ tens))
+                buffer.append(ASCII.Code(ASCII.Code.`0`.underlying &+ ones))
                 return
             }
 
@@ -193,9 +240,9 @@ extension RFC_791.IPv4.Address: Binary.ASCII.Serializable {
             let tens = remainder / 10
             let ones = remainder % 10
 
-            buffer.append(Byte(ASCII.Code.`0`.underlying &+ hundreds))
-            buffer.append(Byte(ASCII.Code.`0`.underlying &+ tens))
-            buffer.append(Byte(ASCII.Code.`0`.underlying &+ ones))
+            buffer.append(ASCII.Code(ASCII.Code.`0`.underlying &+ hundreds))
+            buffer.append(ASCII.Code(ASCII.Code.`0`.underlying &+ tens))
+            buffer.append(ASCII.Code(ASCII.Code.`0`.underlying &+ ones))
         }
 
         // Serialize: <a>.<b>.<c>.<d>. octets are Byte; bridge via .underlying
@@ -208,6 +255,11 @@ extension RFC_791.IPv4.Address: Binary.ASCII.Serializable {
         buffer.append(ASCII.Code.period)
         appendDecimal(d.underlying)
     }
+}
+
+// MARK: - ASCII.Parseable Conformance (dotted-decimal text — RFC 791 §3.2)
+
+extension RFC_791.IPv4.Address: ASCII.Parseable {
 
     /// Creates an IPv4 address from ASCII bytes in dotted-decimal notation
     ///
@@ -239,9 +291,8 @@ extension RFC_791.IPv4.Address: Binary.ASCII.Serializable {
     ///
     /// - Parameters:
     ///   - bytes: ASCII bytes representing dotted-decimal notation
-    ///   - context: Parsing context (unused for context-free parsing)
     /// - Throws: `Error` if the format is invalid
-    public init<Bytes: Collection>(ascii bytes: Bytes, in context: Void) throws(Error)
+    public init<Bytes: Swift.Collection>(ascii bytes: Bytes) throws(Error)
     where Bytes.Element == Byte {
         guard !bytes.isEmpty else {
             throw .empty
@@ -252,7 +303,11 @@ extension RFC_791.IPv4.Address: Binary.ASCII.Serializable {
         // is strict ASCII; non-ASCII bytes are fail-state).
         let arr: [ASCII.Code]
         do {
-            arr = try Array<ASCII.Code>(bytes)
+            // `Swift.Array`-qualified: `Binary_Parseable_Primitives`'s load-bearing
+            // re-export brings the institute `Array` (Store&Buffer-constrained) into
+            // scope, shadowing the stdlib type at this explicit `Array<…>` spelling.
+            // Same qualify-the-name pattern as the collection-protocol references above.
+            arr = try Swift.Array<ASCII.Code>(bytes)
         } catch {
             throw .invalidFormat(String(decoding: bytes, as: UTF8.self))
         }
@@ -319,7 +374,28 @@ extension RFC_791.IPv4.Address: Binary.ASCII.Serializable {
     }
 }
 
-extension RFC_791.IPv4.Address: CustomStringConvertible {}
+// MARK: - CustomStringConvertible
+
+extension RFC_791.IPv4.Address: CustomStringConvertible {
+    /// The address in dotted-decimal notation (e.g. "192.168.1.1").
+    ///
+    /// Derived from the `ASCII.Serializable` verb (`.serialized` projects the
+    /// dotted-decimal `ASCII.Code` form to `[Byte]`); re-provided directly now
+    /// that the retired `Binary.ASCII.Serializable` no longer supplies it.
+    public var description: String {
+        String(decoding: serialized, as: UTF8.self)
+    }
+}
+
+// MARK: - String Conveniences
+
+extension RFC_791.IPv4.Address {
+    /// Creates an IPv4 address by parsing the UTF-8 bytes of `string` as
+    /// dotted-decimal ASCII. Convenience over the canonical `init(ascii:)`.
+    public init(_ string: some StringProtocol) throws(Error) {
+        try self.init(ascii: [Byte](string.utf8))
+    }
+}
 
 // MARK: - Comparable
 
@@ -343,7 +419,20 @@ extension RFC_791.IPv4.Address: Comparable {
     }
 }
 
-extension RFC_791.IPv4.Address: ExpressibleByStringLiteral {}
+extension RFC_791.IPv4.Address: ExpressibleByStringLiteral {
+    /// Creates an IPv4 address from a dotted-decimal string literal.
+    ///
+    /// Re-provided directly now that the retired `Binary.ASCII.Serializable`
+    /// no longer supplies the `Context == Void` literal default. Traps on an
+    /// invalid literal (literals are author-controlled, compile-time constants).
+    public init(stringLiteral value: String) {
+        do throws(Error) {
+            try self.init(value)
+        } catch {
+            preconditionFailure("Invalid IPv4 address literal '\(value)': \(error)")
+        }
+    }
+}
 
 // MARK: - Static Constants
 

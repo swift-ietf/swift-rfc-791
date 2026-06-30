@@ -254,4 +254,50 @@ struct IPv4AddressTests {
         #expect(c == 0x01)  // 1
         #expect(d == 0x01)  // 1
     }
+
+    // MARK: - [FAM-012] Format Sibling Tests (drain → flat siblings)
+
+    @Test
+    func `Binary.Serializable wire form is four network-order octets`() {
+        let address = RFC_791.IPv4.Address(192, 168, 1, 1)
+        #expect(address.bytes == [192, 168, 1, 1])
+    }
+
+    @Test
+    func `ASCII.Serializable text form is dotted-decimal`() {
+        let address = RFC_791.IPv4.Address(192, 168, 1, 1)
+        #expect(String(decoding: address.serialized.underlying, as: UTF8.self) == "192.168.1.1")
+    }
+
+    @Test
+    func `the two format siblings are distinct representations`() {
+        // Source-defect-1 fix: the text sibling (dotted-decimal, ASCII.Code) and
+        // the wire sibling (4 octets, Byte) are genuinely different forms.
+        let address: RFC_791.IPv4.Address = "10.0.0.255"
+        #expect(String(decoding: address.serialized.underlying, as: UTF8.self) == "10.0.0.255")
+        #expect(address.bytes == [10, 0, 0, 255])
+    }
+
+    @Test
+    func `Binary.Parseable round-trips the wire form with cursor semantics`() throws {
+        var source: [Byte] = [192, 168, 1, 1, 0xFF]   // 4 octets + a trailing byte
+        let address = try RFC_791.IPv4.Address.parse(from: &source)
+        #expect(address == RFC_791.IPv4.Address(192, 168, 1, 1))
+        #expect(source == [0xFF])                      // cursor advanced past 4 bytes
+    }
+
+    @Test
+    func `Binary.Parseable rejects insufficient input`() {
+        var source: [Byte] = [192, 168, 1]            // only 3 bytes
+        #expect(throws: (any Error).self) {
+            _ = try RFC_791.IPv4.Address.parse(from: &source)
+        }
+    }
+
+    @Test
+    func `ASCII.Parseable round-trips the text form`() throws {
+        let address = try RFC_791.IPv4.Address(ascii: Array("172.16.0.1".utf8))
+        #expect(address.octets == (172, 16, 0, 1))
+        #expect(String(decoding: address.serialized.underlying, as: UTF8.self) == "172.16.0.1")
+    }
 }

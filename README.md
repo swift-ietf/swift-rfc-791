@@ -59,8 +59,9 @@ let ttl = RFC_791.TTL.default64  // 64 hops (Linux/macOS default)
 let proto = RFC_791.`Protocol`.tcp  // Protocol number 6
 let flags = RFC_791.Flags(dontFragment: true, moreFragments: false)
 
-// Serialize address to ASCII bytes (dotted-decimal)
-let bytes = [UInt8](address)  // "192.168.1.1" as ASCII
+// Serialize the address — text sibling (dotted-decimal) vs wire sibling (4 octets)
+let text: [Byte] = address.serialized  // "192.168.1.1"
+let wire: [Byte] = address.bytes        // [192, 168, 1, 1]
 ```
 
 ## Usage Examples
@@ -234,9 +235,10 @@ RFC_791.HeaderChecksum(rawValue: 0xABCD).serialize(into: &buffer)
 RFC_791.TTL(rawValue: 64).serialize(into: &buffer)
 RFC_791.`Protocol`.tcp.serialize(into: &buffer)
 
-// Address serializes to ASCII dotted-decimal (variable length)
+// Address has two format siblings: ASCII text (dotted-decimal) and binary wire
 let address: RFC_791.IPv4.Address = "192.168.1.1"
-let addressBytes = [UInt8](address)  // "192.168.1.1" as ASCII
+let textBytes: [Byte] = address.serialized  // "192.168.1.1"
+let wireBytes: [Byte] = address.bytes        // [192, 168, 1, 1]
 ```
 
 ### Binary Parsing
@@ -247,8 +249,8 @@ Parse fields from bytes:
 import RFC_791
 
 // Parse address from ASCII dotted-decimal bytes
-let addrBytes: [UInt8] = Array("192.168.1.1".utf8)
-let address = try RFC_791.IPv4.Address(ascii: addrBytes, in: ())
+let addrBytes: [Byte] = Array("192.168.1.1".utf8)
+let address = try RFC_791.IPv4.Address(ascii: addrBytes)
 
 // Parse 16-bit fields from binary
 let lengthBytes: [UInt8] = [0x05, 0xDC]  // 1500

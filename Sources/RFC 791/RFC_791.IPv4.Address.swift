@@ -261,6 +261,8 @@ extension RFC_791.IPv4.Address: ASCII.Serializable {
 
 extension RFC_791.IPv4.Address: ASCII.Parseable {
 
+    public typealias Failure = RFC_791.IPv4.Address.Error
+
     /// Creates an IPv4 address from ASCII bytes in dotted-decimal notation
     ///
     /// This is the canonical parsing transformation per STANDARD_IMPLEMENTATION_PATTERNS.md.

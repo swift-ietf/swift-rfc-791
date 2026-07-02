@@ -1,6 +1,6 @@
 # RFC 791
 
-[![CI](https://github.com/swift-standards/swift-rfc-791/workflows/CI/badge.svg)](https://github.com/swift-standards/swift-rfc-791/actions/workflows/ci.yml)
+[![CI](https://github.com/swift-ietf/swift-rfc-791/workflows/CI/badge.svg)](https://github.com/swift-ietf/swift-rfc-791/actions/workflows/ci.yml)
 ![Development Status](https://img.shields.io/badge/status-active--development-blue.svg)
 
 Swift implementation of RFC 791: Internet Protocol (IPv4).
@@ -29,7 +29,7 @@ Add to your `Package.swift`:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/swift-standards/swift-rfc-791.git", from: "0.1.0")
+    .package(url: "https://github.com/swift-ietf/swift-rfc-791.git", from: "0.3.0")
 ]
 ```
 
@@ -321,7 +321,7 @@ swift test
 ## Related Packages
 
 - [swift-standards](https://github.com/swift-standards/swift-standards) - Foundation utilities for standards implementations
-- [swift-incits-4-1986](https://github.com/swift-standards/swift-incits-4-1986) - US-ASCII character set implementation
+- [swift-incits-4-1986](https://github.com/swift-incits/swift-incits-4-1986) - US-ASCII character set implementation
 
 ## License
 

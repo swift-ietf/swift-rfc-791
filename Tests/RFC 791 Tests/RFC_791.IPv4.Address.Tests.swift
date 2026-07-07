@@ -280,15 +280,15 @@ struct IPv4AddressTests {
 
     @Test
     func `Binary.Parseable round-trips the wire form with cursor semantics`() throws {
-        var source: [Byte] = [192, 168, 1, 1, 0xFF]   // 4 octets + a trailing byte
+        var source: [Byte] = [192, 168, 1, 1, 0xFF]  // 4 octets + a trailing byte
         let address = try RFC_791.IPv4.Address.parse(from: &source)
         #expect(address == RFC_791.IPv4.Address(192, 168, 1, 1))
-        #expect(source == [0xFF])                      // cursor advanced past 4 bytes
+        #expect(source == [0xFF])  // cursor advanced past 4 bytes
     }
 
     @Test
     func `Binary.Parseable rejects insufficient input`() {
-        var source: [Byte] = [192, 168, 1]            // only 3 bytes
+        var source: [Byte] = [192, 168, 1]  // only 3 bytes
         #expect(throws: (any Error).self) {
             _ = try RFC_791.IPv4.Address.parse(from: &source)
         }

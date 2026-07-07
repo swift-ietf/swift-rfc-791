@@ -17,8 +17,8 @@
 // four `UInt8` octets (e.g. from network buffers) via `Byte.init`.
 // Per [API-BYTE-007] (byte-discipline skill).
 
-public import RFC_791
 internal import Byte_Primitives
+public import RFC_791
 
 extension RFC_791.IPv4.Address {
     /// Stdlib-interop forwarder: construction from four `UInt8` octets.

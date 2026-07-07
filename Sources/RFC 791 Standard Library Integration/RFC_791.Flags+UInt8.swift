@@ -17,8 +17,8 @@
 // `[UInt8]` via `.underlying` on the byte-domain result.
 // Per [API-BYTE-007] (byte-discipline skill).
 
-public import RFC_791
 internal import Byte_Primitives
+public import RFC_791
 
 extension [UInt8] {
     /// Stdlib-interop forwarder: byte representation as `[UInt8]`.

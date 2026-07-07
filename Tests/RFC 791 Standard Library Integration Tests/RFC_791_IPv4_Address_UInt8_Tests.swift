@@ -10,9 +10,9 @@
 //
 // ===----------------------------------------------------------------------===//
 
-import Testing
 import RFC_791
 import RFC_791_Standard_Library_Integration
+import Testing
 
 @Suite("RFC 791 IPv4 Address UInt8 forwarder")
 struct RFC_791_IPv4_Address_UInt8_Tests {

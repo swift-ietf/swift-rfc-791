@@ -10,13 +10,13 @@
 //
 // ===----------------------------------------------------------------------===//
 
-public import Parseable_ASCII_Primitives
 // `Binary_Parseable_Primitives` re-exports a `Collection` / buffer-protocol
 // family that shadows the stdlib protocols within this file's scope. Every
 // collection-protocol reference below is therefore `Swift.`-qualified so the
 // shadow is harmless — qualify the name, don't isolate the conformance into a
 // separate file (principal directive; the file-scoped import shadows only here).
 public import Binary_Parseable_Primitives
+public import Parseable_ASCII_Primitives
 
 extension RFC_791.IPv4 {
     /// IPv4 Address (RFC 791)
@@ -309,6 +309,8 @@ extension RFC_791.IPv4.Address: ASCII.Parseable {
             // re-export brings the institute `Array` (Store&Buffer-constrained) into
             // scope, shadowing the stdlib type at this explicit `Array<…>` spelling.
             // Same qualify-the-name pattern as the collection-protocol references above.
+            // swift-format-ignore: UseShorthandTypeNames
+            // swiftlint:disable:next syntactic_sugar
             arr = try Swift.Array<ASCII.Code>(bytes)
         } catch {
             throw .invalidFormat(String(decoding: bytes, as: UTF8.self))

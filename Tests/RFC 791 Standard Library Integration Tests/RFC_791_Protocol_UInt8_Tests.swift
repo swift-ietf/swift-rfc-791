@@ -10,9 +10,9 @@
 //
 // ===----------------------------------------------------------------------===//
 
-import Testing
 import RFC_791
 import RFC_791_Standard_Library_Integration
+import Testing
 
 private typealias IPProtocol = RFC_791.`Protocol`
 

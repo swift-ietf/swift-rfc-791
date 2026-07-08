@@ -304,7 +304,7 @@ extension RFC_791.IPv4.Address: ASCII.Parseable {
         // against ASCII.Code constants directly (RFC 791 dotted-decimal grammar
         // is strict ASCII; non-ASCII bytes are fail-state).
         let arr: [ASCII.Code]
-        do {
+        do throws(ASCII.Code.Error) {
             // `Swift.Array`-qualified: `Binary_Parseable_Primitives`'s load-bearing
             // re-export brings the institute `Array` (Store&Buffer-constrained) into
             // scope, shadowing the stdlib type at this explicit `Array<…>` spelling.

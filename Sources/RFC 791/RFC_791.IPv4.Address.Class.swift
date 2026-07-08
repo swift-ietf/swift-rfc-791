@@ -125,31 +125,6 @@ extension RFC_791.IPv4.Address {
         init(_ address: RFC_791.IPv4.Address) {
             self.address = address
         }
-
-        /// Whether this address is a multicast address (Class D)
-        ///
-        /// Multicast addresses are used to send a single packet to multiple
-        /// destinations simultaneously.
-        ///
-        /// ## Example
-        ///
-        /// ```swift
-        /// let multicast = RFC_791.IPv4.Address(224, 0, 0, 1)
-        /// print(multicast.is.multicast)  // true
-        /// ```
-        @inlinable
-        public var multicast: Bool {
-            address.class == .d
-        }
-
-        /// Whether this address is reserved (Class E)
-        ///
-        /// Class E addresses are reserved for experimental purposes and
-        /// should not be used on the public Internet.
-        @inlinable
-        public var reserved: Bool {
-            address.class == .e
-        }
     }
 
     /// Access address type predicates
@@ -162,6 +137,33 @@ extension RFC_791.IPv4.Address {
     /// ```
     public var `is`: Is {
         Is(self)
+    }
+}
+
+extension RFC_791.IPv4.Address.Is {
+    /// Whether this address is a multicast address (Class D)
+    ///
+    /// Multicast addresses are used to send a single packet to multiple
+    /// destinations simultaneously.
+    ///
+    /// ## Example
+    ///
+    /// ```swift
+    /// let multicast = RFC_791.IPv4.Address(224, 0, 0, 1)
+    /// print(multicast.is.multicast)  // true
+    /// ```
+    @inlinable
+    public var multicast: Bool {
+        address.class == .d
+    }
+
+    /// Whether this address is reserved (Class E)
+    ///
+    /// Class E addresses are reserved for experimental purposes and
+    /// should not be used on the public Internet.
+    @inlinable
+    public var reserved: Bool {
+        address.class == .e
     }
 }
 

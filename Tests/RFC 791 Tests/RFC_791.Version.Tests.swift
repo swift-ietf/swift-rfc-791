@@ -14,8 +14,9 @@ import Testing
 
 @testable import RFC_791
 
-@Suite("RFC_791.Version Tests")
-struct VersionTests {
+extension RFC_791.Version {
+    @Suite("RFC_791.Version Tests")
+    struct Test {
 
     // MARK: - Raw Value Initialization
 
@@ -142,4 +143,5 @@ struct VersionTests {
     func `Error descriptions`() {
         #expect(RFC_791.Version.Error.empty.description == "Version data cannot be empty")
     }
+}
 }

@@ -14,8 +14,9 @@ import Testing
 
 @testable import RFC_791
 
-@Suite("RFC_791.HeaderChecksum Tests")
-struct HeaderChecksumTests {
+extension RFC_791.HeaderChecksum {
+    @Suite("RFC_791.HeaderChecksum Tests")
+    struct Test {
 
     // MARK: - Raw Value Initialization
 
@@ -170,4 +171,5 @@ struct HeaderChecksumTests {
         let insufficientDesc = RFC_791.HeaderChecksum.Error.insufficientBytes.description
         #expect(insufficientDesc == "HeaderChecksum requires 2 bytes")
     }
+}
 }

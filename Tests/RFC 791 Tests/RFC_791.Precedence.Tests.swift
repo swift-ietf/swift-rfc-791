@@ -14,8 +14,9 @@ import Testing
 
 @testable import RFC_791
 
-@Suite("RFC 791: Precedence Tests")
-struct PrecedenceTests {
+extension RFC_791.Precedence {
+    @Suite("RFC 791: Precedence Tests")
+    struct Test {
 
     // MARK: - Initialization Tests
 
@@ -139,4 +140,5 @@ struct PrecedenceTests {
         #expect(set.contains(.routine))
         #expect(set.contains(.priority))
     }
+}
 }

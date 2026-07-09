@@ -14,8 +14,9 @@ import Testing
 
 @testable import RFC_791
 
-@Suite("RFC 791: IPv4 Address Class Tests")
-struct IPv4AddressClassTests {
+extension RFC_791.IPv4.Address.Class {
+    @Suite("RFC 791: IPv4 Address Class Tests")
+    struct Test {
 
     // MARK: - Class A Tests
 
@@ -138,4 +139,5 @@ struct IPv4AddressClassTests {
         #expect(RFC_791.IPv4.Address.Class.d.description == "Class D (Multicast)")
         #expect(RFC_791.IPv4.Address.Class.e.description == "Class E (Reserved)")
     }
+}
 }

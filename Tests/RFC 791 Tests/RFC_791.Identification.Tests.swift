@@ -14,8 +14,9 @@ import Testing
 
 @testable import RFC_791
 
-@Suite("RFC_791.Identification Tests")
-struct IdentificationTests {
+extension RFC_791.Identification {
+    @Suite("RFC_791.Identification Tests")
+    struct Test {
 
     // MARK: - Raw Value Initialization
 
@@ -127,4 +128,5 @@ struct IdentificationTests {
         let insufficientDesc = RFC_791.Identification.Error.insufficientBytes.description
         #expect(insufficientDesc == "Identification requires 2 bytes")
     }
+}
 }

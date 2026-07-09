@@ -14,8 +14,9 @@ import Testing
 
 @testable import RFC_791
 
-@Suite("RFC_791.TotalLength Tests")
-struct TotalLengthTests {
+extension RFC_791.TotalLength {
+    @Suite("RFC_791.TotalLength Tests")
+    struct Test {
 
     // MARK: - Raw Value Initialization
 
@@ -160,4 +161,5 @@ struct TotalLengthTests {
         let tooSmallDesc = RFC_791.TotalLength.Error.tooSmall(10).description
         #expect(tooSmallDesc == "TotalLength 10 is less than minimum header size of 20")
     }
+}
 }

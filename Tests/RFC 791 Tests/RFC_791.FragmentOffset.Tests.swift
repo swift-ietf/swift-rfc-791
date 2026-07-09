@@ -14,8 +14,9 @@ import Testing
 
 @testable import RFC_791
 
-@Suite("RFC_791.FragmentOffset Tests")
-struct FragmentOffsetTests {
+extension RFC_791.FragmentOffset {
+    @Suite("RFC_791.FragmentOffset Tests")
+    struct Test {
 
     // MARK: - Raw Value Initialization
 
@@ -175,4 +176,5 @@ struct FragmentOffsetTests {
         let insufficientDesc = RFC_791.FragmentOffset.Error.insufficientBytes.description
         #expect(insufficientDesc == "FragmentOffset requires 2 bytes")
     }
+}
 }

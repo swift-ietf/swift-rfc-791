@@ -14,8 +14,9 @@ import Testing
 
 @testable import RFC_791
 
-@Suite("RFC 791: Type of Service Tests")
-struct TypeOfServiceTests {
+extension RFC_791.TypeOfService {
+    @Suite("RFC 791: Type of Service Tests")
+    struct Test {
 
     // MARK: - Initialization Tests
 
@@ -223,4 +224,5 @@ struct TypeOfServiceTests {
         #expect(desc.contains("HighReliability"))
         #expect(!desc.contains("HighThroughput"))
     }
+}
 }

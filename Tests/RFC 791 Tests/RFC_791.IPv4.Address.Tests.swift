@@ -14,8 +14,9 @@ import Testing
 
 @testable import RFC_791
 
-@Suite("RFC 791: IPv4 Address Tests")
-struct IPv4AddressTests {
+extension RFC_791.IPv4.Address {
+    @Suite("RFC 791: IPv4 Address Tests")
+    struct Test {
 
     // MARK: - Initialization Tests
 
@@ -289,7 +290,7 @@ struct IPv4AddressTests {
     @Test
     func `Binary.Parseable rejects insufficient input`() {
         var source: [Byte] = [192, 168, 1]  // only 3 bytes
-        #expect(throws: (any Error).self) {
+        #expect(throws: (any Swift.Error).self) {
             _ = try RFC_791.IPv4.Address.parse(from: &source)
         }
     }
@@ -300,4 +301,5 @@ struct IPv4AddressTests {
         #expect(address.octets == (172, 16, 0, 1))
         #expect(String(decoding: address.serialized.underlying, as: UTF8.self) == "172.16.0.1")
     }
+}
 }

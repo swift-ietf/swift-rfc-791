@@ -14,8 +14,9 @@ import Testing
 
 @testable import RFC_791
 
-@Suite("RFC 791: Flags Tests")
-struct FlagsTests {
+extension RFC_791.Flags {
+    @Suite("RFC 791: Flags Tests")
+    struct Test {
 
     // MARK: - Initialization Tests
 
@@ -194,4 +195,5 @@ struct FlagsTests {
         #expect(both.description.contains("DF"))
         #expect(both.description.contains("MF"))
     }
+}
 }

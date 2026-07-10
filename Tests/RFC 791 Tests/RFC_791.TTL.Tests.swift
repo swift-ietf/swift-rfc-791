@@ -14,142 +14,144 @@ import Testing
 
 @testable import RFC_791
 
-@Suite("RFC_791.TTL Tests")
-struct TTLTests {
+extension RFC_791.TTL {
+    @Suite("RFC_791.TTL Tests")
+    struct Test {
 
-    // MARK: - Raw Value Initialization
+        // MARK: - Raw Value Initialization
 
-    @Test
-    func `All 8-bit values are valid TTL values`() {
-        for value: UInt8 in 0...255 {
-            let ttl = RFC_791.TTL(rawValue: value)
-            #expect(ttl.rawValue == value)
-        }
-    }
-
-    // MARK: - Static Constants
-
-    @Test
-    func `Default64 constant (Linux/macOS)`() {
-        #expect(RFC_791.TTL.default64.rawValue == 64)
-    }
-
-    @Test
-    func `Default128 constant (Windows)`() {
-        #expect(RFC_791.TTL.default128.rawValue == 128)
-    }
-
-    @Test
-    func `Maximum constant`() {
-        #expect(RFC_791.TTL.maximum.rawValue == 255)
-    }
-
-    @Test
-    func `Expired constant`() {
-        #expect(RFC_791.TTL.expired.rawValue == 0)
-        #expect(RFC_791.TTL.expired.isExpired)
-    }
-
-    @Test
-    func `LinkLocal constant`() {
-        #expect(RFC_791.TTL.linkLocal.rawValue == 1)
-    }
-
-    // MARK: - Computed Properties
-
-    @Test
-    func `isExpired property`() {
-        #expect(RFC_791.TTL(rawValue: 0).isExpired == true)
-        #expect(RFC_791.TTL(rawValue: 1).isExpired == false)
-        #expect(RFC_791.TTL(rawValue: 255).isExpired == false)
-    }
-
-    @Test
-    func `decremented property`() {
-        #expect(RFC_791.TTL(rawValue: 64).decremented?.rawValue == 63)
-        #expect(RFC_791.TTL(rawValue: 1).decremented?.rawValue == 0)
-        #expect(RFC_791.TTL(rawValue: 0).decremented == nil)
-    }
-
-    @Test
-    func `Decrement chain simulation`() {
-        var ttl: RFC_791.TTL? = RFC_791.TTL(rawValue: 5)
-        var hops = 0
-
-        while let current = ttl {
-            ttl = current.decremented
-            hops += 1
+        @Test
+        func `All 8-bit values are valid TTL values`() {
+            for value: UInt8 in 0...255 {
+                let ttl = RFC_791.TTL(rawValue: value)
+                #expect(ttl.rawValue == value)
+            }
         }
 
-        // Starting at 5, we decrement through 4, 3, 2, 1, 0, then nil
-        // That's 6 iterations (including the 0 state)
-        #expect(hops == 6)
-    }
+        // MARK: - Static Constants
 
-    // MARK: - Byte Parsing
-
-    @Test
-    func `Parse TTL from bytes`() throws {
-        let bytes: [Byte] = [64]
-        let ttl = try RFC_791.TTL(bytes: bytes)
-        #expect(ttl.rawValue == 64)
-    }
-
-    @Test
-    func `Parse from empty bytes throws error`() {
-        let bytes: [Byte] = []
-        #expect(throws: RFC_791.TTL.Error.empty) {
-            try RFC_791.TTL(bytes: bytes)
+        @Test
+        func `Default64 constant (Linux/macOS)`() {
+            #expect(RFC_791.TTL.default64.rawValue == 64)
         }
-    }
 
-    // MARK: - Serialization
+        @Test
+        func `Default128 constant (Windows)`() {
+            #expect(RFC_791.TTL.default128.rawValue == 128)
+        }
 
-    @Test
-    func `Serialize TTL to bytes`() {
-        var buffer: [Byte] = []
-        RFC_791.TTL.default64.serialize(into: &buffer)
-        #expect(buffer == [64])
-    }
+        @Test
+        func `Maximum constant`() {
+            #expect(RFC_791.TTL.maximum.rawValue == 255)
+        }
 
-    @Test
-    func `Round-trip serialization`() throws {
-        let original = RFC_791.TTL(rawValue: 128)
-        var buffer: [Byte] = []
-        original.serialize(into: &buffer)
+        @Test
+        func `Expired constant`() {
+            #expect(RFC_791.TTL.expired.rawValue == 0)
+            #expect(RFC_791.TTL.expired.isExpired)
+        }
 
-        let parsed = try RFC_791.TTL(bytes: buffer)
-        #expect(parsed == original)
-    }
+        @Test
+        func `LinkLocal constant`() {
+            #expect(RFC_791.TTL.linkLocal.rawValue == 1)
+        }
 
-    // MARK: - CustomStringConvertible
+        // MARK: - Computed Properties
 
-    @Test
-    func `Description format`() {
-        #expect(RFC_791.TTL(rawValue: 64).description == "TTL(64)")
-        #expect(RFC_791.TTL(rawValue: 0).description == "TTL(0)")
-    }
+        @Test
+        func `isExpired property`() {
+            #expect(RFC_791.TTL(rawValue: 0).isExpired == true)
+            #expect(RFC_791.TTL(rawValue: 1).isExpired == false)
+            #expect(RFC_791.TTL(rawValue: 255).isExpired == false)
+        }
 
-    // MARK: - Comparable
+        @Test
+        func `decremented property`() {
+            #expect(RFC_791.TTL(rawValue: 64).decremented?.rawValue == 63)
+            #expect(RFC_791.TTL(rawValue: 1).decremented?.rawValue == 0)
+            #expect(RFC_791.TTL(rawValue: 0).decremented == nil)
+        }
 
-    @Test
-    func `TTL values are comparable`() {
-        #expect(RFC_791.TTL.expired < RFC_791.TTL.default64)
-        #expect(RFC_791.TTL.default64 < RFC_791.TTL.maximum)
-    }
+        @Test
+        func `Decrement chain simulation`() {
+            var ttl: RFC_791.TTL? = RFC_791.TTL(rawValue: 5)
+            var hops = 0
 
-    // MARK: - ExpressibleByIntegerLiteral
+            while let current = ttl {
+                ttl = current.decremented
+                hops += 1
+            }
 
-    @Test
-    func `Integer literal initialization`() {
-        let ttl: RFC_791.TTL = 64
-        #expect(ttl.rawValue == 64)
-    }
+            // Starting at 5, we decrement through 4, 3, 2, 1, 0, then nil
+            // That's 6 iterations (including the 0 state)
+            #expect(hops == 6)
+        }
 
-    // MARK: - Error Tests
+        // MARK: - Byte Parsing
 
-    @Test
-    func `Error descriptions`() {
-        #expect(RFC_791.TTL.Error.empty.description == "TTL data cannot be empty")
+        @Test
+        func `Parse TTL from bytes`() throws {
+            let bytes: [Byte] = [64]
+            let ttl = try RFC_791.TTL(bytes: bytes)
+            #expect(ttl.rawValue == 64)
+        }
+
+        @Test
+        func `Parse from empty bytes throws error`() {
+            let bytes: [Byte] = []
+            #expect(throws: RFC_791.TTL.Error.empty) {
+                try RFC_791.TTL(bytes: bytes)
+            }
+        }
+
+        // MARK: - Serialization
+
+        @Test
+        func `Serialize TTL to bytes`() {
+            var buffer: [Byte] = []
+            RFC_791.TTL.default64.serialize(into: &buffer)
+            #expect(buffer == [64])
+        }
+
+        @Test
+        func `Round-trip serialization`() throws {
+            let original = RFC_791.TTL(rawValue: 128)
+            var buffer: [Byte] = []
+            original.serialize(into: &buffer)
+
+            let parsed = try RFC_791.TTL(bytes: buffer)
+            #expect(parsed == original)
+        }
+
+        // MARK: - CustomStringConvertible
+
+        @Test
+        func `Description format`() {
+            #expect(RFC_791.TTL(rawValue: 64).description == "TTL(64)")
+            #expect(RFC_791.TTL(rawValue: 0).description == "TTL(0)")
+        }
+
+        // MARK: - Comparable
+
+        @Test
+        func `TTL values are comparable`() {
+            #expect(RFC_791.TTL.expired < RFC_791.TTL.default64)
+            #expect(RFC_791.TTL.default64 < RFC_791.TTL.maximum)
+        }
+
+        // MARK: - ExpressibleByIntegerLiteral
+
+        @Test
+        func `Integer literal initialization`() {
+            let ttl: RFC_791.TTL = 64
+            #expect(ttl.rawValue == 64)
+        }
+
+        // MARK: - Error Tests
+
+        @Test
+        func `Error descriptions`() {
+            #expect(RFC_791.TTL.Error.empty.description == "TTL data cannot be empty")
+        }
     }
 }

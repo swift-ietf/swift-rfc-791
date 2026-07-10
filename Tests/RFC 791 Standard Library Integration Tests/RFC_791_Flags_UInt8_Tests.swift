@@ -14,26 +14,28 @@ import RFC_791
 import RFC_791_Standard_Library_Integration
 import Testing
 
-@Suite("RFC 791 Flags UInt8 forwarder")
-struct RFC_791_Flags_UInt8_Tests {
-    @Test
-    func `forwarder produces same bytes as byte-domain primary`() {
-        let flags = RFC_791.Flags(dontFragment: true)
-        let uint8Bytes: [UInt8] = [UInt8](flags)
-        #expect(uint8Bytes == [0b0100_0000])
-    }
+extension RFC_791.Flags {
+    @Suite("RFC 791 Flags UInt8 forwarder")
+    struct Test {
+        @Test
+        func `forwarder produces same bytes as byte-domain primary`() {
+            let flags = RFC_791.Flags(dontFragment: true)
+            let uint8Bytes: [UInt8] = [UInt8](flags)
+            #expect(uint8Bytes == [0b0100_0000])
+        }
 
-    @Test
-    func `forwarder handles all-flags-set`() {
-        let flags = RFC_791.Flags(dontFragment: true, moreFragments: true)
-        let uint8Bytes: [UInt8] = [UInt8](flags)
-        #expect(uint8Bytes == [0b0110_0000])
-    }
+        @Test
+        func `forwarder handles all-flags-set`() {
+            let flags = RFC_791.Flags(dontFragment: true, moreFragments: true)
+            let uint8Bytes: [UInt8] = [UInt8](flags)
+            #expect(uint8Bytes == [0b0110_0000])
+        }
 
-    @Test
-    func `forwarder handles no-flags`() {
-        let flags = RFC_791.Flags.none
-        let uint8Bytes: [UInt8] = [UInt8](flags)
-        #expect(uint8Bytes == [0])
+        @Test
+        func `forwarder handles no-flags`() {
+            let flags = RFC_791.Flags.none
+            let uint8Bytes: [UInt8] = [UInt8](flags)
+            #expect(uint8Bytes == [0])
+        }
     }
 }

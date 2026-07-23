@@ -48,7 +48,9 @@ extension RFC_791.IPv4.Address {
             // first dotted-decimal octet in the lowest memory address.
             let address = RFC_791.IPv4.Address(192, 168, 1, 1)
 
-            #expect(address.bigEndian == address.rawValue.bigEndian)
+            // Round-trip through the stdlib's bigEndian init recovers the
+            // host-order value on any host endianness.
+            #expect(UInt32(bigEndian: address.bigEndian) == 0xC0A8_0101)
             withUnsafeBytes(of: address.bigEndian) { bytes in
                 #expect(bytes[0] == 192)
                 #expect(bytes[1] == 168)

@@ -134,6 +134,21 @@ extension RFC_791.IPv4.Address {
     }
 }
 
+// MARK: - Network Byte Order
+
+extension RFC_791.IPv4.Address {
+    /// The 32-bit address value in network byte order (big-endian).
+    ///
+    /// RFC 791 transmits addresses most-significant-octet first ("network
+    /// byte order"). This projection is the typed boundary for storage that
+    /// keeps addresses in network order — e.g. ISO 9945 socket addresses
+    /// (`in_addr.s_addr`) — mirroring the stdlib's `FixedWidthInteger`
+    /// `bigEndian` vocabulary. Host-order arithmetic stays on `rawValue`.
+    public var bigEndian: UInt32 {
+        rawValue.bigEndian
+    }
+}
+
 // MARK: - Binary.Serializable Conformance
 extension RFC_791.IPv4.Address: Binary.Serializable {
     static public func serialize<Buffer>(

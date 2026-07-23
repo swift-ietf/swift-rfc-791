@@ -43,6 +43,21 @@ extension RFC_791.IPv4.Address {
         }
 
         @Test
+        func `IPv4 Address network byte order projection`() throws {
+            // 192.168.1.1 = 0xC0A80101 host-order; bigEndian stores the
+            // first dotted-decimal octet in the lowest memory address.
+            let address = RFC_791.IPv4.Address(192, 168, 1, 1)
+
+            #expect(address.bigEndian == address.rawValue.bigEndian)
+            withUnsafeBytes(of: address.bigEndian) { bytes in
+                #expect(bytes[0] == 192)
+                #expect(bytes[1] == 168)
+                #expect(bytes[2] == 1)
+                #expect(bytes[3] == 1)
+            }
+        }
+
+        @Test
         func `IPv4 Address from string - valid`() throws {
             let address: RFC_791.IPv4.Address = try .init("192.168.1.1")
 

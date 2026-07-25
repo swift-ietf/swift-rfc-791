@@ -3,3 +3,4 @@ builder:
   configs:
   - documentation_targets:
     - RFC 791
+    - RFC 791 Standard Library Integration

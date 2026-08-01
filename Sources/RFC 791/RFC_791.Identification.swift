@@ -66,7 +66,7 @@ extension RFC_791.Identification {
     ///
     /// - Parameter bytes: Binary data containing the identification (2 bytes, big-endian)
     /// - Throws: `Error` if there are insufficient bytes
-    public init<Bytes: Collection>(bytes: Bytes) throws(Error)
+    public init<Bytes: Swift.Collection>(bytes: Bytes) throws(Error)
     where Bytes.Element == Byte {
         var iterator = bytes.makeIterator()
 

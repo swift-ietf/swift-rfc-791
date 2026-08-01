@@ -159,7 +159,7 @@ extension RFC_791.Flags {
     ///
     /// - Parameter bytes: Binary data containing the flags
     /// - Throws: `Error` if the format is invalid
-    public init<Bytes: Collection>(bytes: Bytes) throws(Error)
+    public init<Bytes: Swift.Collection>(bytes: Bytes) throws(Error)
     where Bytes.Element == Byte {
         guard let firstByte = bytes.first else {
             throw .empty

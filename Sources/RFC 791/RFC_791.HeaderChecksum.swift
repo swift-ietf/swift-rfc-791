@@ -73,7 +73,7 @@ extension RFC_791.HeaderChecksum {
     ///
     /// - Parameter header: The header bytes (checksum field should be zero)
     /// - Returns: The computed checksum
-    public static func compute<Bytes: Collection>(
+    public static func compute<Bytes: Swift.Collection>(
         over header: Bytes
     ) -> RFC_791.HeaderChecksum where Bytes.Element == Byte {
         var sum: UInt32 = 0
@@ -100,7 +100,7 @@ extension RFC_791.HeaderChecksum {
     ///
     /// - Parameter header: The complete header bytes including checksum
     /// - Returns: `true` if the checksum is valid
-    public static func verify<Bytes: Collection>(
+    public static func verify<Bytes: Swift.Collection>(
         header: Bytes
     ) -> Bool where Bytes.Element == Byte {
         var sum: UInt32 = 0
@@ -130,7 +130,7 @@ extension RFC_791.HeaderChecksum {
     ///
     /// - Parameter bytes: Binary data containing the checksum (2 bytes, big-endian)
     /// - Throws: `Error` if there are insufficient bytes
-    public init<Bytes: Collection>(bytes: Bytes) throws(Error)
+    public init<Bytes: Swift.Collection>(bytes: Bytes) throws(Error)
     where Bytes.Element == Byte {
         var iterator = bytes.makeIterator()
 

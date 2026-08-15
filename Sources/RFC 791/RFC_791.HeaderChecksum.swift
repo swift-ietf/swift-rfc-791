@@ -151,7 +151,7 @@ extension RFC_791.HeaderChecksum {
 // MARK: - Binary.Serializable Conformance
 
 extension RFC_791.HeaderChecksum: Binary.Serializable {
-    static public func serialize<Buffer>(
+    public static func serialize<Buffer>(
         _ headerChecksum: RFC_791.HeaderChecksum,
         into buffer: inout Buffer
     ) where Buffer: RangeReplaceableCollection, Buffer.Element == Byte {

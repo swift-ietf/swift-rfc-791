@@ -151,7 +151,7 @@ extension RFC_791.IPv4.Address {
 
 // MARK: - Binary.Serializable Conformance
 extension RFC_791.IPv4.Address: Binary.Serializable {
-    static public func serialize<Buffer>(
+    public static func serialize<Buffer>(
         _ address: RFC_791.IPv4.Address,
         into buffer: inout Buffer
     ) where Buffer: Swift.RangeReplaceableCollection, Buffer.Element == Byte {

@@ -137,7 +137,7 @@ extension RFC_791.FragmentOffset {
 // MARK: - Binary.Serializable Conformance
 
 extension RFC_791.FragmentOffset: Binary.Serializable {
-    static public func serialize<Buffer>(
+    public static func serialize<Buffer>(
         _ fragmentOffset: RFC_791.FragmentOffset,
         into buffer: inout Buffer
     ) where Buffer: RangeReplaceableCollection, Buffer.Element == Byte {

@@ -99,7 +99,7 @@ extension RFC_791.Version {
 // MARK: - Binary.Serializable Conformance
 
 extension RFC_791.Version: Binary.Serializable {
-    static public func serialize<Buffer>(
+    public static func serialize<Buffer>(
         _ version: RFC_791.Version,
         into buffer: inout Buffer
     ) where Buffer: RangeReplaceableCollection, Buffer.Element == Byte {

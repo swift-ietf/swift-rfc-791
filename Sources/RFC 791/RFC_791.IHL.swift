@@ -143,7 +143,7 @@ extension RFC_791.IHL {
 // MARK: - Binary.Serializable Conformance
 
 extension RFC_791.IHL: Binary.Serializable {
-    static public func serialize<Buffer>(
+    public static func serialize<Buffer>(
         _ ihl: RFC_791.IHL,
         into buffer: inout Buffer
     ) where Buffer: RangeReplaceableCollection, Buffer.Element == Byte {

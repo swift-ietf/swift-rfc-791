@@ -180,7 +180,7 @@ extension RFC_791.Flags {
 // MARK: - Binary.Serializable Conformance
 
 extension RFC_791.Flags: Binary.Serializable {
-    static public func serialize<Buffer>(
+    public static func serialize<Buffer>(
         _ flags: RFC_791.Flags,
         into buffer: inout Buffer
     ) where Buffer: RangeReplaceableCollection, Buffer.Element == Byte {

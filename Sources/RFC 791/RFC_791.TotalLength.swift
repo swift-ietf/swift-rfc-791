@@ -125,7 +125,7 @@ extension RFC_791.TotalLength {
 // MARK: - Binary.Serializable Conformance
 
 extension RFC_791.TotalLength: Binary.Serializable {
-    static public func serialize<Buffer>(
+    public static func serialize<Buffer>(
         _ totalLength: RFC_791.TotalLength,
         into buffer: inout Buffer
     ) where Buffer: RangeReplaceableCollection, Buffer.Element == Byte {

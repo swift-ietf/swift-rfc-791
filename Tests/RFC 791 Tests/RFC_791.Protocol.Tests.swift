@@ -1,27 +1,12 @@
-// ===----------------------------------------------------------------------===//
-//
-// Copyright (c) 2025 Coen ten Thije Boonkkamp
-// Licensed under Apache License v2.0
-//
-// See LICENSE.txt for license information
-// See CONTRIBUTORS.txt for the list of project contributors
-//
-// SPDX-License-Identifier: Apache-2.0
-//
-// ===----------------------------------------------------------------------===//
-
 import Foundation
 import Testing
 
 @testable import RFC_791
 
-// Typealias to avoid backtick issues with reserved keyword
 private typealias IPProtocol = RFC_791.`Protocol`
 
 @Suite("RFC 791: Protocol Tests")
 struct ProtocolTests {
-
-    // MARK: - Initialization Tests
 
     @Test
     func `Protocol from raw value`() {
@@ -32,15 +17,13 @@ struct ProtocolTests {
 
     @Test
     func `Protocol all values valid`() {
-        // All Byte values are valid protocol numbers
+
         for value: UInt8 in 0...255 {
             let typed = Byte(value)
             let proto = IPProtocol(rawValue: typed)
             #expect(proto.rawValue == typed)
         }
     }
-
-    // MARK: - Static Constants Tests
 
     @Test
     func `Protocol static constants`() {
@@ -55,8 +38,6 @@ struct ProtocolTests {
         #expect(IPProtocol.icmpv6.rawValue == 58)
         #expect(IPProtocol.sctp.rawValue == 132)
     }
-
-    // MARK: - Byte Parsing Tests
 
     @Test
     func `Protocol from bytes - valid`() throws {
@@ -79,12 +60,10 @@ struct ProtocolTests {
 
     @Test
     func `Protocol from bytes - multiple bytes (uses first)`() throws {
-        // Should only use first byte
+
         let proto = try IPProtocol(bytes: [0x06, 0x11, 0x01])
         #expect(proto == .tcp)
     }
-
-    // MARK: - Serialization Tests
 
     @Test
     func `Protocol serialization`() {
@@ -99,8 +78,6 @@ struct ProtocolTests {
         let proto = IPProtocol.udp
         #expect(proto.bytes == [0x11])
     }
-
-    // MARK: - Round Trip Tests
 
     @Test
     func `Protocol round trip`() throws {
@@ -120,8 +97,6 @@ struct ProtocolTests {
         }
     }
 
-    // MARK: - Equality Tests
-
     @Test
     func `Protocol equality`() {
         let proto1 = IPProtocol.tcp
@@ -132,21 +107,17 @@ struct ProtocolTests {
         #expect(proto1 != proto3)
     }
 
-    // MARK: - Hashable Tests
-
     @Test
     func `Protocol hashable`() {
         var set: Set<IPProtocol> = []
         set.insert(.tcp)
         set.insert(.udp)
-        set.insert(.tcp)  // Duplicate
+        set.insert(.tcp)
 
         #expect(set.count == 2)
         #expect(set.contains(.tcp))
         #expect(set.contains(.udp))
     }
-
-    // MARK: - Description Tests
 
     @Test
     func `Protocol description - known protocols`() {
@@ -171,17 +142,13 @@ struct ProtocolTests {
         #expect(proto0.description == "Protocol(0)")
     }
 
-    // MARK: - Codable Tests
-
     @Test
     func `Protocol codable`() throws {
         let original = IPProtocol.tcp
 
-        // Encode
         let encoder = JSONEncoder()
         let data = try encoder.encode(original)
 
-        // Decode
         let decoder = JSONDecoder()
         let decoded = try decoder.decode(IPProtocol.self, from: data)
 

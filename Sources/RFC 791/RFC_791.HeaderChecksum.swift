@@ -1,135 +1,61 @@
-// ===----------------------------------------------------------------------===//
-//
-// Copyright (c) 2025 Coen ten Thije Boonkkamp
-// Licensed under Apache License v2.0
-//
-// See LICENSE.txt for license information
-// See CONTRIBUTORS.txt for the list of project contributors
-//
-// SPDX-License-Identifier: Apache-2.0
-//
-// ===----------------------------------------------------------------------===//
-
 extension RFC_791 {
-    /// Header Checksum (RFC 791)
-    ///
-    /// A 16-bit one's complement of the one's complement sum of all 16-bit
-    /// words in the header. For purposes of computing the checksum, the value
-    /// of the checksum field is zero.
-    ///
-    /// ## Binary Format
-    ///
-    /// Per RFC 791 Section 3.1, Header Checksum is a 16-bit field.
-    ///
-    /// ## Algorithm
-    ///
-    /// 1. Set checksum field to zero
-    /// 2. Sum all 16-bit words in the header (using one's complement arithmetic)
-    /// 3. Take the one's complement of the result
-    ///
-    /// ## Verification
-    ///
-    /// When verifying, sum all 16-bit words including the checksum.
-    /// If valid, the result should be all 1s (0xFFFF in one's complement).
-    ///
-    /// ## Note
-    ///
-    /// The checksum must be recomputed at each router since TTL changes.
-    ///
-    /// ## Example
-    ///
-    /// ```swift
-    /// let checksum = RFC_791.HeaderChecksum(rawValue: 0xB861)
-    /// ```
+
     public struct HeaderChecksum: RawRepresentable, Hashable, Sendable, Codable {
-        /// The 16-bit raw value
+
         public let rawValue: UInt16
 
-        /// Creates a HeaderChecksum value WITHOUT validation
-        ///
-        /// **Warning**: Bypasses validation. Only use for:
-        /// - Static constants
-        /// - Pre-validated values
-        /// - Internal construction after validation
         init(__unchecked: Void, rawValue: UInt16) {
             self.rawValue = rawValue
         }
 
-        /// Creates a HeaderChecksum from a raw value
-        ///
-        /// All 16-bit values are valid checksums.
-        ///
-        /// - Parameter rawValue: The checksum value (0-65535)
         public init(rawValue: UInt16) {
             self.init(__unchecked: (), rawValue: rawValue)
         }
     }
 }
 
-// MARK: - Checksum Computation
-
 extension RFC_791.HeaderChecksum {
-    /// Computes the checksum for a header
-    ///
-    /// - Parameter header: The header bytes (checksum field should be zero)
-    /// - Returns: The computed checksum
+
     public static func compute<Bytes: Swift.Collection>(
         over header: Bytes
     ) -> RFC_791.HeaderChecksum where Bytes.Element == Byte {
         var sum: UInt32 = 0
         var iterator = header.makeIterator()
 
-        // Sum all 16-bit words. UInt32 accumulator is arithmetic-domain;
-        // cross the byte-domain boundary via .underlying.
         while let high = iterator.next() {
             let low = iterator.next()?.underlying ?? 0
             sum += UInt32(high.underlying) << 8 | UInt32(low)
         }
 
-        // Fold 32-bit sum to 16 bits (add carry bits)
         while sum > 0xFFFF {
             sum = (sum & 0xFFFF) + (sum >> 16)
         }
 
-        // One's complement
         let checksum = UInt16(~sum & 0xFFFF)
         return RFC_791.HeaderChecksum(__unchecked: (), rawValue: checksum)
     }
 
-    /// Verifies that a header's checksum is correct
-    ///
-    /// - Parameter header: The complete header bytes including checksum
-    /// - Returns: `true` if the checksum is valid
     public static func verify<Bytes: Swift.Collection>(
         header: Bytes
     ) -> Bool where Bytes.Element == Byte {
         var sum: UInt32 = 0
         var iterator = header.makeIterator()
 
-        // Sum all 16-bit words including checksum. UInt32 accumulator is
-        // arithmetic-domain; cross the byte-domain boundary via .underlying.
         while let high = iterator.next() {
             let low = iterator.next()?.underlying ?? 0
             sum += UInt32(high.underlying) << 8 | UInt32(low)
         }
 
-        // Fold 32-bit sum to 16 bits
         while sum > 0xFFFF {
             sum = (sum & 0xFFFF) + (sum >> 16)
         }
 
-        // Valid checksum should produce 0xFFFF
         return sum == 0xFFFF
     }
 }
 
-// MARK: - Byte Parsing
-
 extension RFC_791.HeaderChecksum {
-    /// Creates a HeaderChecksum from bytes (big-endian)
-    ///
-    /// - Parameter bytes: Binary data containing the checksum (2 bytes, big-endian)
-    /// - Throws: `Error` if there are insufficient bytes
+
     public init<Bytes: Swift.Collection>(bytes: Bytes) throws(Error)
     where Bytes.Element == Byte {
         var iterator = bytes.makeIterator()
@@ -141,26 +67,20 @@ extension RFC_791.HeaderChecksum {
             throw .insufficientBytes
         }
 
-        // UInt16 storage is arithmetic-domain; cross the byte-domain boundary
-        // via .underlying at the conformance boundary.
         let value = UInt16(high.underlying) << 8 | UInt16(low.underlying)
         self.init(__unchecked: (), rawValue: value)
     }
 }
-
-// MARK: - Binary.Serializable Conformance
 
 extension RFC_791.HeaderChecksum: Binary.Serializable {
     public static func serialize<Buffer>(
         _ headerChecksum: RFC_791.HeaderChecksum,
         into buffer: inout Buffer
     ) where Buffer: RangeReplaceableCollection, Buffer.Element == Byte {
-        // UInt16 → [Byte] via Byte-primary BinaryInteger.bytes(endianness:).
+
         buffer.append(contentsOf: headerChecksum.rawValue.bytes(endianness: .big))
     }
 }
-
-// MARK: - CustomStringConvertible
 
 extension RFC_791.HeaderChecksum: CustomStringConvertible {
     public var description: String {
@@ -168,9 +88,7 @@ extension RFC_791.HeaderChecksum: CustomStringConvertible {
     }
 }
 
-// MARK: - Static Constants
-
 extension RFC_791.HeaderChecksum {
-    /// Zero checksum (used during computation)
+
     public static let zero = RFC_791.HeaderChecksum(__unchecked: (), rawValue: 0)
 }

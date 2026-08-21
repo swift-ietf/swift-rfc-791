@@ -1,31 +1,15 @@
-// ===----------------------------------------------------------------------===//
-//
-// Copyright (c) 2025 Coen ten Thije Boonkkamp
-// Licensed under Apache License v2.0
-//
-// See LICENSE.txt for license information
-// See CONTRIBUTORS.txt for the list of project contributors
-//
-// SPDX-License-Identifier: Apache-2.0
-//
-// ===----------------------------------------------------------------------===//
-
 import Testing
 
 @testable import RFC_791
 
-// Typealias to avoid backtick issues with reserved keyword
 private typealias IPProtocol = RFC_791.`Protocol`
 
-/// Tests that verify code examples in README.md compile and work correctly.
 @Suite("README Verification")
 struct ReadmeVerificationTests {
 
-    // MARK: - Quick Start Examples
-
     @Test
     func `Quick Start - Create IPv4 address`() {
-        // Create an IPv4 address from dotted-decimal notation
+
         let address: RFC_791.IPv4.Address = "192.168.1.1"
         #expect(address.octets == (192, 168, 1, 1))
         #expect(address.class == .c)
@@ -33,9 +17,9 @@ struct ReadmeVerificationTests {
 
     @Test
     func `Quick Start - Header fields`() {
-        // Create header fields
-        let ttl = RFC_791.TTL.default64  // 64 hops (Linux/macOS default)
-        let proto = IPProtocol.tcp  // Protocol number 6
+
+        let ttl = RFC_791.TTL.default64
+        let proto = IPProtocol.tcp
         let flags = RFC_791.Flags(dontFragment: true, moreFragments: false)
 
         #expect(ttl.rawValue == 64)
@@ -46,29 +30,22 @@ struct ReadmeVerificationTests {
 
     @Test
     func `Quick Start - Serialize to ASCII bytes`() {
-        // Address serializes via two format siblings: ASCII text (dotted-decimal)
-        // and binary wire (4 octets).
+
         let address: RFC_791.IPv4.Address = "192.168.1.1"
         let text: [Byte] = address.serialized
         let wire: [Byte] = address.bytes
 
-        // Verify it produces ASCII dotted-decimal. Bridge via .underlying
-        // for the stdlib UTF-8 idiom.
         #expect(String(decoding: text.underlying, as: UTF8.self) == "192.168.1.1")
         #expect(wire == [192, 168, 1, 1])
     }
 
-    // MARK: - IPv4 Addresses Examples
-
     @Test
     func `IPv4 Addresses - Creation methods`() {
-        // From string literal
+
         let addr1: RFC_791.IPv4.Address = "10.0.0.1"
 
-        // From raw 32-bit value
-        let addr2 = RFC_791.IPv4.Address(rawValue: 0xC0A8_0001)  // 192.168.0.1
+        let addr2 = RFC_791.IPv4.Address(rawValue: 0xC0A8_0001)
 
-        // From individual octets
         let addr3 = RFC_791.IPv4.Address(127, 0, 0, 1)
 
         #expect(addr1.octets == (10, 0, 0, 1))
@@ -80,7 +57,6 @@ struct ReadmeVerificationTests {
     func `IPv4 Addresses - Access octets`() {
         let addr: RFC_791.IPv4.Address = "10.0.0.1"
 
-        // Access octets
         let (a, b, c, d) = addr.octets
         let description = "\(a).\(b).\(c).\(d)"
 
@@ -91,40 +67,37 @@ struct ReadmeVerificationTests {
     func `IPv4 Addresses - Classification`() {
         let addr: RFC_791.IPv4.Address = "10.0.0.1"
 
-        // Address classification (RFC 791 Section 3.2)
-        #expect(addr.class == .a)  // 10.x.x.x
+        #expect(addr.class == .a)
         #expect(addr.is.multicast == false)
         #expect(addr.is.reserved == false)
     }
 
     @Test
     func `IPv4 Addresses - Special addresses`() {
-        // Special addresses
-        #expect(RFC_791.IPv4.Address.any.rawValue == 0)  // 0.0.0.0
-        #expect(RFC_791.IPv4.Address.broadcast.rawValue == 0xFFFF_FFFF)  // 255.255.255.255
+
+        #expect(RFC_791.IPv4.Address.any.rawValue == 0)
+        #expect(RFC_791.IPv4.Address.broadcast.rawValue == 0xFFFF_FFFF)
         #expect(RFC_791.IPv4.Address.loopback.octets == (127, 0, 0, 1))
     }
 
-    // MARK: - IP Header Fields Examples
-
     @Test
     func `Header Fields - Version`() {
-        // Version (4-bit)
+
         let version = RFC_791.Version.v4
         #expect(version.isIPv4 == true)
     }
 
     @Test
     func `Header Fields - IHL`() {
-        // Internet Header Length (4-bit, in 32-bit words)
-        let ihl = RFC_791.IHL.minimum  // 5 (20 bytes, no options)
+
+        let ihl = RFC_791.IHL.minimum
         #expect(ihl.byteLength == 20)
         #expect(ihl.hasOptions == false)
     }
 
     @Test
     func `Header Fields - TTL`() {
-        // Time to Live (8-bit)
+
         let ttl = RFC_791.TTL(rawValue: 64)
         #expect(ttl.isExpired == false)
         #expect(ttl.decremented?.rawValue == 63)
@@ -132,7 +105,7 @@ struct ReadmeVerificationTests {
 
     @Test
     func `Header Fields - Protocol`() {
-        // Protocol (8-bit)
+
         #expect(IPProtocol.icmp.rawValue == 1)
         #expect(IPProtocol.tcp.rawValue == 6)
         #expect(IPProtocol.udp.rawValue == 17)
@@ -140,20 +113,17 @@ struct ReadmeVerificationTests {
 
     @Test
     func `Header Fields - Identification and TotalLength`() {
-        // Identification (16-bit)
+
         let id = RFC_791.Identification(rawValue: 0x1234)
         #expect(id.rawValue == 0x1234)
 
-        // Total Length (16-bit)
         let length = RFC_791.TotalLength(rawValue: 1500)!
-        #expect(length.maximumDataLength == 1480)  // minus minimum header
+        #expect(length.maximumDataLength == 1480)
     }
-
-    // MARK: - Type of Service Examples
 
     @Test
     func `Type of Service - Creation and components`() {
-        // Create with precedence and flags
+
         let tos = RFC_791.TypeOfService(
             precedence: .immediate,
             lowDelay: true,
@@ -161,7 +131,6 @@ struct ReadmeVerificationTests {
             highReliability: true
         )
 
-        // Extract components
         #expect(tos.precedence == .immediate)
         #expect(tos.lowDelay == true)
         #expect(tos.highThroughput == false)
@@ -170,7 +139,7 @@ struct ReadmeVerificationTests {
 
     @Test
     func `Type of Service - Precedence levels`() {
-        // Precedence levels (RFC 791 Section 3.1)
+
         #expect(RFC_791.Precedence.routine.rawValue == 0)
         #expect(RFC_791.Precedence.priority.rawValue == 1)
         #expect(RFC_791.Precedence.immediate.rawValue == 2)
@@ -181,11 +150,9 @@ struct ReadmeVerificationTests {
         #expect(RFC_791.Precedence.networkControl.rawValue == 7)
     }
 
-    // MARK: - Fragmentation Examples
-
     @Test
     func `Fragmentation - Flags`() {
-        // Fragment flags
+
         let flags = RFC_791.Flags(dontFragment: false, moreFragments: true)
         #expect(flags.dontFragment == false)
         #expect(flags.moreFragments == true)
@@ -193,30 +160,27 @@ struct ReadmeVerificationTests {
 
     @Test
     func `Fragmentation - Fragment offset`() {
-        // Fragment offset (13-bit, in 8-octet units)
+
         let offset = RFC_791.FragmentOffset(rawValue: 185)!
-        #expect(offset.byteOffset == 1480)  // typical MTU boundary
+        #expect(offset.byteOffset == 1480)
         #expect(offset.isFirstFragment == false)
 
-        // Create from byte offset
         let firstFrag = RFC_791.FragmentOffset.fromByteOffset(0)!
         #expect(firstFrag.isFirstFragment == true)
     }
 
-    // MARK: - Header Checksum Examples
-
     @Test
     func `Header Checksum - Compute`() {
-        // Compute checksum for a header (with checksum field zeroed)
+
         let header: [Byte] = [
-            0x45, 0x00,  // Version, IHL, TOS
-            0x00, 0x73,  // Total Length
-            0x00, 0x00,  // Identification
-            0x40, 0x00,  // Flags, Fragment Offset
-            0x40, 0x11,  // TTL, Protocol
-            0x00, 0x00,  // Checksum (zero for computation)
-            0xC0, 0xA8, 0x00, 0x01,  // Source: 192.168.0.1
-            0xC0, 0xA8, 0x00, 0xC7,  // Destination: 192.168.0.199
+            0x45, 0x00,
+            0x00, 0x73,
+            0x00, 0x00,
+            0x40, 0x00,
+            0x40, 0x11,
+            0x00, 0x00,
+            0xC0, 0xA8, 0x00, 0x01,
+            0xC0, 0xA8, 0x00, 0xC7,
         ]
 
         let checksum = RFC_791.HeaderChecksum.compute(over: header)
@@ -225,53 +189,44 @@ struct ReadmeVerificationTests {
 
     @Test
     func `Header Checksum - Verify`() {
-        // Verify a header with checksum included
+
         let completeHeader: [Byte] = [
             0x45, 0x00, 0x00, 0x73, 0x00, 0x00, 0x40, 0x00,
-            0x40, 0x11, 0xB8, 0x61,  // Checksum at bytes 10-11
+            0x40, 0x11, 0xB8, 0x61,
             0xC0, 0xA8, 0x00, 0x01, 0xC0, 0xA8, 0x00, 0xC7,
         ]
 
         #expect(RFC_791.HeaderChecksum.verify(header: completeHeader) == true)
     }
 
-    // MARK: - Binary Serialization Examples
-
     @Test
     func `Binary Serialization - 16-bit and 8-bit fields`() {
         var buffer: [Byte] = []
 
-        // 16-bit fields (2 bytes each, big-endian)
         RFC_791.TotalLength(rawValue: 1500)!.serialize(into: &buffer)
         #expect(buffer == [0x05, 0xDC])
 
         RFC_791.Identification(rawValue: 0x1234).serialize(into: &buffer)
         RFC_791.HeaderChecksum(rawValue: 0xABCD).serialize(into: &buffer)
 
-        // 8-bit fields (1 byte each)
         RFC_791.TTL(rawValue: 64).serialize(into: &buffer)
         IPProtocol.tcp.serialize(into: &buffer)
 
-        // Verify sizes (2 + 2 + 2 + 1 + 1 = 8 bytes)
         #expect(buffer.count == 8)
     }
 
     @Test
     func `Binary Serialization - Address to ASCII`() {
-        // Address serializes to ASCII dotted-decimal (variable length)
+
         let address: RFC_791.IPv4.Address = "192.168.1.1"
         let bytes: [Byte] = address.serialized
 
-        // Verify ASCII output. Bridge via .underlying for the stdlib
-        // UTF-8 idiom.
         #expect(String(decoding: bytes.underlying, as: UTF8.self) == "192.168.1.1")
     }
 
-    // MARK: - Binary Parsing Examples
-
     @Test
     func `Binary Parsing - Address from ASCII`() throws {
-        // Parse address from ASCII dotted-decimal bytes
+
         let addrBytes: [Byte] = Array("192.168.1.1".utf8)
         let address = try RFC_791.IPv4.Address(ascii: addrBytes)
         #expect(address.octets == (192, 168, 1, 1))
@@ -279,15 +234,15 @@ struct ReadmeVerificationTests {
 
     @Test
     func `Binary Parsing - 16-bit fields`() throws {
-        // Parse 16-bit fields from binary
-        let lengthBytes: [Byte] = [0x05, 0xDC]  // 1500
+
+        let lengthBytes: [Byte] = [0x05, 0xDC]
         let length = try RFC_791.TotalLength(bytes: lengthBytes)
         #expect(length.rawValue == 1500)
     }
 
     @Test
     func `Binary Parsing - Error handling`() {
-        // Parse with error handling
+
         #expect(throws: RFC_791.TTL.Error.empty) {
             _ = try RFC_791.TTL(bytes: [] as [Byte])
         }

@@ -1,15 +1,3 @@
-// ===----------------------------------------------------------------------===//
-//
-// Copyright (c) 2025 Coen ten Thije Boonkkamp
-// Licensed under Apache License v2.0
-//
-// See LICENSE.txt for license information
-// See CONTRIBUTORS.txt for the list of project contributors
-//
-// SPDX-License-Identifier: Apache-2.0
-//
-// ===----------------------------------------------------------------------===//
-
 import Testing
 
 @testable import RFC_791
@@ -18,12 +6,10 @@ extension RFC_791.FragmentOffset {
     @Suite("RFC_791.FragmentOffset Tests")
     struct Test {
 
-        // MARK: - Raw Value Initialization
-
         @Test
         func `Valid fragment offset values (0-8191) are accepted`() {
             #expect(RFC_791.FragmentOffset(rawValue: 0)?.rawValue == 0)
-            #expect(RFC_791.FragmentOffset(rawValue: 185)?.rawValue == 185)  // 1480 bytes
+            #expect(RFC_791.FragmentOffset(rawValue: 185)?.rawValue == 185)
             #expect(RFC_791.FragmentOffset(rawValue: 0x1FFF)?.rawValue == 8191)
         }
 
@@ -32,8 +18,6 @@ extension RFC_791.FragmentOffset {
             #expect(RFC_791.FragmentOffset(rawValue: 0x2000) == nil)
             #expect(RFC_791.FragmentOffset(rawValue: 0xFFFF) == nil)
         }
-
-        // MARK: - Static Constants
 
         @Test
         func `Zero offset constant`() {
@@ -48,13 +32,11 @@ extension RFC_791.FragmentOffset {
             #expect(RFC_791.FragmentOffset.maximum.byteOffset == 65528)
         }
 
-        // MARK: - Computed Properties
-
         @Test
         func `byteOffset calculation`() {
             #expect(RFC_791.FragmentOffset(rawValue: 0)?.byteOffset == 0)
             #expect(RFC_791.FragmentOffset(rawValue: 1)?.byteOffset == 8)
-            // Typical MTU boundary
+
             #expect(RFC_791.FragmentOffset(rawValue: 185)?.byteOffset == 1480)
             #expect(RFC_791.FragmentOffset(rawValue: 8191)?.byteOffset == 65528)
         }
@@ -66,8 +48,6 @@ extension RFC_791.FragmentOffset {
             #expect(RFC_791.FragmentOffset(rawValue: 185)?.isFirstFragment == false)
         }
 
-        // MARK: - Factory Methods
-
         @Test
         func `Create from byte offset`() {
             #expect(RFC_791.FragmentOffset.fromByteOffset(0)?.rawValue == 0)
@@ -78,32 +58,30 @@ extension RFC_791.FragmentOffset {
 
         @Test
         func `Create from invalid byte offset`() {
-            #expect(RFC_791.FragmentOffset.fromByteOffset(-1) == nil)  // Negative
-            #expect(RFC_791.FragmentOffset.fromByteOffset(7) == nil)  // Not divisible by 8
-            #expect(RFC_791.FragmentOffset.fromByteOffset(65536) == nil)  // Too large
+            #expect(RFC_791.FragmentOffset.fromByteOffset(-1) == nil)
+            #expect(RFC_791.FragmentOffset.fromByteOffset(7) == nil)
+            #expect(RFC_791.FragmentOffset.fromByteOffset(65536) == nil)
         }
-
-        // MARK: - Byte Parsing
 
         @Test
         func `Parse fragment offset from bytes`() throws {
-            // Fragment offset is in lower 13 bits
-            let bytes: [Byte] = [0x00, 0xB9]  // Offset 185
+
+            let bytes: [Byte] = [0x00, 0xB9]
             let offset = try RFC_791.FragmentOffset(bytes: bytes)
             #expect(offset.rawValue == 185)
         }
 
         @Test
         func `Parse with flags in upper bits`() throws {
-            // Flags DF=1, MF=0 in upper 3 bits, offset 185
-            let bytes: [Byte] = [0x40, 0xB9]  // DF set, offset 185
+
+            let bytes: [Byte] = [0x40, 0xB9]
             let offset = try RFC_791.FragmentOffset(bytes: bytes)
-            #expect(offset.rawValue == 185)  // Flags should be masked out
+            #expect(offset.rawValue == 185)
         }
 
         @Test
         func `Parse maximum offset from bytes`() throws {
-            let bytes: [Byte] = [0x1F, 0xFF]  // Maximum 13-bit value
+            let bytes: [Byte] = [0x1F, 0xFF]
             let offset = try RFC_791.FragmentOffset(bytes: bytes)
             #expect(offset.rawValue == 8191)
         }
@@ -124,8 +102,6 @@ extension RFC_791.FragmentOffset {
             }
         }
 
-        // MARK: - Serialization
-
         @Test
         func `Serialize fragment offset to bytes`() {
             var buffer: [Byte] = []
@@ -142,15 +118,13 @@ extension RFC_791.FragmentOffset {
 
         @Test
         func `Round-trip serialization`() throws {
-            let original = RFC_791.FragmentOffset(rawValue: 370)!  // 2960 bytes
+            let original = RFC_791.FragmentOffset(rawValue: 370)!
             var buffer: [Byte] = []
             original.serialize(into: &buffer)
 
             let parsed = try RFC_791.FragmentOffset(bytes: buffer)
             #expect(parsed == original)
         }
-
-        // MARK: - CustomStringConvertible
 
         @Test
         func `Description format`() {
@@ -160,15 +134,11 @@ extension RFC_791.FragmentOffset {
             #expect(offset185Desc == "FragmentOffset(185 = 1480 bytes)")
         }
 
-        // MARK: - Comparable
-
         @Test
         func `Fragment offsets are comparable`() {
             #expect(RFC_791.FragmentOffset.zero < RFC_791.FragmentOffset.maximum)
             #expect(RFC_791.FragmentOffset(rawValue: 100)! < RFC_791.FragmentOffset(rawValue: 200)!)
         }
-
-        // MARK: - Error Tests
 
         @Test
         func `Error descriptions`() {

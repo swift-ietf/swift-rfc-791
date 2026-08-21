@@ -1,15 +1,3 @@
-// ===----------------------------------------------------------------------===//
-//
-// Copyright (c) 2025 Coen ten Thije Boonkkamp
-// Licensed under Apache License v2.0
-//
-// See LICENSE.txt for license information
-// See CONTRIBUTORS.txt for the list of project contributors
-//
-// SPDX-License-Identifier: Apache-2.0
-//
-// ===----------------------------------------------------------------------===//
-
 import Testing
 
 @testable import RFC_791
@@ -18,11 +6,9 @@ extension RFC_791.Flags {
     @Suite("RFC 791: Flags Tests")
     struct Test {
 
-        // MARK: - Initialization Tests
-
         @Test
         func `Flags from raw value - valid`() {
-            // Valid: reserved bit (0) is zero
+
             let flags = RFC_791.Flags(rawValue: 0b011)
             #expect(flags != nil)
             #expect(flags?.dontFragment == true)
@@ -31,7 +17,7 @@ extension RFC_791.Flags {
 
         @Test
         func `Flags from raw value - invalid (reserved bit set)`() {
-            // Invalid: reserved bit set
+
             #expect(RFC_791.Flags(rawValue: 0b100) == nil)
             #expect(RFC_791.Flags(rawValue: 0b111) == nil)
         }
@@ -52,27 +38,21 @@ extension RFC_791.Flags {
             #expect(flags.moreFragments == false)
         }
 
-        // MARK: - Flag Access Tests
-
         @Test
         func `Flags individual flag access`() {
-            // Don't Fragment only
+
             let df = RFC_791.Flags(dontFragment: true, moreFragments: false)
             #expect(df.dontFragment == true)
             #expect(df.moreFragments == false)
 
-            // More Fragments only
             let mf = RFC_791.Flags(dontFragment: false, moreFragments: true)
             #expect(mf.dontFragment == false)
             #expect(mf.moreFragments == true)
 
-            // Both flags
             let both = RFC_791.Flags(dontFragment: true, moreFragments: true)
             #expect(both.dontFragment == true)
             #expect(both.moreFragments == true)
         }
-
-        // MARK: - Static Constants Tests
 
         @Test
         func `Flags static constants`() {
@@ -87,11 +67,9 @@ extension RFC_791.Flags {
             #expect(RFC_791.Flags.moreFragments.moreFragments == true)
         }
 
-        // MARK: - Byte Parsing Tests
-
         @Test
         func `Flags from bytes - valid`() throws {
-            // Flags in upper 3 bits: 0b010_00000 = DF set
+
             let flags = try RFC_791.Flags(bytes: [0b0100_0000])
             #expect(flags.dontFragment == true)
             #expect(flags.moreFragments == false)
@@ -99,7 +77,7 @@ extension RFC_791.Flags {
 
         @Test
         func `Flags from bytes - MF set`() throws {
-            // Flags in upper 3 bits: 0b001_00000 = MF set
+
             let flags = try RFC_791.Flags(bytes: [0b0010_0000])
             #expect(flags.dontFragment == false)
             #expect(flags.moreFragments == true)
@@ -107,7 +85,7 @@ extension RFC_791.Flags {
 
         @Test
         func `Flags from bytes - both set`() throws {
-            // Flags in upper 3 bits: 0b011_00000 = DF and MF set
+
             let flags = try RFC_791.Flags(bytes: [0b0110_0000])
             #expect(flags.dontFragment == true)
             #expect(flags.moreFragments == true)
@@ -122,13 +100,11 @@ extension RFC_791.Flags {
 
         @Test
         func `Flags from bytes - reserved bit set`() {
-            // Reserved bit in upper 3 bits: 0b100_00000
+
             #expect(throws: RFC_791.Flags.Error.self) {
                 _ = try RFC_791.Flags(bytes: [0b1000_0000])
             }
         }
-
-        // MARK: - Serialization Tests
 
         @Test
         func `Flags serialization`() {
@@ -136,18 +112,15 @@ extension RFC_791.Flags {
             var buffer: [Byte] = []
             flags.serialize(into: &buffer)
 
-            // DF = bit 1 = 0b010, shifted left 5 = 0b0100_0000
             #expect(buffer == [0b0100_0000])
         }
 
         @Test
         func `Flags bytes property`() {
             let flags = RFC_791.Flags.moreFragments
-            // MF = bit 0 = 0b001, shifted left 5 = 0b0010_0000
+
             #expect(flags.bytes == [0b0010_0000])
         }
-
-        // MARK: - Round Trip Tests
 
         @Test
         func `Flags round trip`() throws {
@@ -159,8 +132,6 @@ extension RFC_791.Flags {
             #expect(parsed.moreFragments == original.moreFragments)
         }
 
-        // MARK: - Equality Tests
-
         @Test
         func `Flags equality`() {
             let flags1 = RFC_791.Flags(dontFragment: true, moreFragments: false)
@@ -171,19 +142,15 @@ extension RFC_791.Flags {
             #expect(flags1 != flags3)
         }
 
-        // MARK: - Hashable Tests
-
         @Test
         func `Flags hashable`() {
             var set: Set<RFC_791.Flags> = []
             set.insert(.none)
             set.insert(.dontFragment)
-            set.insert(.none)  // Duplicate
+            set.insert(.none)
 
             #expect(set.count == 2)
         }
-
-        // MARK: - Description Tests
 
         @Test
         func `Flags description`() {

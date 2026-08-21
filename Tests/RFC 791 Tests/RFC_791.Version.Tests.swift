@@ -1,15 +1,3 @@
-// ===----------------------------------------------------------------------===//
-//
-// Copyright (c) 2025 Coen ten Thije Boonkkamp
-// Licensed under Apache License v2.0
-//
-// See LICENSE.txt for license information
-// See CONTRIBUTORS.txt for the list of project contributors
-//
-// SPDX-License-Identifier: Apache-2.0
-//
-// ===----------------------------------------------------------------------===//
-
 import Testing
 
 @testable import RFC_791
@@ -17,8 +5,6 @@ import Testing
 extension RFC_791.Version {
     @Suite("RFC_791.Version Tests")
     struct Test {
-
-        // MARK: - Raw Value Initialization
 
         @Test
         func `Valid version values (0-15) are accepted`() {
@@ -38,8 +24,6 @@ extension RFC_791.Version {
             }
         }
 
-        // MARK: - Static Constants
-
         @Test
         func `IPv4 version constant`() {
             #expect(RFC_791.Version.v4.rawValue == 4)
@@ -51,8 +35,6 @@ extension RFC_791.Version {
             #expect(RFC_791.Version.v6.rawValue == 6)
             #expect(RFC_791.Version.v6.isIPv6)
         }
-
-        // MARK: - Computed Properties
 
         @Test
         func `isIPv4 property`() {
@@ -68,19 +50,17 @@ extension RFC_791.Version {
             #expect(RFC_791.Version(rawValue: 0)?.isIPv6 == false)
         }
 
-        // MARK: - Byte Parsing
-
         @Test
         func `Parse version from bytes`() throws {
-            // Version is in upper 4 bits
-            let bytes: [Byte] = [0x45]  // Version 4, IHL 5
+
+            let bytes: [Byte] = [0x45]
             let version = try RFC_791.Version(bytes: bytes)
             #expect(version.rawValue == 4)
         }
 
         @Test
         func `Parse version 6 from bytes`() throws {
-            let bytes: [Byte] = [0x60]  // Version 6
+            let bytes: [Byte] = [0x60]
             let version = try RFC_791.Version(bytes: bytes)
             #expect(version.rawValue == 6)
         }
@@ -93,13 +73,11 @@ extension RFC_791.Version {
             }
         }
 
-        // MARK: - Serialization
-
         @Test
         func `Serialize version to bytes`() {
             var buffer: [Byte] = []
             RFC_791.Version.v4.serialize(into: &buffer)
-            #expect(buffer == [0x40])  // Upper nibble only
+            #expect(buffer == [0x40])
         }
 
         @Test
@@ -112,8 +90,6 @@ extension RFC_791.Version {
             #expect(parsed == original)
         }
 
-        // MARK: - CustomStringConvertible
-
         @Test
         func `Description format`() {
             #expect(RFC_791.Version.v4.description == "IPv4")
@@ -121,23 +97,17 @@ extension RFC_791.Version {
             #expect(RFC_791.Version(rawValue: 0)?.description == "Version(0)")
         }
 
-        // MARK: - Comparable
-
         @Test
         func `Versions are comparable`() {
             #expect(RFC_791.Version.v4 < RFC_791.Version.v6)
             #expect(RFC_791.Version(rawValue: 0)! < RFC_791.Version.v4)
         }
 
-        // MARK: - Equatable
-
         @Test
         func `Versions are equatable`() {
             #expect(RFC_791.Version.v4 == RFC_791.Version(rawValue: 4))
             #expect(RFC_791.Version.v6 == RFC_791.Version(rawValue: 6))
         }
-
-        // MARK: - Error Tests
 
         @Test
         func `Error descriptions`() {

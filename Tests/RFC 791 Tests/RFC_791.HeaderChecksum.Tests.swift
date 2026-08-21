@@ -1,15 +1,3 @@
-// ===----------------------------------------------------------------------===//
-//
-// Copyright (c) 2025 Coen ten Thije Boonkkamp
-// Licensed under Apache License v2.0
-//
-// See LICENSE.txt for license information
-// See CONTRIBUTORS.txt for the list of project contributors
-//
-// SPDX-License-Identifier: Apache-2.0
-//
-// ===----------------------------------------------------------------------===//
-
 import Testing
 
 @testable import RFC_791
@@ -18,8 +6,6 @@ extension RFC_791.HeaderChecksum {
     @Suite("RFC_791.HeaderChecksum Tests")
     struct Test {
 
-        // MARK: - Raw Value Initialization
-
         @Test
         func `All 16-bit values are valid checksums`() {
             #expect(RFC_791.HeaderChecksum(rawValue: 0).rawValue == 0)
@@ -27,28 +13,23 @@ extension RFC_791.HeaderChecksum {
             #expect(RFC_791.HeaderChecksum(rawValue: 0xB861).rawValue == 0xB861)
         }
 
-        // MARK: - Static Constants
-
         @Test
         func `Zero constant`() {
             #expect(RFC_791.HeaderChecksum.zero.rawValue == 0)
         }
 
-        // MARK: - Checksum Computation
-
         @Test
         func `Compute checksum for simple header`() {
-            // Example from RFC 1071: Simple header with checksum field zeroed
-            // 4500 0073 0000 4000 4011 [0000] c0a8 0001 c0a8 00c7
+
             let header: [Byte] = [
-                0x45, 0x00,  // Version, IHL, TOS
-                0x00, 0x73,  // Total Length
-                0x00, 0x00,  // Identification
-                0x40, 0x00,  // Flags, Fragment Offset
-                0x40, 0x11,  // TTL, Protocol
-                0x00, 0x00,  // Checksum (zero for computation)
-                0xC0, 0xA8, 0x00, 0x01,  // Source IP (192.168.0.1)
-                0xC0, 0xA8, 0x00, 0xC7,  // Destination IP (192.168.0.199)
+                0x45, 0x00,
+                0x00, 0x73,
+                0x00, 0x00,
+                0x40, 0x00,
+                0x40, 0x11,
+                0x00, 0x00,
+                0xC0, 0xA8, 0x00, 0x01,
+                0xC0, 0xA8, 0x00, 0xC7,
             ]
 
             let checksum = RFC_791.HeaderChecksum.compute(over: header)
@@ -57,14 +38,14 @@ extension RFC_791.HeaderChecksum {
 
         @Test
         func `Verify valid checksum`() {
-            // Same header with correct checksum included
+
             let header: [Byte] = [
                 0x45, 0x00,
                 0x00, 0x73,
                 0x00, 0x00,
                 0x40, 0x00,
                 0x40, 0x11,
-                0xB8, 0x61,  // Correct checksum
+                0xB8, 0x61,
                 0xC0, 0xA8, 0x00, 0x01,
                 0xC0, 0xA8, 0x00, 0xC7,
             ]
@@ -80,7 +61,7 @@ extension RFC_791.HeaderChecksum {
                 0x00, 0x00,
                 0x40, 0x00,
                 0x40, 0x11,
-                0x00, 0x00,  // Wrong checksum
+                0x00, 0x00,
                 0xC0, 0xA8, 0x00, 0x01,
                 0xC0, 0xA8, 0x00, 0xC7,
             ]
@@ -98,18 +79,13 @@ extension RFC_791.HeaderChecksum {
         @Test
         func `Compute checksum for all ones`() {
             var header: [Byte] = Array(repeating: 0xFF, count: 20)
-            // Zero out checksum field (bytes 10-11)
+
             header[10] = 0
             header[11] = 0
             let checksum = RFC_791.HeaderChecksum.compute(over: header)
-            // Sum of 9 words of 0xFFFF plus one 0x0000
-            // = 9 * 0xFFFF = 0x8FFF7
-            // Folding: 0x8FFF7 = 0x8 carry + 0xFFF7 = 0xFFFF
-            // One's complement of 0xFFFF = 0x0000
+
             #expect(checksum.rawValue == 0x0000)
         }
-
-        // MARK: - Byte Parsing
 
         @Test
         func `Parse checksum from bytes (big-endian)`() throws {
@@ -134,8 +110,6 @@ extension RFC_791.HeaderChecksum {
             }
         }
 
-        // MARK: - Serialization
-
         @Test
         func `Serialize checksum to bytes (big-endian)`() {
             var buffer: [Byte] = []
@@ -153,16 +127,12 @@ extension RFC_791.HeaderChecksum {
             #expect(parsed == original)
         }
 
-        // MARK: - CustomStringConvertible
-
         @Test
         func `Description format (hexadecimal)`() {
             #expect(RFC_791.HeaderChecksum(rawValue: 0xB861).description == "0xB861")
             #expect(RFC_791.HeaderChecksum(rawValue: 0x0001).description == "0x1")
             #expect(RFC_791.HeaderChecksum(rawValue: 0xFFFF).description == "0xFFFF")
         }
-
-        // MARK: - Error Tests
 
         @Test
         func `Error descriptions`() {

@@ -1,15 +1,3 @@
-// ===----------------------------------------------------------------------===//
-//
-// Copyright (c) 2025 Coen ten Thije Boonkkamp
-// Licensed under Apache License v2.0
-//
-// See LICENSE.txt for license information
-// See CONTRIBUTORS.txt for the list of project contributors
-//
-// SPDX-License-Identifier: Apache-2.0
-//
-// ===----------------------------------------------------------------------===//
-
 import Testing
 
 @testable import RFC_791
@@ -17,8 +5,6 @@ import Testing
 extension RFC_791.Precedence {
     @Suite("RFC 791: Precedence Tests")
     struct Test {
-
-        // MARK: - Initialization Tests
 
         @Test
         func `Precedence from raw value - valid`() {
@@ -36,8 +22,6 @@ extension RFC_791.Precedence {
             #expect(RFC_791.Precedence(rawValue: 255) == nil)
         }
 
-        // MARK: - Static Constants Tests
-
         @Test
         func `Precedence static constants`() {
             #expect(RFC_791.Precedence.routine.rawValue == 0)
@@ -49,8 +33,6 @@ extension RFC_791.Precedence {
             #expect(RFC_791.Precedence.internetworkControl.rawValue == 6)
             #expect(RFC_791.Precedence.networkControl.rawValue == 7)
         }
-
-        // MARK: - Byte Parsing Tests
 
         @Test
         func `Precedence from bytes - valid`() throws {
@@ -72,8 +54,6 @@ extension RFC_791.Precedence {
             }
         }
 
-        // MARK: - Serialization Tests
-
         @Test
         func `Precedence serialization`() {
             let precedence = RFC_791.Precedence.immediate
@@ -88,8 +68,6 @@ extension RFC_791.Precedence {
             #expect(precedence.bytes == [0x03])
         }
 
-        // MARK: - Comparable Tests
-
         @Test
         func `Precedence comparable`() {
             #expect(RFC_791.Precedence.routine < .priority)
@@ -100,8 +78,6 @@ extension RFC_791.Precedence {
             #expect(RFC_791.Precedence.criticEcp < .internetworkControl)
             #expect(RFC_791.Precedence.internetworkControl < .networkControl)
         }
-
-        // MARK: - Description Tests
 
         @Test
         func `Precedence description`() {
@@ -115,8 +91,6 @@ extension RFC_791.Precedence {
             #expect(RFC_791.Precedence.networkControl.description == "Network Control")
         }
 
-        // MARK: - Equality Tests
-
         @Test
         func `Precedence equality`() {
             let prec1 = RFC_791.Precedence.flash
@@ -127,14 +101,12 @@ extension RFC_791.Precedence {
             #expect(prec1 != prec3)
         }
 
-        // MARK: - Hashable Tests
-
         @Test
         func `Precedence hashable`() {
             var set: Set<RFC_791.Precedence> = []
             set.insert(.routine)
             set.insert(.priority)
-            set.insert(.routine)  // Duplicate
+            set.insert(.routine)
 
             #expect(set.count == 2)
             #expect(set.contains(.routine))

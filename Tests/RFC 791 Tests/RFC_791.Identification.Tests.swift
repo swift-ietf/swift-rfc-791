@@ -1,15 +1,3 @@
-// ===----------------------------------------------------------------------===//
-//
-// Copyright (c) 2025 Coen ten Thije Boonkkamp
-// Licensed under Apache License v2.0
-//
-// See LICENSE.txt for license information
-// See CONTRIBUTORS.txt for the list of project contributors
-//
-// SPDX-License-Identifier: Apache-2.0
-//
-// ===----------------------------------------------------------------------===//
-
 import Testing
 
 @testable import RFC_791
@@ -18,17 +6,13 @@ extension RFC_791.Identification {
     @Suite("RFC_791.Identification Tests")
     struct Test {
 
-        // MARK: - Raw Value Initialization
-
         @Test
         func `All 16-bit values are valid`() {
-            // Test boundary values
+
             #expect(RFC_791.Identification(rawValue: 0).rawValue == 0)
             #expect(RFC_791.Identification(rawValue: 0xFFFF).rawValue == 65535)
             #expect(RFC_791.Identification(rawValue: 0x1234).rawValue == 0x1234)
         }
-
-        // MARK: - Byte Parsing
 
         @Test
         func `Parse identification from bytes (big-endian)`() throws {
@@ -67,8 +51,6 @@ extension RFC_791.Identification {
             }
         }
 
-        // MARK: - Serialization
-
         @Test
         func `Serialize identification to bytes (big-endian)`() {
             var buffer: [Byte] = []
@@ -93,16 +75,12 @@ extension RFC_791.Identification {
             #expect(parsed == original)
         }
 
-        // MARK: - CustomStringConvertible
-
         @Test
         func `Description format (hexadecimal)`() {
             #expect(RFC_791.Identification(rawValue: 0x1234).description == "0x1234")
             #expect(RFC_791.Identification(rawValue: 0x0001).description == "0x1")
             #expect(RFC_791.Identification(rawValue: 0xFFFF).description == "0xFFFF")
         }
-
-        // MARK: - Comparable
 
         @Test
         func `Identifications are comparable`() {
@@ -111,15 +89,11 @@ extension RFC_791.Identification {
             #expect(low < high)
         }
 
-        // MARK: - ExpressibleByIntegerLiteral
-
         @Test
         func `Integer literal initialization`() {
             let id: RFC_791.Identification = 0x5678
             #expect(id.rawValue == 0x5678)
         }
-
-        // MARK: - Error Tests
 
         @Test
         func `Error descriptions`() {

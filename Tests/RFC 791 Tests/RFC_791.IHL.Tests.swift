@@ -1,15 +1,3 @@
-// ===----------------------------------------------------------------------===//
-//
-// Copyright (c) 2025 Coen ten Thije Boonkkamp
-// Licensed under Apache License v2.0
-//
-// See LICENSE.txt for license information
-// See CONTRIBUTORS.txt for the list of project contributors
-//
-// SPDX-License-Identifier: Apache-2.0
-//
-// ===----------------------------------------------------------------------===//
-
 import Testing
 
 @testable import RFC_791
@@ -18,11 +6,9 @@ extension RFC_791.IHL {
     @Suite("RFC_791.IHL Tests")
     struct Test {
 
-        // MARK: - Raw Value Initialization
-
         @Test
         func `Valid IHL values (5-15) are accepted`() {
-            // IHL.rawValue stays UInt8 (arithmetic-domain: × 4 multiplier).
+
             for value: UInt8 in 5...15 {
                 let ihl = RFC_791.IHL(rawValue: value)
                 #expect(ihl != nil)
@@ -46,8 +32,6 @@ extension RFC_791.IHL {
             }
         }
 
-        // MARK: - Static Constants
-
         @Test
         func `Minimum IHL constant`() {
             #expect(RFC_791.IHL.minimum.rawValue == 5)
@@ -59,8 +43,6 @@ extension RFC_791.IHL {
             #expect(RFC_791.IHL.maximum.rawValue == 15)
             #expect(RFC_791.IHL.maximum.byteLength == 60)
         }
-
-        // MARK: - Computed Properties
 
         @Test
         func `byteLength calculation`() {
@@ -85,8 +67,6 @@ extension RFC_791.IHL {
             #expect(RFC_791.IHL(rawValue: 15)?.hasOptions == true)
         }
 
-        // MARK: - Factory Methods
-
         @Test
         func `Create from byte length`() {
             #expect(RFC_791.IHL.fromByteLength(20)?.rawValue == 5)
@@ -96,24 +76,22 @@ extension RFC_791.IHL {
 
         @Test
         func `Create from invalid byte length`() {
-            #expect(RFC_791.IHL.fromByteLength(16) == nil)  // Too small
-            #expect(RFC_791.IHL.fromByteLength(64) == nil)  // Too large
-            #expect(RFC_791.IHL.fromByteLength(21) == nil)  // Not divisible by 4
+            #expect(RFC_791.IHL.fromByteLength(16) == nil)
+            #expect(RFC_791.IHL.fromByteLength(64) == nil)
+            #expect(RFC_791.IHL.fromByteLength(21) == nil)
         }
-
-        // MARK: - Byte Parsing
 
         @Test
         func `Parse IHL from bytes`() throws {
-            // IHL is in lower 4 bits
-            let bytes: [Byte] = [0x45]  // Version 4, IHL 5
+
+            let bytes: [Byte] = [0x45]
             let ihl = try RFC_791.IHL(bytes: bytes)
             #expect(ihl.rawValue == 5)
         }
 
         @Test
         func `Parse IHL 15 from bytes`() throws {
-            let bytes: [Byte] = [0x4F]  // Version 4, IHL 15
+            let bytes: [Byte] = [0x4F]
             let ihl = try RFC_791.IHL(bytes: bytes)
             #expect(ihl.rawValue == 15)
         }
@@ -128,19 +106,17 @@ extension RFC_791.IHL {
 
         @Test
         func `Parse invalid IHL from bytes throws error`() {
-            let bytes: [Byte] = [0x43]  // Version 4, IHL 3 (invalid)
+            let bytes: [Byte] = [0x43]
             #expect(throws: RFC_791.IHL.Error.tooSmall(3)) {
                 try RFC_791.IHL(bytes: bytes)
             }
         }
 
-        // MARK: - Serialization
-
         @Test
         func `Serialize IHL to bytes`() {
             var buffer: [Byte] = []
             RFC_791.IHL.minimum.serialize(into: &buffer)
-            #expect(buffer == [0x05])  // Lower nibble only
+            #expect(buffer == [0x05])
         }
 
         @Test
@@ -153,23 +129,17 @@ extension RFC_791.IHL {
             #expect(parsed == original)
         }
 
-        // MARK: - CustomStringConvertible
-
         @Test
         func `Description format`() {
             #expect(RFC_791.IHL(rawValue: 5)?.description == "IHL(5 words, 20 bytes)")
             #expect(RFC_791.IHL(rawValue: 15)?.description == "IHL(15 words, 60 bytes)")
         }
 
-        // MARK: - Comparable
-
         @Test
         func `IHL values are comparable`() {
             #expect(RFC_791.IHL.minimum < RFC_791.IHL.maximum)
             #expect(RFC_791.IHL(rawValue: 6)! < RFC_791.IHL(rawValue: 10)!)
         }
-
-        // MARK: - Error Tests
 
         @Test
         func `Error descriptions`() {

@@ -1,15 +1,3 @@
-// ===----------------------------------------------------------------------===//
-//
-// Copyright (c) 2025 Coen ten Thije Boonkkamp
-// Licensed under Apache License v2.0
-//
-// See LICENSE.txt for license information
-// See CONTRIBUTORS.txt for the list of project contributors
-//
-// SPDX-License-Identifier: Apache-2.0
-//
-// ===----------------------------------------------------------------------===//
-
 import Testing
 
 @testable import RFC_791
@@ -18,8 +6,6 @@ extension RFC_791.TTL {
     @Suite("RFC_791.TTL Tests")
     struct Test {
 
-        // MARK: - Raw Value Initialization
-
         @Test
         func `All 8-bit values are valid TTL values`() {
             for value: UInt8 in 0...255 {
@@ -27,8 +13,6 @@ extension RFC_791.TTL {
                 #expect(ttl.rawValue == value)
             }
         }
-
-        // MARK: - Static Constants
 
         @Test
         func `Default64 constant (Linux/macOS)`() {
@@ -56,8 +40,6 @@ extension RFC_791.TTL {
             #expect(RFC_791.TTL.linkLocal.rawValue == 1)
         }
 
-        // MARK: - Computed Properties
-
         @Test
         func `isExpired property`() {
             #expect(RFC_791.TTL(rawValue: 0).isExpired == true)
@@ -82,12 +64,8 @@ extension RFC_791.TTL {
                 hops += 1
             }
 
-            // Starting at 5, we decrement through 4, 3, 2, 1, 0, then nil
-            // That's 6 iterations (including the 0 state)
             #expect(hops == 6)
         }
-
-        // MARK: - Byte Parsing
 
         @Test
         func `Parse TTL from bytes`() throws {
@@ -103,8 +81,6 @@ extension RFC_791.TTL {
                 try RFC_791.TTL(bytes: bytes)
             }
         }
-
-        // MARK: - Serialization
 
         @Test
         func `Serialize TTL to bytes`() {
@@ -123,15 +99,11 @@ extension RFC_791.TTL {
             #expect(parsed == original)
         }
 
-        // MARK: - CustomStringConvertible
-
         @Test
         func `Description format`() {
             #expect(RFC_791.TTL(rawValue: 64).description == "TTL(64)")
             #expect(RFC_791.TTL(rawValue: 0).description == "TTL(0)")
         }
-
-        // MARK: - Comparable
 
         @Test
         func `TTL values are comparable`() {
@@ -139,15 +111,11 @@ extension RFC_791.TTL {
             #expect(RFC_791.TTL.default64 < RFC_791.TTL.maximum)
         }
 
-        // MARK: - ExpressibleByIntegerLiteral
-
         @Test
         func `Integer literal initialization`() {
             let ttl: RFC_791.TTL = 64
             #expect(ttl.rawValue == 64)
         }
-
-        // MARK: - Error Tests
 
         @Test
         func `Error descriptions`() {

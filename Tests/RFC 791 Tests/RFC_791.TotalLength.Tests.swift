@@ -1,15 +1,3 @@
-// ===----------------------------------------------------------------------===//
-//
-// Copyright (c) 2025 Coen ten Thije Boonkkamp
-// Licensed under Apache License v2.0
-//
-// See LICENSE.txt for license information
-// See CONTRIBUTORS.txt for the list of project contributors
-//
-// SPDX-License-Identifier: Apache-2.0
-//
-// ===----------------------------------------------------------------------===//
-
 import Testing
 
 @testable import RFC_791
@@ -17,8 +5,6 @@ import Testing
 extension RFC_791.TotalLength {
     @Suite("RFC_791.TotalLength Tests")
     struct Test {
-
-        // MARK: - Raw Value Initialization
 
         @Test
         func `Valid total length values (20-65535) are accepted`() {
@@ -35,8 +21,6 @@ extension RFC_791.TotalLength {
                 #expect(length == nil)
             }
         }
-
-        // MARK: - Static Constants
 
         @Test
         func `Minimum constant`() {
@@ -59,8 +43,6 @@ extension RFC_791.TotalLength {
             #expect(RFC_791.TotalLength.ethernetMTU.rawValue == 1500)
         }
 
-        // MARK: - Computed Properties
-
         @Test
         func `maximumDataLength calculation`() {
             #expect(RFC_791.TotalLength(rawValue: 20)?.maximumDataLength == 0)
@@ -75,18 +57,16 @@ extension RFC_791.TotalLength {
             #expect(RFC_791.TotalLength(rawValue: 1500)?.isMinimum == false)
         }
 
-        // MARK: - Byte Parsing
-
         @Test
         func `Parse total length from bytes (big-endian)`() throws {
-            let bytes: [Byte] = [0x05, 0xDC]  // 1500
+            let bytes: [Byte] = [0x05, 0xDC]
             let length = try RFC_791.TotalLength(bytes: bytes)
             #expect(length.rawValue == 1500)
         }
 
         @Test
         func `Parse minimum from bytes`() throws {
-            let bytes: [Byte] = [0x00, 0x14]  // 20
+            let bytes: [Byte] = [0x00, 0x14]
             let length = try RFC_791.TotalLength(bytes: bytes)
             #expect(length.rawValue == 20)
         }
@@ -109,13 +89,11 @@ extension RFC_791.TotalLength {
 
         @Test
         func `Parse too small value throws error`() {
-            let bytes: [Byte] = [0x00, 0x10]  // 16 (less than minimum 20)
+            let bytes: [Byte] = [0x00, 0x10]
             #expect(throws: RFC_791.TotalLength.Error.tooSmall(16)) {
                 try RFC_791.TotalLength(bytes: bytes)
             }
         }
-
-        // MARK: - Serialization
 
         @Test
         func `Serialize total length to bytes (big-endian)`() {
@@ -134,23 +112,17 @@ extension RFC_791.TotalLength {
             #expect(parsed == original)
         }
 
-        // MARK: - CustomStringConvertible
-
         @Test
         func `Description format`() {
             #expect(RFC_791.TotalLength(rawValue: 1500)?.description == "1500 bytes")
             #expect(RFC_791.TotalLength(rawValue: 20)?.description == "20 bytes")
         }
 
-        // MARK: - Comparable
-
         @Test
         func `Total lengths are comparable`() {
             #expect(RFC_791.TotalLength.minimum < RFC_791.TotalLength.ethernetMTU)
             #expect(RFC_791.TotalLength.ethernetMTU < RFC_791.TotalLength.maximum)
         }
-
-        // MARK: - Error Tests
 
         @Test
         func `Error descriptions`() {

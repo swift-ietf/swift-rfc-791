@@ -11,26 +11,26 @@ extension Target.Dependency {
         name: "Standard Library Extensions",
         package: "swift-standard-library-extensions"
     )
-    static let binary = Self.product(name: "Binary Primitives", package: "swift-binary-primitives")
+    static let binary = Self.product(name: "Binary", package: "swift-binary")
     static let binarySerializable = Self.product(
-        name: "Binary Serializable Primitives",
-        package: "swift-binary-serializer-primitives"
+        name: "Binary Serializable",
+        package: "swift-binary-serializer"
     )
     static let incits41986 = Self.product(
-        name: "ASCII Serializer Primitives",
-        package: "swift-ascii-serializer-primitives"
+        name: "ASCII Serializer",
+        package: "swift-ascii-serializer"
     )
     static let binaryParseable = Self.product(
-        name: "Binary Parseable Primitives",
-        package: "swift-binary-parser-primitives"
+        name: "Binary Parseable",
+        package: "swift-binary-parser"
     )
     static let asciiParseable = Self.product(
-        name: "Parseable ASCII Primitives",
-        package: "swift-ascii-parser-primitives"
+        name: "Parseable ASCII",
+        package: "swift-ascii-parser"
     )
     static let byteSLI = Self.product(
-        name: "Byte Primitives Standard Library Integration",
-        package: "swift-byte-primitives"
+        name: "Byte Standard Library Integration",
+        package: "swift-byte"
     )
 }
 
@@ -51,31 +51,31 @@ let package = Package(
     ],
     dependencies: [
         .package(
-            url: "https://github.com/swift-primitives/swift-standard-library-extensions.git",
+            url: "https://github.com/swift-molecules/swift-standard-library-extensions.git",
             branch: "main"
         ),
         .package(
-            url: "https://github.com/swift-primitives/swift-binary-primitives.git",
+            url: "https://github.com/swift-molecules/swift-binary.git",
             branch: "main"
         ),
         .package(
-            url: "https://github.com/swift-primitives/swift-binary-serializer-primitives.git",
+            url: "https://github.com/swift-molecules/swift-binary-serializer.git",
             branch: "main"
         ),
         .package(
-            url: "https://github.com/swift-primitives/swift-ascii-serializer-primitives.git",
+            url: "https://github.com/swift-molecules/swift-ascii-serializer.git",
             branch: "main"
         ),
         .package(
-            url: "https://github.com/swift-primitives/swift-binary-parser-primitives.git",
+            url: "https://github.com/swift-molecules/swift-binary-parser.git",
             branch: "main"
         ),
         .package(
-            url: "https://github.com/swift-primitives/swift-ascii-parser-primitives.git",
+            url: "https://github.com/swift-molecules/swift-ascii-parser.git",
             branch: "main"
         ),
         .package(
-            url: "https://github.com/swift-primitives/swift-byte-primitives.git",
+            url: "https://github.com/swift-molecules/swift-byte.git",
             branch: "main"
         ),
     ],

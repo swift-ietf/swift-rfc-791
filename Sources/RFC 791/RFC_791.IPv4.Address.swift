@@ -22,10 +22,10 @@ extension RFC_791.IPv4.Address {
     public init(_ octet1: Byte, _ octet2: Byte, _ octet3: Byte, _ octet4: Byte) {
 
         let value =
-            UInt32(octet1.underlying) << 24
-            | UInt32(octet2.underlying) << 16
-            | UInt32(octet3.underlying) << 8
-            | UInt32(octet4.underlying)
+            UInt32(octet1.bitPattern) << 24
+            | UInt32(octet2.bitPattern) << 16
+            | UInt32(octet3.bitPattern) << 8
+            | UInt32(octet4.bitPattern)
         self.init(__unchecked: (), rawValue: value)
     }
 
@@ -35,10 +35,10 @@ extension RFC_791.IPv4.Address {
 
     public var octets: (Byte, Byte, Byte, Byte) {
         (
-            Byte(UInt8((rawValue >> 24) & 0xFF)),
-            Byte(UInt8((rawValue >> 16) & 0xFF)),
-            Byte(UInt8((rawValue >> 8) & 0xFF)),
-            Byte(UInt8(rawValue & 0xFF))
+            Byte(bitPattern: UInt8((rawValue >> 24) & 0xFF)),
+            Byte(bitPattern: UInt8((rawValue >> 16) & 0xFF)),
+            Byte(bitPattern: UInt8((rawValue >> 8) & 0xFF)),
+            Byte(bitPattern: UInt8(rawValue & 0xFF))
         )
     }
 }
@@ -134,13 +134,13 @@ extension RFC_791.IPv4.Address: ASCII.Serializable {
             buffer.append(ASCII.Code(ASCII.Code.`0`.underlying &+ ones))
         }
 
-        appendDecimal(a.underlying)
+        appendDecimal(a.bitPattern)
         buffer.append(ASCII.Code.period)
-        appendDecimal(b.underlying)
+        appendDecimal(b.bitPattern)
         buffer.append(ASCII.Code.period)
-        appendDecimal(c.underlying)
+        appendDecimal(c.bitPattern)
         buffer.append(ASCII.Code.period)
-        appendDecimal(d.underlying)
+        appendDecimal(d.bitPattern)
     }
 }
 
@@ -156,8 +156,12 @@ extension RFC_791.IPv4.Address: ASCII.Parseable {
 
         let arr: [ASCII.Code]
         do throws(ASCII.Code.Error) {
-
-            arr = try Swift.Array<ASCII.Code>(bytes)
+            var codes: [ASCII.Code] = []
+            codes.reserveCapacity(bytes.count)
+            for byte in bytes {
+                codes.append(try ASCII.Code(byte))
+            }
+            arr = codes
         } catch {
             throw .invalidFormat(String(decoding: bytes, as: UTF8.self))
         }
@@ -214,7 +218,12 @@ extension RFC_791.IPv4.Address: ASCII.Parseable {
             throw .invalidFormat(String(decoding: bytes, as: UTF8.self))
         }
 
-        self.init(Byte(octets[0]), Byte(octets[1]), Byte(octets[2]), Byte(octets[3]))
+        self.init(
+            Byte(bitPattern: octets[0]),
+            Byte(bitPattern: octets[1]),
+            Byte(bitPattern: octets[2]),
+            Byte(bitPattern: octets[3])
+        )
     }
 }
 
@@ -228,7 +237,7 @@ extension RFC_791.IPv4.Address: CustomStringConvertible {
 extension RFC_791.IPv4.Address {
 
     public init(_ string: some StringProtocol) throws(Error) {
-        try self.init(ascii: [Byte](string.utf8))
+        try self.init(ascii: string.utf8.map(Byte.init(bitPattern:)))
     }
 }
 

@@ -21,7 +21,7 @@ extension RFC_791.HeaderChecksum {
         @Test
         func `Compute checksum for simple header`() {
 
-            let header: [Byte] = [
+            let header: [Byte] = ([
                 0x45, 0x00,
                 0x00, 0x73,
                 0x00, 0x00,
@@ -30,7 +30,7 @@ extension RFC_791.HeaderChecksum {
                 0x00, 0x00,
                 0xC0, 0xA8, 0x00, 0x01,
                 0xC0, 0xA8, 0x00, 0xC7,
-            ]
+            ] as [UInt8]).map(Byte.init(bitPattern:))
 
             let checksum = RFC_791.HeaderChecksum.compute(over: header)
             #expect(checksum.rawValue == 0xB861)
@@ -39,7 +39,7 @@ extension RFC_791.HeaderChecksum {
         @Test
         func `Verify valid checksum`() {
 
-            let header: [Byte] = [
+            let header: [Byte] = ([
                 0x45, 0x00,
                 0x00, 0x73,
                 0x00, 0x00,
@@ -48,14 +48,14 @@ extension RFC_791.HeaderChecksum {
                 0xB8, 0x61,
                 0xC0, 0xA8, 0x00, 0x01,
                 0xC0, 0xA8, 0x00, 0xC7,
-            ]
+            ] as [UInt8]).map(Byte.init(bitPattern:))
 
             #expect(RFC_791.HeaderChecksum.verify(header: header))
         }
 
         @Test
         func `Verify invalid checksum`() {
-            let header: [Byte] = [
+            let header: [Byte] = ([
                 0x45, 0x00,
                 0x00, 0x73,
                 0x00, 0x00,
@@ -64,24 +64,24 @@ extension RFC_791.HeaderChecksum {
                 0x00, 0x00,
                 0xC0, 0xA8, 0x00, 0x01,
                 0xC0, 0xA8, 0x00, 0xC7,
-            ]
+            ] as [UInt8]).map(Byte.init(bitPattern:))
 
             #expect(!RFC_791.HeaderChecksum.verify(header: header))
         }
 
         @Test
         func `Compute checksum for all zeros`() {
-            let header: [Byte] = Array(repeating: 0, count: 20)
+            let header: [Byte] = Array(repeating: Byte(bitPattern: 0), count: 20)
             let checksum = RFC_791.HeaderChecksum.compute(over: header)
             #expect(checksum.rawValue == 0xFFFF)
         }
 
         @Test
         func `Compute checksum for all ones`() {
-            var header: [Byte] = Array(repeating: 0xFF, count: 20)
+            var header: [Byte] = Array(repeating: Byte(bitPattern: 0xFF), count: 20)
 
-            header[10] = 0
-            header[11] = 0
+            header[10] = Byte(bitPattern: 0)
+            header[11] = Byte(bitPattern: 0)
             let checksum = RFC_791.HeaderChecksum.compute(over: header)
 
             #expect(checksum.rawValue == 0x0000)
@@ -89,7 +89,7 @@ extension RFC_791.HeaderChecksum {
 
         @Test
         func `Parse checksum from bytes (big-endian)`() throws {
-            let bytes: [Byte] = [0xB8, 0x61]
+            let bytes: [Byte] = ([0xB8, 0x61] as [UInt8]).map(Byte.init(bitPattern:))
             let checksum = try RFC_791.HeaderChecksum(bytes: bytes)
             #expect(checksum.rawValue == 0xB861)
         }
@@ -104,7 +104,7 @@ extension RFC_791.HeaderChecksum {
 
         @Test
         func `Parse from insufficient bytes throws error`() {
-            let bytes: [Byte] = [0xB8]
+            let bytes: [Byte] = ([0xB8] as [UInt8]).map(Byte.init(bitPattern:))
             #expect(throws: RFC_791.HeaderChecksum.Error.insufficientBytes) {
                 try RFC_791.HeaderChecksum(bytes: bytes)
             }
@@ -114,7 +114,7 @@ extension RFC_791.HeaderChecksum {
         func `Serialize checksum to bytes (big-endian)`() {
             var buffer: [Byte] = []
             RFC_791.HeaderChecksum(rawValue: 0xB861).serialize(into: &buffer)
-            #expect(buffer == [0xB8, 0x61])
+            #expect(buffer == ([0xB8, 0x61] as [UInt8]).map(Byte.init(bitPattern:)))
         }
 
         @Test

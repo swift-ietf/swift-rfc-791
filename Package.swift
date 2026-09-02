@@ -1,39 +1,6 @@
 // swift-tools-version: 6.4
 import PackageDescription
 
-extension String {
-    static let rfc791 = "RFC 791"
-}
-
-extension Target.Dependency {
-    static let rfc791 = Self.target(name: .rfc791)
-    static let standards = Self.product(
-        name: "Standard Library Extensions",
-        package: "swift-standard-library-extensions"
-    )
-    static let binary = Self.product(name: "Binary", package: "swift-binary")
-    static let binarySerializable = Self.product(
-        name: "Binary Serializable",
-        package: "swift-binary-serializer"
-    )
-    static let incits41986 = Self.product(
-        name: "ASCII Serializer",
-        package: "swift-ascii-serializer"
-    )
-    static let binaryParseable = Self.product(
-        name: "Binary Parseable",
-        package: "swift-binary-parser"
-    )
-    static let asciiParseable = Self.product(
-        name: "Parseable ASCII",
-        package: "swift-ascii-parser"
-    )
-    static let byteSLI = Self.product(
-        name: "Byte Standard Library Integration",
-        package: "swift-byte"
-    )
-}
-
 let package = Package(
     name: "swift-rfc-791",
     platforms: [
@@ -43,7 +10,10 @@ let package = Package(
         .watchOS(.v27),
     ],
     products: [
-        .library(name: "RFC 791", targets: ["RFC 791"]),
+        .library(
+            name: "RFC 791",
+            targets: ["RFC 791"]
+        ),
         .library(
             name: "RFC 791 Standard Library Integration",
             targets: ["RFC 791 Standard Library Integration"]
@@ -55,7 +25,7 @@ let package = Package(
             branch: "main"
         ),
         .package(
-            url: "https://github.com/swift-molecules/swift-binary.git",
+            url: "https://github.com/swift-atoms/swift-binary.git",
             branch: "main"
         ),
         .package(
@@ -75,7 +45,7 @@ let package = Package(
             branch: "main"
         ),
         .package(
-            url: "https://github.com/swift-molecules/swift-byte.git",
+            url: "https://github.com/swift-atoms/swift-byte.git",
             branch: "main"
         ),
     ],
@@ -83,38 +53,70 @@ let package = Package(
         .target(
             name: "RFC 791",
             dependencies: [
-                .standards, .binary, .binarySerializable, .incits41986, .binaryParseable,
-                .asciiParseable,
+                .product(
+                    name: "Standard Library Extensions",
+                    package: "swift-standard-library-extensions"
+                ),
+                .product(
+                    name: "Binary",
+                    package: "swift-binary"
+                ),
+                .product(
+                    name: "Binary Endianness",
+                    package: "swift-binary"
+                ),
+                .product(
+                    name: "Binary Standard Library Integration",
+                    package: "swift-binary"
+                ),
+                .product(
+                    name: "Binary Serializable",
+                    package: "swift-binary-serializer"
+                ),
+                .product(
+                    name: "ASCII Serializer",
+                    package: "swift-ascii-serializer"
+                ),
+                .product(
+                    name: "Binary Parseable",
+                    package: "swift-binary-parser"
+                ),
+                .product(
+                    name: "Parseable ASCII",
+                    package: "swift-ascii-parser"
+                ),
+                .product(
+                    name: "Byte Standard Library Integration",
+                    package: "swift-byte"
+                )
             ]
         ),
         .target(
             name: "RFC 791 Standard Library Integration",
             dependencies: [
-                "RFC 791",
-                .byteSLI,
+                .target(name: "RFC 791"),
+                .product(
+                    name: "Byte Standard Library Integration",
+                    package: "swift-byte"
+                )
             ]
         ),
         .testTarget(
             name: "RFC 791 Tests",
             dependencies: [
-                "RFC 791"
+                .target(name: "RFC 791"),
             ]
         ),
         .testTarget(
             name: "RFC 791 Standard Library Integration Tests",
             dependencies: [
-                "RFC 791",
-                "RFC 791 Standard Library Integration",
+                .target(name: "RFC 791"),
+                .target(name: "RFC 791 Standard Library Integration"),
             ]
         ),
     ],
     swiftLanguageModes: [.v6]
 )
-
-extension String {
-    var tests: Self { self + " Tests" }
-    var foundation: Self { self + " Foundation" }
-}
 
 for target in package.targets where ![.system, .binary, .plugin, .macro].contains(target.type) {
     let ecosystem: [SwiftSetting] = [

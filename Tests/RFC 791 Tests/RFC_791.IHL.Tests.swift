@@ -84,14 +84,14 @@ extension RFC_791.IHL {
         @Test
         func `Parse IHL from bytes`() throws {
 
-            let bytes: [Byte] = [0x45]
+            let bytes: [Byte] = ([0x45] as [UInt8]).map(Byte.init(bitPattern:))
             let ihl = try RFC_791.IHL(bytes: bytes)
             #expect(ihl.rawValue == 5)
         }
 
         @Test
         func `Parse IHL 15 from bytes`() throws {
-            let bytes: [Byte] = [0x4F]
+            let bytes: [Byte] = ([0x4F] as [UInt8]).map(Byte.init(bitPattern:))
             let ihl = try RFC_791.IHL(bytes: bytes)
             #expect(ihl.rawValue == 15)
         }
@@ -106,7 +106,7 @@ extension RFC_791.IHL {
 
         @Test
         func `Parse invalid IHL from bytes throws error`() {
-            let bytes: [Byte] = [0x43]
+            let bytes: [Byte] = ([0x43] as [UInt8]).map(Byte.init(bitPattern:))
             #expect(throws: RFC_791.IHL.Error.tooSmall(3)) {
                 try RFC_791.IHL(bytes: bytes)
             }
@@ -116,7 +116,7 @@ extension RFC_791.IHL {
         func `Serialize IHL to bytes`() {
             var buffer: [Byte] = []
             RFC_791.IHL.minimum.serialize(into: &buffer)
-            #expect(buffer == [0x05])
+            #expect(buffer == ([0x05] as [UInt8]).map(Byte.init(bitPattern:)))
         }
 
         @Test

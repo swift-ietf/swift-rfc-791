@@ -66,7 +66,7 @@ extension RFC_791.FragmentOffset {
         @Test
         func `Parse fragment offset from bytes`() throws {
 
-            let bytes: [Byte] = [0x00, 0xB9]
+            let bytes: [Byte] = ([0x00, 0xB9] as [UInt8]).map(Byte.init(bitPattern:))
             let offset = try RFC_791.FragmentOffset(bytes: bytes)
             #expect(offset.rawValue == 185)
         }
@@ -74,14 +74,14 @@ extension RFC_791.FragmentOffset {
         @Test
         func `Parse with flags in upper bits`() throws {
 
-            let bytes: [Byte] = [0x40, 0xB9]
+            let bytes: [Byte] = ([0x40, 0xB9] as [UInt8]).map(Byte.init(bitPattern:))
             let offset = try RFC_791.FragmentOffset(bytes: bytes)
             #expect(offset.rawValue == 185)
         }
 
         @Test
         func `Parse maximum offset from bytes`() throws {
-            let bytes: [Byte] = [0x1F, 0xFF]
+            let bytes: [Byte] = ([0x1F, 0xFF] as [UInt8]).map(Byte.init(bitPattern:))
             let offset = try RFC_791.FragmentOffset(bytes: bytes)
             #expect(offset.rawValue == 8191)
         }
@@ -96,7 +96,7 @@ extension RFC_791.FragmentOffset {
 
         @Test
         func `Parse from insufficient bytes throws error`() {
-            let bytes: [Byte] = [0x00]
+            let bytes: [Byte] = ([0x00] as [UInt8]).map(Byte.init(bitPattern:))
             #expect(throws: RFC_791.FragmentOffset.Error.insufficientBytes) {
                 try RFC_791.FragmentOffset(bytes: bytes)
             }
@@ -106,14 +106,14 @@ extension RFC_791.FragmentOffset {
         func `Serialize fragment offset to bytes`() {
             var buffer: [Byte] = []
             RFC_791.FragmentOffset(rawValue: 185)!.serialize(into: &buffer)
-            #expect(buffer == [0x00, 0xB9])
+            #expect(buffer == ([0x00, 0xB9] as [UInt8]).map(Byte.init(bitPattern:)))
         }
 
         @Test
         func `Serialize maximum offset`() {
             var buffer: [Byte] = []
             RFC_791.FragmentOffset.maximum.serialize(into: &buffer)
-            #expect(buffer == [0x1F, 0xFF])
+            #expect(buffer == ([0x1F, 0xFF] as [UInt8]).map(Byte.init(bitPattern:)))
         }
 
         @Test

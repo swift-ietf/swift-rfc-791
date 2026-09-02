@@ -9,10 +9,9 @@ extension RFC_791.Precedence {
         @Test
         func `Precedence from raw value - valid`() {
             for value: UInt8 in 0...7 {
-                let typed = Byte(value)
-                let precedence = RFC_791.Precedence(rawValue: typed)
+                let precedence = RFC_791.Precedence(rawValue: value)
                 #expect(precedence != nil)
-                #expect(precedence?.rawValue == typed)
+                #expect(precedence?.rawValue == value)
             }
         }
 
@@ -36,7 +35,7 @@ extension RFC_791.Precedence {
 
         @Test
         func `Precedence from bytes - valid`() throws {
-            let precedence = try RFC_791.Precedence(bytes: [0x03])
+            let precedence = try RFC_791.Precedence(bytes: [Byte(bitPattern: 0x03)])
             #expect(precedence == .flash)
         }
 
@@ -50,7 +49,7 @@ extension RFC_791.Precedence {
         @Test
         func `Precedence from bytes - out of range`() {
             #expect(throws: RFC_791.Precedence.Error.self) {
-                _ = try RFC_791.Precedence(bytes: [0x08])
+                _ = try RFC_791.Precedence(bytes: [Byte(bitPattern: 0x08)])
             }
         }
 
@@ -59,13 +58,13 @@ extension RFC_791.Precedence {
             let precedence = RFC_791.Precedence.immediate
             var buffer: [Byte] = []
             precedence.serialize(into: &buffer)
-            #expect(buffer == [0x02])
+            #expect(buffer == ([0x02] as [UInt8]).map(Byte.init(bitPattern:)))
         }
 
         @Test
         func `Precedence bytes property`() {
             let precedence = RFC_791.Precedence.flash
-            #expect(precedence.bytes == [0x03])
+            #expect(precedence.bytes == ([0x03] as [UInt8]).map(Byte.init(bitPattern:)))
         }
 
         @Test

@@ -6,6 +6,6 @@ extension [UInt8] {
     @_disfavoredOverload
     public init(_ identification: RFC_791.Identification) {
         let typed: [Byte] = [Byte](identification)
-        self = typed.underlying
+        self = typed.map(\.bitPattern)
     }
 }

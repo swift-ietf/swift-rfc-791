@@ -19,9 +19,8 @@ struct ProtocolTests {
     func `Protocol all values valid`() {
 
         for value: UInt8 in 0...255 {
-            let typed = Byte(value)
-            let proto = IPProtocol(rawValue: typed)
-            #expect(proto.rawValue == typed)
+            let proto = IPProtocol(rawValue: value)
+            #expect(proto.rawValue == value)
         }
     }
 
@@ -41,13 +40,13 @@ struct ProtocolTests {
 
     @Test
     func `Protocol from bytes - valid`() throws {
-        let proto = try IPProtocol(bytes: [0x06])
+        let proto = try IPProtocol(bytes: [Byte(bitPattern: 0x06)])
         #expect(proto == .tcp)
     }
 
     @Test
     func `Protocol from bytes - UDP`() throws {
-        let proto = try IPProtocol(bytes: [0x11])
+        let proto = try IPProtocol(bytes: [Byte(bitPattern: 0x11)])
         #expect(proto == .udp)
     }
 
@@ -61,7 +60,7 @@ struct ProtocolTests {
     @Test
     func `Protocol from bytes - multiple bytes (uses first)`() throws {
 
-        let proto = try IPProtocol(bytes: [0x06, 0x11, 0x01])
+        let proto = try IPProtocol(bytes: ([0x06, 0x11, 0x01] as [UInt8]).map(Byte.init(bitPattern:)))
         #expect(proto == .tcp)
     }
 
@@ -70,13 +69,13 @@ struct ProtocolTests {
         let proto = IPProtocol.tcp
         var buffer: [Byte] = []
         proto.serialize(into: &buffer)
-        #expect(buffer == [0x06])
+        #expect(buffer == ([0x06] as [UInt8]).map(Byte.init(bitPattern:)))
     }
 
     @Test
     func `Protocol bytes property`() {
         let proto = IPProtocol.udp
-        #expect(proto.bytes == [0x11])
+        #expect(proto.bytes == ([0x11] as [UInt8]).map(Byte.init(bitPattern:)))
     }
 
     @Test
@@ -90,7 +89,7 @@ struct ProtocolTests {
     @Test
     func `Protocol round trip all values`() throws {
         for value: UInt8 in 0...255 {
-            let original = IPProtocol(rawValue: Byte(value))
+            let original = IPProtocol(rawValue: value)
             let bytes = original.bytes
             let parsed = try IPProtocol(bytes: bytes)
             #expect(parsed == original)

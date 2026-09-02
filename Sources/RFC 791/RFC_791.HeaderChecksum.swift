@@ -1,3 +1,6 @@
+public import Binary_Endianness
+public import Binary_Standard_Library_Integration
+
 extension RFC_791 {
 
     public struct HeaderChecksum: RawRepresentable, Hashable, Sendable, Codable {
@@ -23,8 +26,8 @@ extension RFC_791.HeaderChecksum {
         var iterator = header.makeIterator()
 
         while let high = iterator.next() {
-            let low = iterator.next()?.underlying ?? 0
-            sum += UInt32(high.underlying) << 8 | UInt32(low)
+            let low = iterator.next()?.bitPattern ?? 0
+            sum += UInt32(high.bitPattern) << 8 | UInt32(low)
         }
 
         while sum > 0xFFFF {
@@ -42,8 +45,8 @@ extension RFC_791.HeaderChecksum {
         var iterator = header.makeIterator()
 
         while let high = iterator.next() {
-            let low = iterator.next()?.underlying ?? 0
-            sum += UInt32(high.underlying) << 8 | UInt32(low)
+            let low = iterator.next()?.bitPattern ?? 0
+            sum += UInt32(high.bitPattern) << 8 | UInt32(low)
         }
 
         while sum > 0xFFFF {
@@ -67,7 +70,7 @@ extension RFC_791.HeaderChecksum {
             throw .insufficientBytes
         }
 
-        let value = UInt16(high.underlying) << 8 | UInt16(low.underlying)
+        let value = UInt16(high.bitPattern) << 8 | UInt16(low.bitPattern)
         self.init(__unchecked: (), rawValue: value)
     }
 }

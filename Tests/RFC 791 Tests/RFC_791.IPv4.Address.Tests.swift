@@ -2,18 +2,46 @@ import Testing
 
 @testable import RFC_791
 
+private func ipv4(
+    _ octet1: UInt8,
+    _ octet2: UInt8,
+    _ octet3: UInt8,
+    _ octet4: UInt8
+) -> RFC_791.IPv4.Address {
+    RFC_791.IPv4.Address(
+        Byte(bitPattern: octet1),
+        Byte(bitPattern: octet2),
+        Byte(bitPattern: octet3),
+        Byte(bitPattern: octet4)
+    )
+}
+
+private func octetTuple(
+    _ octet1: UInt8,
+    _ octet2: UInt8,
+    _ octet3: UInt8,
+    _ octet4: UInt8
+) -> (Byte, Byte, Byte, Byte) {
+    (
+        Byte(bitPattern: octet1),
+        Byte(bitPattern: octet2),
+        Byte(bitPattern: octet3),
+        Byte(bitPattern: octet4)
+    )
+}
+
 extension RFC_791.IPv4.Address {
     @Suite("RFC 791: IPv4 Address Tests")
     struct Test {
 
         @Test
         func `IPv4 Address from octets`() throws {
-            let address = RFC_791.IPv4.Address(192, 168, 1, 1)
+            let address = ipv4(192, 168, 1, 1)
 
-            #expect(address.octets.0 == 192)
-            #expect(address.octets.1 == 168)
-            #expect(address.octets.2 == 1)
-            #expect(address.octets.3 == 1)
+            #expect(address.octets.0 == Byte(bitPattern: 192))
+            #expect(address.octets.1 == Byte(bitPattern: 168))
+            #expect(address.octets.2 == Byte(bitPattern: 1))
+            #expect(address.octets.3 == Byte(bitPattern: 1))
         }
 
         @Test
@@ -22,23 +50,23 @@ extension RFC_791.IPv4.Address {
             let address = RFC_791.IPv4.Address(rawValue: 0xC0A8_0101)
 
             let (a, b, c, d) = address.octets
-            #expect(a == 192)
-            #expect(b == 168)
-            #expect(c == 1)
-            #expect(d == 1)
+            #expect(a == Byte(bitPattern: 192))
+            #expect(b == Byte(bitPattern: 168))
+            #expect(c == Byte(bitPattern: 1))
+            #expect(d == Byte(bitPattern: 1))
         }
 
         @Test
         func `IPv4 Address network byte order projection`() throws {
 
-            let address = RFC_791.IPv4.Address(192, 168, 1, 1)
+            let address = ipv4(192, 168, 1, 1)
 
             #expect(UInt32(bigEndian: address.bigEndian) == 0xC0A8_0101)
             withUnsafeBytes(of: address.bigEndian) { bytes in
-                #expect(bytes[0] == 192)
-                #expect(bytes[1] == 168)
-                #expect(bytes[2] == 1)
-                #expect(bytes[3] == 1)
+                #expect(unsafe bytes[0] == 192)
+                #expect(unsafe bytes[1] == 168)
+                #expect(unsafe bytes[2] == 1)
+                #expect(unsafe bytes[3] == 1)
             }
         }
 
@@ -46,10 +74,10 @@ extension RFC_791.IPv4.Address {
         func `IPv4 Address from string - valid`() throws {
             let address: RFC_791.IPv4.Address = try .init("192.168.1.1")
 
-            #expect(address.octets.0 == 192)
-            #expect(address.octets.1 == 168)
-            #expect(address.octets.2 == 1)
-            #expect(address.octets.3 == 1)
+            #expect(address.octets.0 == Byte(bitPattern: 192))
+            #expect(address.octets.1 == Byte(bitPattern: 168))
+            #expect(address.octets.2 == Byte(bitPattern: 1))
+            #expect(address.octets.3 == Byte(bitPattern: 1))
         }
 
         @Test
@@ -62,8 +90,8 @@ extension RFC_791.IPv4.Address {
             #expect(broadcast.rawValue == 0xFFFF_FFFF)
 
             let localhost: RFC_791.IPv4.Address = try .init("127.0.0.1")
-            #expect(localhost.octets.0 == 127)
-            #expect(localhost.octets.3 == 1)
+            #expect(localhost.octets.0 == Byte(bitPattern: 127))
+            #expect(localhost.octets.3 == Byte(bitPattern: 1))
         }
 
         @Test
@@ -110,13 +138,13 @@ extension RFC_791.IPv4.Address {
 
         @Test
         func `IPv4 Address description`() throws {
-            let address = RFC_791.IPv4.Address(192, 168, 1, 1)
+            let address = ipv4(192, 168, 1, 1)
             #expect(address.description == "192.168.1.1")
 
-            let zeros = RFC_791.IPv4.Address(0, 0, 0, 0)
+            let zeros = ipv4(0, 0, 0, 0)
             #expect(zeros.description == "0.0.0.0")
 
-            let broadcast = RFC_791.IPv4.Address(255, 255, 255, 255)
+            let broadcast = ipv4(255, 255, 255, 255)
             #expect(broadcast.description == "255.255.255.255")
         }
 
@@ -131,9 +159,9 @@ extension RFC_791.IPv4.Address {
 
         @Test
         func `IPv4 Address equality`() throws {
-            let addr1 = RFC_791.IPv4.Address(192, 168, 1, 1)
-            let addr2 = RFC_791.IPv4.Address(192, 168, 1, 1)
-            let addr3 = RFC_791.IPv4.Address(192, 168, 1, 2)
+            let addr1 = ipv4(192, 168, 1, 1)
+            let addr2 = ipv4(192, 168, 1, 1)
+            let addr3 = ipv4(192, 168, 1, 2)
 
             #expect(addr1 == addr2)
             #expect(addr1 != addr3)
@@ -141,9 +169,9 @@ extension RFC_791.IPv4.Address {
 
         @Test
         func `IPv4 Address hashable`() throws {
-            let addr1 = RFC_791.IPv4.Address(192, 168, 1, 1)
-            let addr2 = RFC_791.IPv4.Address(192, 168, 1, 1)
-            let addr3 = RFC_791.IPv4.Address(192, 168, 1, 2)
+            let addr1 = ipv4(192, 168, 1, 1)
+            let addr2 = ipv4(192, 168, 1, 1)
+            let addr3 = ipv4(192, 168, 1, 2)
 
             var set: Set<RFC_791.IPv4.Address> = []
             set.insert(addr1)
@@ -157,9 +185,9 @@ extension RFC_791.IPv4.Address {
 
         @Test
         func `IPv4 Address comparable`() throws {
-            let addr1 = RFC_791.IPv4.Address(192, 168, 1, 1)
-            let addr2 = RFC_791.IPv4.Address(192, 168, 1, 10)
-            let addr3 = RFC_791.IPv4.Address(192, 168, 2, 1)
+            let addr1 = ipv4(192, 168, 1, 1)
+            let addr2 = ipv4(192, 168, 1, 10)
+            let addr3 = ipv4(192, 168, 2, 1)
 
             #expect(addr1 < addr2)
             #expect(addr2 < addr3)
@@ -169,10 +197,10 @@ extension RFC_791.IPv4.Address {
         @Test
         func `IPv4 Address sorting`() throws {
             let addresses = [
-                RFC_791.IPv4.Address(192, 168, 1, 100),
-                RFC_791.IPv4.Address(192, 168, 1, 1),
-                RFC_791.IPv4.Address(192, 168, 1, 50),
-                RFC_791.IPv4.Address(10, 0, 0, 1),
+                ipv4(192, 168, 1, 100),
+                ipv4(192, 168, 1, 1),
+                ipv4(192, 168, 1, 50),
+                ipv4(10, 0, 0, 1),
             ]
 
             let sorted = addresses.sorted()
@@ -185,10 +213,10 @@ extension RFC_791.IPv4.Address {
 
         @Test
         func `IPv4 Address range operations`() throws {
-            let start = RFC_791.IPv4.Address(192, 168, 1, 1)
-            let end = RFC_791.IPv4.Address(192, 168, 1, 255)
-            let inRange = RFC_791.IPv4.Address(192, 168, 1, 100)
-            let outOfRange = RFC_791.IPv4.Address(192, 168, 2, 1)
+            let start = ipv4(192, 168, 1, 1)
+            let end = ipv4(192, 168, 1, 255)
+            let inRange = ipv4(192, 168, 1, 100)
+            let outOfRange = ipv4(192, 168, 2, 1)
 
             #expect(inRange >= start)
             #expect(inRange <= end)
@@ -198,28 +226,28 @@ extension RFC_791.IPv4.Address {
         @Test
         func `IPv4 Address special addresses`() throws {
 
-            let loopback = RFC_791.IPv4.Address(127, 0, 0, 1)
+            let loopback = ipv4(127, 0, 0, 1)
             #expect(loopback.description == "127.0.0.1")
 
-            let broadcast = RFC_791.IPv4.Address(255, 255, 255, 255)
+            let broadcast = ipv4(255, 255, 255, 255)
             #expect(broadcast.description == "255.255.255.255")
 
-            let unspecified = RFC_791.IPv4.Address(0, 0, 0, 0)
+            let unspecified = ipv4(0, 0, 0, 0)
             #expect(unspecified.description == "0.0.0.0")
 
-            let private1 = RFC_791.IPv4.Address(10, 0, 0, 1)
+            let private1 = ipv4(10, 0, 0, 1)
             #expect(private1.description == "10.0.0.1")
 
-            let private2 = RFC_791.IPv4.Address(172, 16, 0, 1)
+            let private2 = ipv4(172, 16, 0, 1)
             #expect(private2.description == "172.16.0.1")
 
-            let private3 = RFC_791.IPv4.Address(192, 168, 0, 1)
+            let private3 = ipv4(192, 168, 0, 1)
             #expect(private3.description == "192.168.0.1")
         }
 
         @Test
         func `IPv4 Address raw value consistency`() throws {
-            let address = RFC_791.IPv4.Address(192, 168, 1, 1)
+            let address = ipv4(192, 168, 1, 1)
             let fromRaw = RFC_791.IPv4.Address(rawValue: address.rawValue)
 
             #expect(address == fromRaw)
@@ -231,43 +259,49 @@ extension RFC_791.IPv4.Address {
             let address = RFC_791.IPv4.Address(rawValue: 0xC0A8_0101)
             let (a, b, c, d) = address.octets
 
-            #expect(a == 0xC0)
-            #expect(b == 0xA8)
-            #expect(c == 0x01)
-            #expect(d == 0x01)
+            #expect(a == Byte(bitPattern: 0xC0))
+            #expect(b == Byte(bitPattern: 0xA8))
+            #expect(c == Byte(bitPattern: 0x01))
+            #expect(d == Byte(bitPattern: 0x01))
         }
 
         @Test
         func `Binary.Serializable wire form is four network-order octets`() {
-            let address = RFC_791.IPv4.Address(192, 168, 1, 1)
-            #expect(address.bytes == [192, 168, 1, 1])
+            let address = ipv4(192, 168, 1, 1)
+            #expect(address.bytes == ([192, 168, 1, 1] as [UInt8]).map(Byte.init(bitPattern:)))
         }
 
         @Test
         func `ASCII.Serializable text form is dotted-decimal`() {
-            let address = RFC_791.IPv4.Address(192, 168, 1, 1)
-            #expect(String(decoding: address.serialized.underlying, as: UTF8.self) == "192.168.1.1")
+            let address = ipv4(192, 168, 1, 1)
+            #expect(
+                String(decoding: address.serialized.map(\.bitPattern), as: UTF8.self)
+                    == "192.168.1.1"
+            )
         }
 
         @Test
         func `the two format siblings are distinct representations`() {
 
             let address: RFC_791.IPv4.Address = "10.0.0.255"
-            #expect(String(decoding: address.serialized.underlying, as: UTF8.self) == "10.0.0.255")
-            #expect(address.bytes == [10, 0, 0, 255])
+            #expect(
+                String(decoding: address.serialized.map(\.bitPattern), as: UTF8.self)
+                    == "10.0.0.255"
+            )
+            #expect(address.bytes == ([10, 0, 0, 255] as [UInt8]).map(Byte.init(bitPattern:)))
         }
 
         @Test
         func `Binary.Parseable round-trips the wire form with cursor semantics`() throws {
-            var source: [Byte] = [192, 168, 1, 1, 0xFF]
+            var source: [Byte] = ([192, 168, 1, 1, 0xFF] as [UInt8]).map(Byte.init(bitPattern:))
             let address = try RFC_791.IPv4.Address.parse(from: &source)
-            #expect(address == RFC_791.IPv4.Address(192, 168, 1, 1))
-            #expect(source == [0xFF])
+            #expect(address == ipv4(192, 168, 1, 1))
+            #expect(source == ([0xFF] as [UInt8]).map(Byte.init(bitPattern:)))
         }
 
         @Test
         func `Binary.Parseable rejects insufficient input`() {
-            var source: [Byte] = [192, 168, 1]
+            var source: [Byte] = ([192, 168, 1] as [UInt8]).map(Byte.init(bitPattern:))
             #expect(throws: (any Swift.Error).self) {
                 _ = try RFC_791.IPv4.Address.parse(from: &source)
             }
@@ -275,9 +309,12 @@ extension RFC_791.IPv4.Address {
 
         @Test
         func `ASCII.Parseable round-trips the text form`() throws {
-            let address = try RFC_791.IPv4.Address(ascii: Array("172.16.0.1".utf8))
-            #expect(address.octets == (172, 16, 0, 1))
-            #expect(String(decoding: address.serialized.underlying, as: UTF8.self) == "172.16.0.1")
+            let address = try RFC_791.IPv4.Address(ascii: "172.16.0.1".utf8.map(Byte.init(bitPattern:)))
+            #expect(address.octets == octetTuple(172, 16, 0, 1))
+            #expect(
+                String(decoding: address.serialized.map(\.bitPattern), as: UTF8.self)
+                    == "172.16.0.1"
+            )
         }
     }
 }

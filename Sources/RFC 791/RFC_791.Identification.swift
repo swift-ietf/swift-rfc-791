@@ -1,3 +1,6 @@
+public import Binary_Endianness
+public import Binary_Standard_Library_Integration
+
 extension RFC_791 {
 
     public struct Identification: RawRepresentable, Hashable, Sendable, Codable {
@@ -27,7 +30,7 @@ extension RFC_791.Identification {
             throw .insufficientBytes
         }
 
-        let value = UInt16(high.underlying) << 8 | UInt16(low.underlying)
+        let value = UInt16(high.bitPattern) << 8 | UInt16(low.bitPattern)
         self.init(__unchecked: (), rawValue: value)
     }
 }

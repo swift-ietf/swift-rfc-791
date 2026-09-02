@@ -70,7 +70,7 @@ extension RFC_791.Flags {
         @Test
         func `Flags from bytes - valid`() throws {
 
-            let flags = try RFC_791.Flags(bytes: [0b0100_0000])
+            let flags = try RFC_791.Flags(bytes: [Byte(bitPattern: 0b0100_0000)])
             #expect(flags.dontFragment == true)
             #expect(flags.moreFragments == false)
         }
@@ -78,7 +78,7 @@ extension RFC_791.Flags {
         @Test
         func `Flags from bytes - MF set`() throws {
 
-            let flags = try RFC_791.Flags(bytes: [0b0010_0000])
+            let flags = try RFC_791.Flags(bytes: [Byte(bitPattern: 0b0010_0000)])
             #expect(flags.dontFragment == false)
             #expect(flags.moreFragments == true)
         }
@@ -86,7 +86,7 @@ extension RFC_791.Flags {
         @Test
         func `Flags from bytes - both set`() throws {
 
-            let flags = try RFC_791.Flags(bytes: [0b0110_0000])
+            let flags = try RFC_791.Flags(bytes: [Byte(bitPattern: 0b0110_0000)])
             #expect(flags.dontFragment == true)
             #expect(flags.moreFragments == true)
         }
@@ -102,7 +102,7 @@ extension RFC_791.Flags {
         func `Flags from bytes - reserved bit set`() {
 
             #expect(throws: RFC_791.Flags.Error.self) {
-                _ = try RFC_791.Flags(bytes: [0b1000_0000])
+                _ = try RFC_791.Flags(bytes: [Byte(bitPattern: 0b1000_0000)])
             }
         }
 
@@ -112,14 +112,14 @@ extension RFC_791.Flags {
             var buffer: [Byte] = []
             flags.serialize(into: &buffer)
 
-            #expect(buffer == [0b0100_0000])
+            #expect(buffer == [Byte(bitPattern: 0b0100_0000)])
         }
 
         @Test
         func `Flags bytes property`() {
             let flags = RFC_791.Flags.moreFragments
 
-            #expect(flags.bytes == [0b0010_0000])
+            #expect(flags.bytes == [Byte(bitPattern: 0b0010_0000)])
         }
 
         @Test

@@ -2,13 +2,13 @@ extension RFC_791 {
 
     public struct Flags: Hashable, Sendable, Codable {
 
-        public let rawValue: Byte
+        public let rawValue: UInt8
 
-        init(__unchecked: Void, rawValue: Byte) {
+        init(__unchecked: Void, rawValue: UInt8) {
             self.rawValue = rawValue
         }
 
-        public init?(rawValue: Byte) {
+        public init?(rawValue: UInt8) {
 
             guard rawValue & 0b100 == 0 else {
                 return nil
@@ -20,10 +20,10 @@ extension RFC_791 {
             dontFragment: Bool = false,
             moreFragments: Bool = false
         ) {
-            var value: Byte = 0
-            if dontFragment { value |= 0b010 }
-            if moreFragments { value |= 0b001 }
-            self.init(__unchecked: (), rawValue: value)
+            var pattern: UInt8 = 0
+            if dontFragment { pattern |= 0b010 }
+            if moreFragments { pattern |= 0b001 }
+            self.init(__unchecked: (), rawValue: pattern)
         }
     }
 }
@@ -56,7 +56,7 @@ extension RFC_791.Flags {
             throw .empty
         }
 
-        let flags = firstByte >> 5
+        let flags = firstByte.bitPattern >> 5
 
         guard flags & 0b100 == 0 else {
             throw .reservedBitSet(firstByte)
@@ -71,7 +71,7 @@ extension RFC_791.Flags: Binary.Serializable {
         _ flags: RFC_791.Flags,
         into buffer: inout Buffer
     ) where Buffer: RangeReplaceableCollection, Buffer.Element == Byte {
-        buffer.append(contentsOf: [flags.rawValue << 5])
+        buffer.append(contentsOf: [Byte(bitPattern: flags.rawValue << 5)])
     }
 }
 
@@ -91,6 +91,6 @@ extension RFC_791.Flags: CustomStringConvertible {
 extension [Byte] {
 
     public init(_ flags: RFC_791.Flags) {
-        self = [flags.rawValue << 5]
+        self = [Byte(bitPattern: flags.rawValue << 5)]
     }
 }

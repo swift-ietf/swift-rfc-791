@@ -1,3 +1,6 @@
+public import Binary_Endianness
+public import Binary_Standard_Library_Integration
+
 extension RFC_791 {
 
     public struct TTL: RawRepresentable, Hashable, Sendable, Codable {
@@ -47,7 +50,7 @@ extension RFC_791.TTL {
             throw .empty
         }
 
-        self.init(__unchecked: (), rawValue: firstByte.underlying)
+        self.init(__unchecked: (), rawValue: firstByte.bitPattern)
     }
 }
 

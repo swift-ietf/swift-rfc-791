@@ -15,7 +15,7 @@ extension RFC_791.TypeOfService.Error: CustomStringConvertible {
             return "Type of Service data cannot be empty"
 
         case .reservedBitsSet(let value):
-            let hex = String(value.underlying, radix: 16, uppercase: true)
+            let hex = String(value.bitPattern, radix: 16, uppercase: true)
             return "Type of Service value 0x\(hex) has reserved bits set (bits 6-7 must be zero)"
         }
     }

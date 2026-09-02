@@ -2,13 +2,13 @@ extension RFC_791 {
 
     public struct TypeOfService: Hashable, Sendable, Codable {
 
-        public let rawValue: Byte
+        public let rawValue: UInt8
 
-        init(__unchecked: Void, rawValue: Byte) {
+        init(__unchecked: Void, rawValue: UInt8) {
             self.rawValue = rawValue
         }
 
-        public init?(rawValue: Byte) {
+        public init?(rawValue: UInt8) {
 
             guard rawValue & 0b0000_0011 == 0 else {
                 return nil
@@ -22,7 +22,7 @@ extension RFC_791 {
             highThroughput: Bool = false,
             highReliability: Bool = false
         ) {
-            var value: Byte = precedence.rawValue << 5
+            var value: UInt8 = precedence.rawValue << 5
             if lowDelay { value |= 0b0001_0000 }
             if highThroughput { value |= 0b0000_1000 }
             if highReliability { value |= 0b0000_0100 }
@@ -69,11 +69,13 @@ extension RFC_791.TypeOfService {
             throw .empty
         }
 
-        guard firstByte & 0b0000_0011 == 0 else {
+        let value = firstByte.bitPattern
+
+        guard value & 0b0000_0011 == 0 else {
             throw .reservedBitsSet(firstByte)
         }
 
-        self.init(__unchecked: (), rawValue: firstByte)
+        self.init(__unchecked: (), rawValue: value)
     }
 }
 
@@ -82,14 +84,14 @@ extension RFC_791.TypeOfService: Binary.Serializable {
         _ tos: Self,
         into buffer: inout Buffer
     ) where Buffer.Element == Byte {
-        buffer.append(tos.rawValue)
+        buffer.append(Byte(bitPattern: tos.rawValue))
     }
 }
 
 extension [Byte] {
 
     public init(_ tos: RFC_791.TypeOfService) {
-        self = [tos.rawValue]
+        self = [Byte(bitPattern: tos.rawValue)]
     }
 }
 

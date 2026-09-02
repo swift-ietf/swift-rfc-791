@@ -9,17 +9,16 @@ extension RFC_791.Version {
         @Test
         func `Valid version values (0-15) are accepted`() {
             for value: UInt8 in 0...15 {
-                let typed = Byte(value)
-                let version = RFC_791.Version(rawValue: typed)
+                let version = RFC_791.Version(rawValue: value)
                 #expect(version != nil)
-                #expect(version?.rawValue == typed)
+                #expect(version?.rawValue == value)
             }
         }
 
         @Test
         func `Invalid version values (>15) are rejected`() {
             for value: UInt8 in 16...255 {
-                let version = RFC_791.Version(rawValue: Byte(value))
+                let version = RFC_791.Version(rawValue: value)
                 #expect(version == nil)
             }
         }
@@ -53,14 +52,14 @@ extension RFC_791.Version {
         @Test
         func `Parse version from bytes`() throws {
 
-            let bytes: [Byte] = [0x45]
+            let bytes: [Byte] = ([0x45] as [UInt8]).map(Byte.init(bitPattern:))
             let version = try RFC_791.Version(bytes: bytes)
             #expect(version.rawValue == 4)
         }
 
         @Test
         func `Parse version 6 from bytes`() throws {
-            let bytes: [Byte] = [0x60]
+            let bytes: [Byte] = ([0x60] as [UInt8]).map(Byte.init(bitPattern:))
             let version = try RFC_791.Version(bytes: bytes)
             #expect(version.rawValue == 6)
         }
@@ -77,7 +76,7 @@ extension RFC_791.Version {
         func `Serialize version to bytes`() {
             var buffer: [Byte] = []
             RFC_791.Version.v4.serialize(into: &buffer)
-            #expect(buffer == [0x40])
+            #expect(buffer == ([0x40] as [UInt8]).map(Byte.init(bitPattern:)))
         }
 
         @Test

@@ -1,3 +1,6 @@
+public import Binary_Endianness
+public import Binary_Standard_Library_Integration
+
 extension RFC_791 {
 
     public struct IHL: RawRepresentable, Hashable, Sendable, Codable {
@@ -57,7 +60,7 @@ extension RFC_791.IHL {
             throw .empty
         }
 
-        let ihl = firstByte.underlying & 0x0F
+        let ihl = firstByte.bitPattern & 0x0F
 
         guard ihl >= 5 else {
             throw .tooSmall(ihl)

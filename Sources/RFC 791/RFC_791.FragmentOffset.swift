@@ -58,7 +58,7 @@ extension RFC_791.FragmentOffset {
             throw .insufficientBytes
         }
 
-        let value = (UInt16(high.underlying) << 8 | UInt16(low.underlying)) & 0x1FFF
+        let value = (UInt16(high.bitPattern) << 8 | UInt16(low.bitPattern)) & 0x1FFF
         self.init(__unchecked: (), rawValue: value)
     }
 }
@@ -69,8 +69,8 @@ extension RFC_791.FragmentOffset: Binary.Serializable {
         into buffer: inout Buffer
     ) where Buffer: RangeReplaceableCollection, Buffer.Element == Byte {
 
-        buffer.append(Byte(UInt8((fragmentOffset.rawValue >> 8) & 0x1F)))
-        buffer.append(Byte(UInt8(fragmentOffset.rawValue & 0xFF)))
+        buffer.append(Byte(bitPattern: UInt8((fragmentOffset.rawValue >> 8) & 0x1F)))
+        buffer.append(Byte(bitPattern: UInt8(fragmentOffset.rawValue & 0xFF)))
     }
 }
 

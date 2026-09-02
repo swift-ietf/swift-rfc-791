@@ -69,7 +69,7 @@ extension RFC_791.TTL {
 
         @Test
         func `Parse TTL from bytes`() throws {
-            let bytes: [Byte] = [64]
+            let bytes: [Byte] = ([64] as [UInt8]).map(Byte.init(bitPattern:))
             let ttl = try RFC_791.TTL(bytes: bytes)
             #expect(ttl.rawValue == 64)
         }
@@ -86,7 +86,7 @@ extension RFC_791.TTL {
         func `Serialize TTL to bytes`() {
             var buffer: [Byte] = []
             RFC_791.TTL.default64.serialize(into: &buffer)
-            #expect(buffer == [64])
+            #expect(buffer == ([64] as [UInt8]).map(Byte.init(bitPattern:)))
         }
 
         @Test

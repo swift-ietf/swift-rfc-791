@@ -93,7 +93,7 @@ extension RFC_791.TypeOfService {
 
         @Test
         func `TypeOfService from bytes - valid`() throws {
-            let tos = try RFC_791.TypeOfService(bytes: [0b0101_1100])
+            let tos = try RFC_791.TypeOfService(bytes: [Byte(bitPattern: 0b0101_1100)])
             #expect(tos.precedence == .immediate)
             #expect(tos.lowDelay == true)
             #expect(tos.highThroughput == true)
@@ -110,7 +110,7 @@ extension RFC_791.TypeOfService {
         @Test
         func `TypeOfService from bytes - reserved bits set`() {
             #expect(throws: RFC_791.TypeOfService.Error.self) {
-                _ = try RFC_791.TypeOfService(bytes: [0b0000_0001])
+                _ = try RFC_791.TypeOfService(bytes: [Byte(bitPattern: 0b0000_0001)])
             }
         }
 
@@ -125,13 +125,13 @@ extension RFC_791.TypeOfService {
             var buffer: [Byte] = []
             tos.serialize(into: &buffer)
 
-            #expect(buffer == [0x70])
+            #expect(buffer == ([0x70] as [UInt8]).map(Byte.init(bitPattern:)))
         }
 
         @Test
         func `TypeOfService bytes property`() {
             let tos = RFC_791.TypeOfService.minimizeDelay
-            #expect(tos.bytes == [0b0001_0000])
+            #expect(tos.bytes == [Byte(bitPattern: 0b0001_0000)])
         }
 
         @Test

@@ -1,3 +1,6 @@
+public import Binary_Endianness
+public import Binary_Standard_Library_Integration
+
 extension RFC_791 {
 
     public struct TotalLength: RawRepresentable, Hashable, Sendable, Codable {
@@ -52,7 +55,7 @@ extension RFC_791.TotalLength {
             throw .insufficientBytes
         }
 
-        let value = UInt16(high.underlying) << 8 | UInt16(low.underlying)
+        let value = UInt16(high.bitPattern) << 8 | UInt16(low.bitPattern)
         guard value >= 20 else {
             throw .tooSmall(value)
         }

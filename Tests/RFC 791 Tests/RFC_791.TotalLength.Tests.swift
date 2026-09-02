@@ -59,14 +59,14 @@ extension RFC_791.TotalLength {
 
         @Test
         func `Parse total length from bytes (big-endian)`() throws {
-            let bytes: [Byte] = [0x05, 0xDC]
+            let bytes: [Byte] = ([0x05, 0xDC] as [UInt8]).map(Byte.init(bitPattern:))
             let length = try RFC_791.TotalLength(bytes: bytes)
             #expect(length.rawValue == 1500)
         }
 
         @Test
         func `Parse minimum from bytes`() throws {
-            let bytes: [Byte] = [0x00, 0x14]
+            let bytes: [Byte] = ([0x00, 0x14] as [UInt8]).map(Byte.init(bitPattern:))
             let length = try RFC_791.TotalLength(bytes: bytes)
             #expect(length.rawValue == 20)
         }
@@ -81,7 +81,7 @@ extension RFC_791.TotalLength {
 
         @Test
         func `Parse from insufficient bytes throws error`() {
-            let bytes: [Byte] = [0x05]
+            let bytes: [Byte] = ([0x05] as [UInt8]).map(Byte.init(bitPattern:))
             #expect(throws: RFC_791.TotalLength.Error.insufficientBytes) {
                 try RFC_791.TotalLength(bytes: bytes)
             }
@@ -89,7 +89,7 @@ extension RFC_791.TotalLength {
 
         @Test
         func `Parse too small value throws error`() {
-            let bytes: [Byte] = [0x00, 0x10]
+            let bytes: [Byte] = ([0x00, 0x10] as [UInt8]).map(Byte.init(bitPattern:))
             #expect(throws: RFC_791.TotalLength.Error.tooSmall(16)) {
                 try RFC_791.TotalLength(bytes: bytes)
             }
@@ -99,7 +99,7 @@ extension RFC_791.TotalLength {
         func `Serialize total length to bytes (big-endian)`() {
             var buffer: [Byte] = []
             RFC_791.TotalLength(rawValue: 1500)!.serialize(into: &buffer)
-            #expect(buffer == [0x05, 0xDC])
+            #expect(buffer == ([0x05, 0xDC] as [UInt8]).map(Byte.init(bitPattern:)))
         }
 
         @Test

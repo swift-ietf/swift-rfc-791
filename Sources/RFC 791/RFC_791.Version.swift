@@ -2,13 +2,13 @@ extension RFC_791 {
 
     public struct Version: RawRepresentable, Hashable, Sendable, Codable {
 
-        public let rawValue: Byte
+        public let rawValue: UInt8
 
-        init(__unchecked: Void, rawValue: Byte) {
+        init(__unchecked: Void, rawValue: UInt8) {
             self.rawValue = rawValue
         }
 
-        public init?(rawValue: Byte) {
+        public init?(rawValue: UInt8) {
             guard rawValue <= 15 else {
                 return nil
             }
@@ -32,7 +32,7 @@ extension RFC_791.Version {
             throw .empty
         }
 
-        let version = firstByte >> 4
+        let version = firstByte.bitPattern >> 4
 
         self.init(__unchecked: (), rawValue: version)
     }
@@ -43,7 +43,7 @@ extension RFC_791.Version: Binary.Serializable {
         _ version: RFC_791.Version,
         into buffer: inout Buffer
     ) where Buffer: RangeReplaceableCollection, Buffer.Element == Byte {
-        buffer.append(version.rawValue << 4)
+        buffer.append(Byte(bitPattern: version.rawValue << 4))
     }
 }
 

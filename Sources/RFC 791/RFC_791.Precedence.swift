@@ -2,13 +2,13 @@ extension RFC_791 {
 
     public struct Precedence: RawRepresentable, Hashable, Sendable, Codable {
 
-        public let rawValue: Byte
+        public let rawValue: UInt8
 
-        init(__unchecked: Void, rawValue: Byte) {
+        init(__unchecked: Void, rawValue: UInt8) {
             self.rawValue = rawValue
         }
 
-        public init?(rawValue: Byte) {
+        public init?(rawValue: UInt8) {
             guard rawValue <= 7 else {
                 return nil
             }
@@ -44,11 +44,13 @@ extension RFC_791.Precedence {
             throw .empty
         }
 
-        guard firstByte <= 7 else {
+        let value = firstByte.bitPattern
+
+        guard value <= 7 else {
             throw .valueOutOfRange(firstByte)
         }
 
-        self.init(__unchecked: (), rawValue: firstByte)
+        self.init(__unchecked: (), rawValue: value)
     }
 }
 
@@ -57,7 +59,7 @@ extension RFC_791.Precedence: Binary.Serializable {
         _ precedence: Self,
         into buffer: inout Buffer
     ) where Buffer.Element == Byte {
-        buffer.append(precedence.rawValue)
+        buffer.append(Byte(bitPattern: precedence.rawValue))
     }
 }
 
@@ -86,6 +88,6 @@ extension RFC_791.Precedence: Comparable {
 extension [Byte] {
 
     public init(_ precedence: RFC_791.Precedence) {
-        self = [precedence.rawValue]
+        self = [Byte(bitPattern: precedence.rawValue)]
     }
 }

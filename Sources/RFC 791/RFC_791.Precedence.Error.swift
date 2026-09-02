@@ -15,7 +15,7 @@ extension RFC_791.Precedence.Error: CustomStringConvertible {
             return "Precedence data cannot be empty"
 
         case .valueOutOfRange(let value):
-            return "Precedence value \(value) is out of range (must be 0-7)"
+            return "Precedence value \(value.bitPattern) is out of range (must be 0-7)"
         }
     }
 }

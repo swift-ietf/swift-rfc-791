@@ -24,7 +24,7 @@ extension RFC_791.IPv4.Address.Error: CustomStringConvertible {
             return "Invalid IPv4 address format '\(value)': expected dotted-decimal"
 
         case .invalidCharacter(let value, let code, let position):
-            let hex = String(code, radix: 16).uppercased()
+            let hex = String(code.underlying, radix: 16).uppercased()
             return "Invalid character 0x\(hex) in octet \(position + 1) of '\(value)'"
 
         case .octetOutOfRange(let value, let position):

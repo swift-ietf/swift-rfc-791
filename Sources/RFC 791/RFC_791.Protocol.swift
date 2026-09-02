@@ -2,13 +2,13 @@ extension RFC_791 {
 
     public struct `Protocol`: RawRepresentable, Hashable, Sendable, Codable {
 
-        public let rawValue: Byte
+        public let rawValue: UInt8
 
-        init(__unchecked: Void, rawValue: Byte) {
+        init(__unchecked: Void, rawValue: UInt8) {
             self.rawValue = rawValue
         }
 
-        public init(rawValue: Byte) {
+        public init(rawValue: UInt8) {
             self.init(__unchecked: (), rawValue: rawValue)
         }
     }
@@ -45,7 +45,7 @@ extension RFC_791.`Protocol` {
             throw .empty
         }
 
-        self.init(__unchecked: (), rawValue: firstByte)
+        self.init(__unchecked: (), rawValue: firstByte.bitPattern)
     }
 }
 
@@ -54,7 +54,7 @@ extension RFC_791.`Protocol`: Binary.Serializable {
         _ proto: Self,
         into buffer: inout Buffer
     ) where Buffer.Element == Byte {
-        buffer.append(proto.rawValue)
+        buffer.append(Byte(bitPattern: proto.rawValue))
     }
 }
 
@@ -79,6 +79,6 @@ extension RFC_791.`Protocol`: CustomStringConvertible {
 extension [Byte] {
 
     public init(_ proto: RFC_791.`Protocol`) {
-        self = [proto.rawValue]
+        self = [Byte(bitPattern: proto.rawValue)]
     }
 }

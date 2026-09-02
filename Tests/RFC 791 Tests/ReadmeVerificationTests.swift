@@ -2,6 +2,34 @@ import Testing
 
 @testable import RFC_791
 
+private func address(
+    _ octet1: UInt8,
+    _ octet2: UInt8,
+    _ octet3: UInt8,
+    _ octet4: UInt8
+) -> RFC_791.IPv4.Address {
+    RFC_791.IPv4.Address(
+        Byte(bitPattern: octet1),
+        Byte(bitPattern: octet2),
+        Byte(bitPattern: octet3),
+        Byte(bitPattern: octet4)
+    )
+}
+
+private func octets(
+    _ octet1: UInt8,
+    _ octet2: UInt8,
+    _ octet3: UInt8,
+    _ octet4: UInt8
+) -> (Byte, Byte, Byte, Byte) {
+    (
+        Byte(bitPattern: octet1),
+        Byte(bitPattern: octet2),
+        Byte(bitPattern: octet3),
+        Byte(bitPattern: octet4)
+    )
+}
+
 private typealias IPProtocol = RFC_791.`Protocol`
 
 @Suite("README Verification")
@@ -11,7 +39,7 @@ struct ReadmeVerificationTests {
     func `Quick Start - Create IPv4 address`() {
 
         let address: RFC_791.IPv4.Address = "192.168.1.1"
-        #expect(address.octets == (192, 168, 1, 1))
+        #expect(address.octets == octets(192, 168, 1, 1))
         #expect(address.class == .c)
     }
 
@@ -35,8 +63,8 @@ struct ReadmeVerificationTests {
         let text: [Byte] = address.serialized
         let wire: [Byte] = address.bytes
 
-        #expect(String(decoding: text.underlying, as: UTF8.self) == "192.168.1.1")
-        #expect(wire == [192, 168, 1, 1])
+        #expect(String(decoding: text.map(\.bitPattern), as: UTF8.self) == "192.168.1.1")
+        #expect(wire == ([192, 168, 1, 1] as [UInt8]).map(Byte.init(bitPattern:)))
     }
 
     @Test
@@ -46,11 +74,11 @@ struct ReadmeVerificationTests {
 
         let addr2 = RFC_791.IPv4.Address(rawValue: 0xC0A8_0001)
 
-        let addr3 = RFC_791.IPv4.Address(127, 0, 0, 1)
+        let addr3 = address(127, 0, 0, 1)
 
-        #expect(addr1.octets == (10, 0, 0, 1))
-        #expect(addr2.octets == (192, 168, 0, 1))
-        #expect(addr3.octets == (127, 0, 0, 1))
+        #expect(addr1.octets == octets(10, 0, 0, 1))
+        #expect(addr2.octets == octets(192, 168, 0, 1))
+        #expect(addr3.octets == octets(127, 0, 0, 1))
     }
 
     @Test
@@ -58,7 +86,7 @@ struct ReadmeVerificationTests {
         let addr: RFC_791.IPv4.Address = "10.0.0.1"
 
         let (a, b, c, d) = addr.octets
-        let description = "\(a).\(b).\(c).\(d)"
+        let description = "\(a.bitPattern).\(b.bitPattern).\(c.bitPattern).\(d.bitPattern)"
 
         #expect(description == "10.0.0.1")
     }
@@ -77,7 +105,7 @@ struct ReadmeVerificationTests {
 
         #expect(RFC_791.IPv4.Address.any.rawValue == 0)
         #expect(RFC_791.IPv4.Address.broadcast.rawValue == 0xFFFF_FFFF)
-        #expect(RFC_791.IPv4.Address.loopback.octets == (127, 0, 0, 1))
+        #expect(RFC_791.IPv4.Address.loopback.octets == octets(127, 0, 0, 1))
     }
 
     @Test
@@ -172,7 +200,7 @@ struct ReadmeVerificationTests {
     @Test
     func `Header Checksum - Compute`() {
 
-        let header: [Byte] = [
+        let header: [Byte] = ([
             0x45, 0x00,
             0x00, 0x73,
             0x00, 0x00,
@@ -181,7 +209,7 @@ struct ReadmeVerificationTests {
             0x00, 0x00,
             0xC0, 0xA8, 0x00, 0x01,
             0xC0, 0xA8, 0x00, 0xC7,
-        ]
+        ] as [UInt8]).map(Byte.init(bitPattern:))
 
         let checksum = RFC_791.HeaderChecksum.compute(over: header)
         #expect(checksum.rawValue == 0xB861)
@@ -190,11 +218,11 @@ struct ReadmeVerificationTests {
     @Test
     func `Header Checksum - Verify`() {
 
-        let completeHeader: [Byte] = [
+        let completeHeader: [Byte] = ([
             0x45, 0x00, 0x00, 0x73, 0x00, 0x00, 0x40, 0x00,
             0x40, 0x11, 0xB8, 0x61,
             0xC0, 0xA8, 0x00, 0x01, 0xC0, 0xA8, 0x00, 0xC7,
-        ]
+        ] as [UInt8]).map(Byte.init(bitPattern:))
 
         #expect(RFC_791.HeaderChecksum.verify(header: completeHeader) == true)
     }
@@ -204,7 +232,7 @@ struct ReadmeVerificationTests {
         var buffer: [Byte] = []
 
         RFC_791.TotalLength(rawValue: 1500)!.serialize(into: &buffer)
-        #expect(buffer == [0x05, 0xDC])
+        #expect(buffer == ([0x05, 0xDC] as [UInt8]).map(Byte.init(bitPattern:)))
 
         RFC_791.Identification(rawValue: 0x1234).serialize(into: &buffer)
         RFC_791.HeaderChecksum(rawValue: 0xABCD).serialize(into: &buffer)
@@ -221,21 +249,21 @@ struct ReadmeVerificationTests {
         let address: RFC_791.IPv4.Address = "192.168.1.1"
         let bytes: [Byte] = address.serialized
 
-        #expect(String(decoding: bytes.underlying, as: UTF8.self) == "192.168.1.1")
+        #expect(String(decoding: bytes.map(\.bitPattern), as: UTF8.self) == "192.168.1.1")
     }
 
     @Test
     func `Binary Parsing - Address from ASCII`() throws {
 
-        let addrBytes: [Byte] = Array("192.168.1.1".utf8)
+        let addrBytes: [Byte] = "192.168.1.1".utf8.map(Byte.init(bitPattern:))
         let address = try RFC_791.IPv4.Address(ascii: addrBytes)
-        #expect(address.octets == (192, 168, 1, 1))
+        #expect(address.octets == octets(192, 168, 1, 1))
     }
 
     @Test
     func `Binary Parsing - 16-bit fields`() throws {
 
-        let lengthBytes: [Byte] = [0x05, 0xDC]
+        let lengthBytes: [Byte] = ([0x05, 0xDC] as [UInt8]).map(Byte.init(bitPattern:))
         let length = try RFC_791.TotalLength(bytes: lengthBytes)
         #expect(length.rawValue == 1500)
     }

@@ -1,6 +1,6 @@
 extension RFC_791.IPv4.Address {
 
-    public enum Class: Sendable, Codable, Hashable {
+    public enum Class: Sendable, Hashable {
 
         case a
 

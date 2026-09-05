@@ -1,6 +1,6 @@
 extension RFC_791 {
 
-    public struct `Protocol`: RawRepresentable, Hashable, Sendable, Codable {
+    public struct `Protocol`: RawRepresentable, Hashable, Sendable {
 
         public let rawValue: UInt8
 
@@ -37,27 +37,6 @@ extension RFC_791.`Protocol` {
     public static let sctp = Self(__unchecked: (), rawValue: 132)
 }
 
-extension RFC_791.`Protocol` {
-
-    public init<Bytes: Swift.Collection>(bytes: Bytes) throws(Error)
-    where Bytes.Element == Byte {
-        guard let firstByte = bytes.first else {
-            throw .empty
-        }
-
-        self.init(__unchecked: (), rawValue: firstByte.bitPattern)
-    }
-}
-
-extension RFC_791.`Protocol`: Binary.Serializable {
-    public static func serialize<Buffer: RangeReplaceableCollection>(
-        _ proto: Self,
-        into buffer: inout Buffer
-    ) where Buffer.Element == Byte {
-        buffer.append(Byte(bitPattern: proto.rawValue))
-    }
-}
-
 extension RFC_791.`Protocol`: CustomStringConvertible {
     public var description: String {
         switch rawValue {
@@ -73,12 +52,5 @@ extension RFC_791.`Protocol`: CustomStringConvertible {
         case 132: return "SCTP"
         default: return "Protocol(\(rawValue))"
         }
-    }
-}
-
-extension [Byte] {
-
-    public init(_ proto: RFC_791.`Protocol`) {
-        self = [Byte(bitPattern: proto.rawValue)]
     }
 }

@@ -1,6 +1,6 @@
 extension RFC_791 {
 
-    public struct TypeOfService: Hashable, Sendable, Codable {
+    public struct TypeOfService: RawRepresentable, Hashable, Sendable {
 
         public let rawValue: UInt8
 
@@ -59,40 +59,6 @@ extension RFC_791.TypeOfService {
     public static let maximizeThroughput = RFC_791.TypeOfService(highThroughput: true)
 
     public static let maximizeReliability = RFC_791.TypeOfService(highReliability: true)
-}
-
-extension RFC_791.TypeOfService {
-
-    public init<Bytes: Swift.Collection>(bytes: Bytes) throws(Error)
-    where Bytes.Element == Byte {
-        guard let firstByte = bytes.first else {
-            throw .empty
-        }
-
-        let value = firstByte.bitPattern
-
-        guard value & 0b0000_0011 == 0 else {
-            throw .reservedBitsSet(firstByte)
-        }
-
-        self.init(__unchecked: (), rawValue: value)
-    }
-}
-
-extension RFC_791.TypeOfService: Binary.Serializable {
-    public static func serialize<Buffer: RangeReplaceableCollection>(
-        _ tos: Self,
-        into buffer: inout Buffer
-    ) where Buffer.Element == Byte {
-        buffer.append(Byte(bitPattern: tos.rawValue))
-    }
-}
-
-extension [Byte] {
-
-    public init(_ tos: RFC_791.TypeOfService) {
-        self = [Byte(bitPattern: tos.rawValue)]
-    }
 }
 
 extension RFC_791.TypeOfService: CustomStringConvertible {

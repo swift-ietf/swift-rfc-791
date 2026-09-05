@@ -1,9 +1,6 @@
-public import Binary_Endianness
-public import Binary_Standard_Library_Integration
-
 extension RFC_791 {
 
-    public struct TotalLength: RawRepresentable, Hashable, Sendable, Codable {
+    public struct TotalLength: RawRepresentable, Hashable, Sendable {
 
         public let rawValue: UInt16
 
@@ -40,38 +37,6 @@ extension RFC_791.TotalLength {
     public static let minimumReassemblyBuffer = RFC_791.TotalLength(__unchecked: (), rawValue: 576)
 
     public static let ethernetMTU = RFC_791.TotalLength(__unchecked: (), rawValue: 1500)
-}
-
-extension RFC_791.TotalLength {
-
-    public init<Bytes: Swift.Collection>(bytes: Bytes) throws(Error)
-    where Bytes.Element == Byte {
-        var iterator = bytes.makeIterator()
-
-        guard let high = iterator.next() else {
-            throw .empty
-        }
-        guard let low = iterator.next() else {
-            throw .insufficientBytes
-        }
-
-        let value = UInt16(high.bitPattern) << 8 | UInt16(low.bitPattern)
-        guard value >= 20 else {
-            throw .tooSmall(value)
-        }
-
-        self.init(__unchecked: (), rawValue: value)
-    }
-}
-
-extension RFC_791.TotalLength: Binary.Serializable {
-    public static func serialize<Buffer>(
-        _ totalLength: RFC_791.TotalLength,
-        into buffer: inout Buffer
-    ) where Buffer: RangeReplaceableCollection, Buffer.Element == Byte {
-
-        buffer.append(contentsOf: totalLength.rawValue.bytes(endianness: .big))
-    }
 }
 
 extension RFC_791.TotalLength: CustomStringConvertible {

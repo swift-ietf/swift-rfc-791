@@ -1,9 +1,6 @@
-public import Binary_Endianness
-public import Binary_Standard_Library_Integration
-
 extension RFC_791 {
 
-    public struct IHL: RawRepresentable, Hashable, Sendable, Codable {
+    public struct IHL: RawRepresentable, Hashable, Sendable {
 
         public let rawValue: UInt8
 
@@ -49,34 +46,6 @@ extension RFC_791.IHL {
             return nil
         }
         return RFC_791.IHL(rawValue: UInt8(bytes / 4))
-    }
-}
-
-extension RFC_791.IHL {
-
-    public init<Bytes: Swift.Collection>(bytes: Bytes) throws(Error)
-    where Bytes.Element == Byte {
-        guard let firstByte = bytes.first else {
-            throw .empty
-        }
-
-        let ihl = firstByte.bitPattern & 0x0F
-
-        guard ihl >= 5 else {
-            throw .tooSmall(ihl)
-        }
-
-        self.init(__unchecked: (), rawValue: ihl)
-    }
-}
-
-extension RFC_791.IHL: Binary.Serializable {
-    public static func serialize<Buffer>(
-        _ ihl: RFC_791.IHL,
-        into buffer: inout Buffer
-    ) where Buffer: RangeReplaceableCollection, Buffer.Element == Byte {
-
-        buffer.append(contentsOf: ihl.rawValue.bytes(endianness: .big))
     }
 }
 

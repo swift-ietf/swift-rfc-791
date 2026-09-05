@@ -1,3 +1,5 @@
+public import Byte
+
 extension RFC_791.Precedence {
 
     public enum Error: Swift.Error, Sendable, Equatable {

@@ -1,9 +1,6 @@
-public import Binary_Endianness
-public import Binary_Standard_Library_Integration
-
 extension RFC_791 {
 
-    public struct TTL: RawRepresentable, Hashable, Sendable, Codable {
+    public struct TTL: RawRepresentable, Hashable, Sendable {
 
         public let rawValue: UInt8
 
@@ -40,28 +37,6 @@ extension RFC_791.TTL {
     public static let expired = RFC_791.TTL(__unchecked: (), rawValue: 0)
 
     public static let linkLocal = RFC_791.TTL(__unchecked: (), rawValue: 1)
-}
-
-extension RFC_791.TTL {
-
-    public init<Bytes: Swift.Collection>(bytes: Bytes) throws(Error)
-    where Bytes.Element == Byte {
-        guard let firstByte = bytes.first else {
-            throw .empty
-        }
-
-        self.init(__unchecked: (), rawValue: firstByte.bitPattern)
-    }
-}
-
-extension RFC_791.TTL: Binary.Serializable {
-    public static func serialize<Buffer>(
-        _ ttl: RFC_791.TTL,
-        into buffer: inout Buffer
-    ) where Buffer: RangeReplaceableCollection, Buffer.Element == Byte {
-
-        buffer.append(contentsOf: ttl.rawValue.bytes(endianness: .big))
-    }
 }
 
 extension RFC_791.TTL: CustomStringConvertible {

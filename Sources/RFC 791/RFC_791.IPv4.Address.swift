@@ -1,9 +1,10 @@
-public import Binary_Parseable
-public import Parseable_ASCII
+public import Byte
+import ASCII
+import Byte_Standard_Library_Integration
 
 extension RFC_791.IPv4 {
 
-    public struct Address: Hashable, Sendable, Codable {
+    public struct Address: Hashable, Sendable {
 
         public let rawValue: UInt32
 
@@ -28,7 +29,6 @@ extension RFC_791.IPv4.Address {
             | UInt32(octet4.bitPattern)
         self.init(__unchecked: (), rawValue: value)
     }
-
 }
 
 extension RFC_791.IPv4.Address {
@@ -50,103 +50,7 @@ extension RFC_791.IPv4.Address {
     }
 }
 
-extension RFC_791.IPv4.Address: Binary.Serializable {
-    public static func serialize<Buffer>(
-        _ address: RFC_791.IPv4.Address,
-        into buffer: inout Buffer
-    ) where Buffer: Swift.RangeReplaceableCollection, Buffer.Element == Byte {
-        let (a, b, c, d) = address.octets
-        buffer.append(a)
-        buffer.append(b)
-        buffer.append(c)
-        buffer.append(d)
-    }
-
-    public init<Bytes: Swift.Collection>(binary bytes: Bytes) throws(Error)
-    where Bytes.Element == Byte {
-        guard bytes.count == 4 else {
-            throw .invalidFormat("Expected 4 bytes, got \(bytes.count)")
-        }
-
-        var iterator = bytes.makeIterator()
-        let a = iterator.next()!
-        let b = iterator.next()!
-        let c = iterator.next()!
-        let d = iterator.next()!
-
-        self.init(a, b, c, d)
-    }
-}
-
-extension RFC_791.IPv4.Address: Binary.Parseable {
-
-    public static func parse<Source>(
-        from source: inout Source
-    ) throws(Binary.Parse.Failure) -> RFC_791.IPv4.Address
-    where Source: Swift.RangeReplaceableCollection, Source.Element == Byte {
-        guard source.count >= 4 else {
-            throw .insufficient(needed: 4)
-        }
-
-        var iterator = source.makeIterator()
-        let a = iterator.next()!
-        let b = iterator.next()!
-        let c = iterator.next()!
-        let d = iterator.next()!
-        source.removeFirst(4)
-
-        return RFC_791.IPv4.Address(a, b, c, d)
-    }
-}
-
-extension RFC_791.IPv4.Address: ASCII.Serializable {
-
-    public static func serialize<Buffer>(
-        _ address: RFC_791.IPv4.Address,
-        into buffer: inout Buffer
-    ) where Buffer: Swift.RangeReplaceableCollection, Buffer.Element == ASCII.Code {
-        let (a, b, c, d) = address.octets
-
-        buffer.reserveCapacity(15)
-
-        func appendDecimal(_ value: UInt8) {
-
-            if value < 10 {
-                buffer.append(ASCII.Code(ASCII.Code.`0`.underlying &+ value))
-                return
-            }
-
-            if value < 100 {
-                let tens = value / 10
-                let ones = value % 10
-                buffer.append(ASCII.Code(ASCII.Code.`0`.underlying &+ tens))
-                buffer.append(ASCII.Code(ASCII.Code.`0`.underlying &+ ones))
-                return
-            }
-
-            let hundreds = value / 100
-            let remainder = value % 100
-            let tens = remainder / 10
-            let ones = remainder % 10
-
-            buffer.append(ASCII.Code(ASCII.Code.`0`.underlying &+ hundreds))
-            buffer.append(ASCII.Code(ASCII.Code.`0`.underlying &+ tens))
-            buffer.append(ASCII.Code(ASCII.Code.`0`.underlying &+ ones))
-        }
-
-        appendDecimal(a.bitPattern)
-        buffer.append(ASCII.Code.period)
-        appendDecimal(b.bitPattern)
-        buffer.append(ASCII.Code.period)
-        appendDecimal(c.bitPattern)
-        buffer.append(ASCII.Code.period)
-        appendDecimal(d.bitPattern)
-    }
-}
-
-extension RFC_791.IPv4.Address: ASCII.Parseable {
-
-    public typealias Failure = RFC_791.IPv4.Address.Error
+extension RFC_791.IPv4.Address {
 
     public init<Bytes: Swift.Collection>(ascii bytes: Bytes) throws(Error)
     where Bytes.Element == Byte {
@@ -154,14 +58,14 @@ extension RFC_791.IPv4.Address: ASCII.Parseable {
             throw .empty
         }
 
-        let arr: [ASCII.Code]
+        let codes: [ASCII.Code]
         do throws(ASCII.Code.Error) {
-            var codes: [ASCII.Code] = []
-            codes.reserveCapacity(bytes.count)
+            var collected: [ASCII.Code] = []
+            collected.reserveCapacity(bytes.count)
             for byte in bytes {
-                codes.append(try ASCII.Code(byte))
+                collected.append(try ASCII.Code(byte))
             }
-            arr = codes
+            codes = collected
         } catch {
             throw .invalidFormat(String(decoding: bytes, as: UTF8.self))
         }
@@ -173,7 +77,7 @@ extension RFC_791.IPv4.Address: ASCII.Parseable {
         var digitCount = 0
         var position = 0
 
-        for code in arr {
+        for code in codes {
             if code == ASCII.Code.period {
 
                 guard digitCount > 0 else {
@@ -227,13 +131,6 @@ extension RFC_791.IPv4.Address: ASCII.Parseable {
     }
 }
 
-extension RFC_791.IPv4.Address: CustomStringConvertible {
-
-    public var description: String {
-        String(decoding: serialized, as: UTF8.self)
-    }
-}
-
 extension RFC_791.IPv4.Address {
 
     public init(_ string: some StringProtocol) throws(Error) {
@@ -241,21 +138,18 @@ extension RFC_791.IPv4.Address {
     }
 }
 
+extension RFC_791.IPv4.Address: CustomStringConvertible {
+
+    public var description: String {
+        let (a, b, c, d) = octets
+        return "\(a.bitPattern).\(b.bitPattern).\(c.bitPattern).\(d.bitPattern)"
+    }
+}
+
 extension RFC_791.IPv4.Address: Comparable {
 
     public static func < (lhs: Self, rhs: Self) -> Bool {
         lhs.rawValue < rhs.rawValue
-    }
-}
-
-extension RFC_791.IPv4.Address: ExpressibleByStringLiteral {
-
-    public init(stringLiteral value: String) {
-        do throws(Error) {
-            try self.init(value)
-        } catch {
-            preconditionFailure("Invalid IPv4 address literal '\(value)': \(error)")
-        }
     }
 }
 

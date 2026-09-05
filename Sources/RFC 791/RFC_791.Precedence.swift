@@ -1,6 +1,6 @@
 extension RFC_791 {
 
-    public struct Precedence: RawRepresentable, Hashable, Sendable, Codable {
+    public struct Precedence: RawRepresentable, Hashable, Sendable {
 
         public let rawValue: UInt8
 
@@ -36,33 +36,6 @@ extension RFC_791.Precedence {
     public static let networkControl = RFC_791.Precedence(__unchecked: (), rawValue: 7)
 }
 
-extension RFC_791.Precedence {
-
-    public init<Bytes: Swift.Collection>(bytes: Bytes) throws(Error)
-    where Bytes.Element == Byte {
-        guard let firstByte = bytes.first else {
-            throw .empty
-        }
-
-        let value = firstByte.bitPattern
-
-        guard value <= 7 else {
-            throw .valueOutOfRange(firstByte)
-        }
-
-        self.init(__unchecked: (), rawValue: value)
-    }
-}
-
-extension RFC_791.Precedence: Binary.Serializable {
-    public static func serialize<Buffer: RangeReplaceableCollection>(
-        _ precedence: Self,
-        into buffer: inout Buffer
-    ) where Buffer.Element == Byte {
-        buffer.append(Byte(bitPattern: precedence.rawValue))
-    }
-}
-
 extension RFC_791.Precedence: CustomStringConvertible {
     public var description: String {
         switch rawValue {
@@ -82,12 +55,5 @@ extension RFC_791.Precedence: CustomStringConvertible {
 extension RFC_791.Precedence: Comparable {
     public static func < (lhs: Self, rhs: Self) -> Bool {
         lhs.rawValue < rhs.rawValue
-    }
-}
-
-extension [Byte] {
-
-    public init(_ precedence: RFC_791.Precedence) {
-        self = [Byte(bitPattern: precedence.rawValue)]
     }
 }

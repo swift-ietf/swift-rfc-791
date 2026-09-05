@@ -1,9 +1,8 @@
-public import Binary_Endianness
-public import Binary_Standard_Library_Integration
+public import Byte
 
 extension RFC_791 {
 
-    public struct HeaderChecksum: RawRepresentable, Hashable, Sendable, Codable {
+    public struct HeaderChecksum: RawRepresentable, Hashable, Sendable {
 
         public let rawValue: UInt16
 
@@ -54,34 +53,6 @@ extension RFC_791.HeaderChecksum {
         }
 
         return sum == 0xFFFF
-    }
-}
-
-extension RFC_791.HeaderChecksum {
-
-    public init<Bytes: Swift.Collection>(bytes: Bytes) throws(Error)
-    where Bytes.Element == Byte {
-        var iterator = bytes.makeIterator()
-
-        guard let high = iterator.next() else {
-            throw .empty
-        }
-        guard let low = iterator.next() else {
-            throw .insufficientBytes
-        }
-
-        let value = UInt16(high.bitPattern) << 8 | UInt16(low.bitPattern)
-        self.init(__unchecked: (), rawValue: value)
-    }
-}
-
-extension RFC_791.HeaderChecksum: Binary.Serializable {
-    public static func serialize<Buffer>(
-        _ headerChecksum: RFC_791.HeaderChecksum,
-        into buffer: inout Buffer
-    ) where Buffer: RangeReplaceableCollection, Buffer.Element == Byte {
-
-        buffer.append(contentsOf: headerChecksum.rawValue.bytes(endianness: .big))
     }
 }
 

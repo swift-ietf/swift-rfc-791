@@ -1,6 +1,5 @@
 public import Byte
 import ASCII
-import Byte
 
 extension RFC_791.IPv4 {
 
@@ -52,7 +51,7 @@ extension RFC_791.IPv4.Address {
 
 extension RFC_791.IPv4.Address {
 
-    public init<Bytes: Swift.Collection>(ascii bytes: Bytes) throws(Error)
+    public init<Bytes: Swift::Collection>(ascii bytes: Bytes) throws(Error)
     where Bytes.Element == Byte {
         guard !bytes.isEmpty else {
             throw .empty

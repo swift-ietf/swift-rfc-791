@@ -1,6 +1,6 @@
 extension RFC_791.TotalLength {
 
-    public enum Error: Swift.Error, Sendable, Equatable {
+    public enum Error: Swift::Error, Sendable, Equatable {
 
         case empty
 

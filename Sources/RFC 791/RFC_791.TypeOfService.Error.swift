@@ -2,7 +2,7 @@ public import Byte
 
 extension RFC_791.TypeOfService {
 
-    public enum Error: Swift.Error, Sendable, Equatable {
+    public enum Error: Swift::Error, Sendable, Equatable {
 
         case empty
 

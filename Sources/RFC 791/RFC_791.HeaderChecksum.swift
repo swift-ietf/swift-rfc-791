@@ -18,7 +18,7 @@ extension RFC_791 {
 
 extension RFC_791.HeaderChecksum {
 
-    public static func compute<Bytes: Swift.Collection>(
+    public static func compute<Bytes: Swift::Collection>(
         over header: Bytes
     ) -> RFC_791.HeaderChecksum where Bytes.Element == Byte {
         var sum: UInt32 = 0
@@ -37,7 +37,7 @@ extension RFC_791.HeaderChecksum {
         return RFC_791.HeaderChecksum(__unchecked: (), rawValue: checksum)
     }
 
-    public static func verify<Bytes: Swift.Collection>(
+    public static func verify<Bytes: Swift::Collection>(
         header: Bytes
     ) -> Bool where Bytes.Element == Byte {
         var sum: UInt32 = 0

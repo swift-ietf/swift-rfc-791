@@ -29,7 +29,10 @@ struct `README Tests` {
         let fromText = try RFC_791.IPv4.Address("10.0.0.1")
         let fromRawValue = RFC_791.IPv4.Address(rawValue: 0xC0A8_0001)
         let fromOctets = RFC_791.IPv4.Address(
-            Byte(bitPattern: 127), Byte(bitPattern: 0), Byte(bitPattern: 0), Byte(bitPattern: 1)
+            Byte(bitPattern: 127),
+            Byte(bitPattern: 0),
+            Byte(bitPattern: 0),
+            Byte(bitPattern: 1)
         )
 
         #expect(fromText.octets == octetTuple(10, 0, 0, 1))
@@ -99,16 +102,50 @@ struct `README Tests` {
     @Test
     func `Header checksum`() {
         let header = bytes(
-            0x45, 0x00, 0x00, 0x73, 0x00, 0x00, 0x40, 0x00,
-            0x40, 0x11, 0x00, 0x00,
-            0xC0, 0xA8, 0x00, 0x01, 0xC0, 0xA8, 0x00, 0xC7
+            0x45,
+            0x00,
+            0x00,
+            0x73,
+            0x00,
+            0x00,
+            0x40,
+            0x00,
+            0x40,
+            0x11,
+            0x00,
+            0x00,
+            0xC0,
+            0xA8,
+            0x00,
+            0x01,
+            0xC0,
+            0xA8,
+            0x00,
+            0xC7
         )
         #expect(RFC_791.HeaderChecksum.compute(over: header).rawValue == 0xB861)
 
         let complete = bytes(
-            0x45, 0x00, 0x00, 0x73, 0x00, 0x00, 0x40, 0x00,
-            0x40, 0x11, 0xB8, 0x61,
-            0xC0, 0xA8, 0x00, 0x01, 0xC0, 0xA8, 0x00, 0xC7
+            0x45,
+            0x00,
+            0x00,
+            0x73,
+            0x00,
+            0x00,
+            0x40,
+            0x00,
+            0x40,
+            0x11,
+            0xB8,
+            0x61,
+            0xC0,
+            0xA8,
+            0x00,
+            0x01,
+            0xC0,
+            0xA8,
+            0x00,
+            0xC7
         )
         #expect(RFC_791.HeaderChecksum.verify(header: complete))
     }

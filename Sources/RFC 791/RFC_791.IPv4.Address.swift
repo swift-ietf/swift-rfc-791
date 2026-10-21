@@ -1,5 +1,5 @@
-public import Byte
 import ASCII
+public import Byte
 
 extension RFC_791.IPv4 {
 
@@ -94,7 +94,10 @@ extension RFC_791.IPv4.Address {
                 if digitCount == 1, currentOctet == 0 {
                     throw .leadingZero(String(decoding: bytes, as: UTF8.self), position: position)
                 }
-                currentOctet = currentOctet * 10 + Int(code.digitValue!)
+                guard let digit = code.digitValue else {
+                    preconditionFailure("A digit code always has a digit value")
+                }
+                currentOctet = currentOctet * 10 + Int(digit)
                 digitCount += 1
 
                 if currentOctet > 255 {

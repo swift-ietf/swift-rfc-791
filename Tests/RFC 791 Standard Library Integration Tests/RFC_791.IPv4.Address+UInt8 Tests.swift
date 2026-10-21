@@ -17,7 +17,10 @@ struct `RFC 791 Standard Library Integration Tests` {
     @Test
     func `agrees with the Byte initializer`() {
         let typed = RFC_791.IPv4.Address(
-            Byte(bitPattern: 10), Byte(bitPattern: 0), Byte(bitPattern: 0), Byte(bitPattern: 1)
+            Byte(bitPattern: 10),
+            Byte(bitPattern: 0),
+            Byte(bitPattern: 0),
+            Byte(bitPattern: 1)
         )
         #expect(RFC_791.IPv4.Address(10, 0, 0, 1) == typed)
     }

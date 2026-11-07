@@ -2,20 +2,37 @@ import Byte
 import RFC_791
 import Testing
 
-@Suite
-struct `RFC 791 Tests` {
+extension `RFC 791 Tests`.`RFC 791 Tests` {
+    @Suite
+    struct `RFC 791 Tests` {
+    }
+}
+
+extension `RFC 791 Tests`.`RFC 791 Tests`.`RFC 791 Tests` {
     @Suite struct `IPv4 Address Tests` {}
+
     @Suite struct `IPv4 Address Class Tests` {}
+
     @Suite struct `Version Tests` {}
+
     @Suite struct `IHL Tests` {}
+
     @Suite struct `Type of Service Tests` {}
+
     @Suite struct `Precedence Tests` {}
+
     @Suite struct `Total Length Tests` {}
+
     @Suite struct `Identification Tests` {}
+
     @Suite struct `Flags Tests` {}
+
     @Suite struct `Fragment Offset Tests` {}
+
     @Suite struct `TTL Tests` {}
+
     @Suite struct `Protocol Tests` {}
+
     @Suite struct `Header Checksum Tests` {}
 }
 

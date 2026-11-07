@@ -1,7 +1,7 @@
 import RFC_791
 import Testing
 
-extension `RFC 791 Tests`.`IHL Tests` {
+extension `RFC 791 Tests`.`RFC 791 Tests`.`IHL Tests` {
 
     @Test
     func `accepts 5 through 15 words`() {

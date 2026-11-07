@@ -1,7 +1,7 @@
 import RFC_791
 import Testing
 
-extension `RFC 791 Tests`.`Total Length Tests` {
+extension `RFC 791 Tests`.`RFC 791 Tests`.`Total Length Tests` {
 
     @Test
     func `accepts 20 through 65535 bytes`() {

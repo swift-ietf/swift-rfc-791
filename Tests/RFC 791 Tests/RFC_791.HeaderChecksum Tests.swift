@@ -2,7 +2,7 @@ import Byte
 import RFC_791
 import Testing
 
-extension `RFC 791 Tests`.`Header Checksum Tests` {
+extension `RFC 791 Tests`.`RFC 791 Tests`.`Header Checksum Tests` {
 
     @Test
     func `accepts every 16-bit value`() {

@@ -1,7 +1,7 @@
 import RFC_791
 import Testing
 
-extension `RFC 791 Tests`.`RFC 791 Tests`.`IPv4 Address Class Tests` {
+extension `RFC 791 Tests`.`IPv4 Address Class Tests` {
 
     @Test
     func `classifies first octets 0 through 127 as class A`() {

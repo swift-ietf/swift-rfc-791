@@ -1,7 +1,7 @@
 import RFC_791
 import Testing
 
-extension `RFC 791 Tests`.`RFC 791 Tests`.`Version Tests` {
+extension `RFC 791 Tests`.`Version Tests` {
 
     @Test
     func `accepts nibble values`() {

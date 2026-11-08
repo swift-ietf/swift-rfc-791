@@ -13,7 +13,7 @@
         public static var coder: Coder<ArraySlice<Byte>, [Byte]> { .init() }
     }
 
-extension RFC_791.IPv4.Address.Coder {
+    extension RFC_791.IPv4.Address.Coder {
         public typealias Output = RFC_791.IPv4.Address
 
         public typealias Failure = RFC_791.IPv4.Address.Error
@@ -37,5 +37,5 @@ extension RFC_791.IPv4.Address.Coder {
             buffer.append(c)
             buffer.append(d)
         }
-}
+    }
 #endif

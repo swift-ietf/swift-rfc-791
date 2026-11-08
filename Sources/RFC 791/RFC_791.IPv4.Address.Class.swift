@@ -40,7 +40,6 @@ extension RFC_791.IPv4.Address {
 
 extension RFC_791.IPv4.Address {
 
-
     public var `is`: Is {
         Is(self)
     }

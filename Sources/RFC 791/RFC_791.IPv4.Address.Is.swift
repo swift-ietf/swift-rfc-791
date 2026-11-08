@@ -1,4 +1,3 @@
-
 extension RFC_791.IPv4.Address {
     public struct Is: Sendable {
         @usableFromInline

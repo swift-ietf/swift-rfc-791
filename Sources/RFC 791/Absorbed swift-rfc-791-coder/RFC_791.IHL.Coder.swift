@@ -14,7 +14,7 @@
         public static var coder: Coder<ArraySlice<Byte>, [Byte]> { .init() }
     }
 
-extension RFC_791.IHL.Coder {
+    extension RFC_791.IHL.Coder {
         public typealias Output = RFC_791.IHL
 
         public typealias Failure = RFC_791.IHL.Error
@@ -33,5 +33,5 @@ extension RFC_791.IHL.Coder {
         public borrowing func serialize(_ output: Output, into buffer: inout Buffer) throws(Failure) {
             RFC_791.IHL.serialize(output, into: &buffer)
         }
-}
+    }
 #endif

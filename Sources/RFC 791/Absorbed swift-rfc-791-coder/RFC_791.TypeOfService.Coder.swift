@@ -14,7 +14,7 @@
         public static var coder: Coder<ArraySlice<Byte>, [Byte]> { .init() }
     }
 
-extension RFC_791.TypeOfService.Coder {
+    extension RFC_791.TypeOfService.Coder {
         public typealias Output = RFC_791.TypeOfService
 
         public typealias Failure = RFC_791.TypeOfService.Error
@@ -32,5 +32,5 @@ extension RFC_791.TypeOfService.Coder {
         public borrowing func serialize(_ output: Output, into buffer: inout Buffer) throws(Failure) {
             RFC_791.TypeOfService.serialize(output, into: &buffer)
         }
-}
+    }
 #endif

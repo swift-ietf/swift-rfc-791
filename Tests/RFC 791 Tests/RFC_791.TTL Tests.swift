@@ -1,7 +1,7 @@
 import RFC_791
 import Testing
 
-extension `RFC 791 Tests`.`RFC 791 Tests`.`TTL Tests` {
+extension `RFC 791 Tests`.`TTL Tests` {
 
     @Test
     func `accepts every 8-bit value`() {

@@ -3,7 +3,7 @@ import Testing
 
 private typealias IPProtocol = RFC_791.`Protocol`
 
-extension `RFC 791 Tests`.`RFC 791 Tests`.`Protocol Tests` {
+extension `RFC 791 Tests`.`Protocol Tests` {
 
     @Test
     func `accepts every 8-bit protocol number`() {

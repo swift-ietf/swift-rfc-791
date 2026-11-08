@@ -1,7 +1,7 @@
 import RFC_791
 import Testing
 
-extension `RFC 791 Tests`.`RFC 791 Tests`.`Precedence Tests` {
+extension `RFC 791 Tests`.`Precedence Tests` {
 
     @Test
     func `accepts 0 through 7`() {

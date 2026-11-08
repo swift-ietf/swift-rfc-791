@@ -2,7 +2,7 @@ import Byte
 import RFC_791
 import Testing
 
-extension `RFC 791 Tests`.`RFC 791 Tests`.`IPv4 Address Tests` {
+extension `RFC 791 Tests`.`IPv4 Address Tests` {
 
     @Test
     func `builds an address from four octets`() {

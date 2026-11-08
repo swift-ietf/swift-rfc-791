@@ -1,7 +1,7 @@
 import RFC_791
 import Testing
 
-extension `RFC 791 Tests`.`RFC 791 Tests`.`Identification Tests` {
+extension `RFC 791 Tests`.`Identification Tests` {
 
     @Test
     func `accepts every 16-bit value`() {

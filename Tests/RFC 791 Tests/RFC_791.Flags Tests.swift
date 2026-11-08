@@ -1,7 +1,7 @@
 import RFC_791
 import Testing
 
-extension `RFC 791 Tests`.`Flags Tests` {
+extension `RFC 791 Tests`.`RFC 791 Tests`.`Flags Tests` {
 
     @Test
     func `accepts a raw value with the reserved bit clear`() {

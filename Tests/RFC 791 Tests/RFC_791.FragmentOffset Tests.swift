@@ -1,7 +1,7 @@
 import RFC_791
 import Testing
 
-extension `RFC 791 Tests`.`Fragment Offset Tests` {
+extension `RFC 791 Tests`.`RFC 791 Tests`.`Fragment Offset Tests` {
 
     @Test
     func `accepts 13-bit values`() {

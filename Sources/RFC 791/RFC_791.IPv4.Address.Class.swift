@@ -19,21 +19,21 @@ extension RFC_791.IPv4.Address {
     public var `class`: Class {
         let firstOctet = UInt8((rawValue >> 24) & 0xFF)
 
-        if firstOctet & 0b1000_0000 == 0 {
+        return if firstOctet & 0b1000_0000 == 0 {
 
-            return .a
+            .a
         } else if firstOctet & 0b1100_0000 == 0b1000_0000 {
 
-            return .b
+            .b
         } else if firstOctet & 0b1110_0000 == 0b1100_0000 {
 
-            return .c
+            .c
         } else if firstOctet & 0b1111_0000 == 0b1110_0000 {
 
-            return .d
+            .d
         } else {
 
-            return .e
+            .e
         }
     }
 }

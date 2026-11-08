@@ -9,13 +9,11 @@
 
     private typealias IPProtocol = RFC_791.`Protocol`
 
-extension `RFC 791 Coder Tests`.`RFC 791 Coder Tests` {
-        @Suite
-        struct `RFC 791 Coder Tests` {
-        }
-}
+    @Suite
+    struct `RFC 791 Coder Tests` {
+    }
 
-    extension `RFC 791 Coder Tests`.`RFC 791 Coder Tests` {
+    extension `RFC 791 Coder Tests` {
         @Suite struct `IPv4 Address Tests` {}
 
         @Suite struct `Version Tests` {}
@@ -41,7 +39,7 @@ extension `RFC 791 Coder Tests`.`RFC 791 Coder Tests` {
         @Suite struct `Header Checksum Tests` {}
     }
 
-    extension `RFC 791 Coder Tests`.`RFC 791 Coder Tests`.`IPv4 Address Tests` {
+    extension `RFC 791 Coder Tests`.`IPv4 Address Tests` {
 
         @Test
         func `reads four network-order octets and stops`() throws {
@@ -82,7 +80,7 @@ extension `RFC 791 Coder Tests`.`RFC 791 Coder Tests` {
         }
     }
 
-    extension `RFC 791 Coder Tests`.`RFC 791 Coder Tests`.`Version Tests` {
+    extension `RFC 791 Coder Tests`.`Version Tests` {
 
         @Test
         func `reads the version from the high nibble`() throws {
@@ -110,7 +108,7 @@ extension `RFC 791 Coder Tests`.`RFC 791 Coder Tests` {
         }
     }
 
-    extension `RFC 791 Coder Tests`.`RFC 791 Coder Tests`.`IHL Tests` {
+    extension `RFC 791 Coder Tests`.`IHL Tests` {
 
         @Test
         func `reads the header length from the low nibble`() throws {
@@ -151,7 +149,7 @@ extension `RFC 791 Coder Tests`.`RFC 791 Coder Tests` {
         }
     }
 
-    extension `RFC 791 Coder Tests`.`RFC 791 Coder Tests`.`Type of Service Tests` {
+    extension `RFC 791 Coder Tests`.`Type of Service Tests` {
 
         @Test
         func `reads precedence and flags from one octet`() throws {
@@ -191,7 +189,7 @@ extension `RFC 791 Coder Tests`.`RFC 791 Coder Tests` {
         }
     }
 
-    extension `RFC 791 Coder Tests`.`RFC 791 Coder Tests`.`Precedence Tests` {
+    extension `RFC 791 Coder Tests`.`Precedence Tests` {
 
         @Test
         func `reads a precedence level`() throws {
@@ -225,7 +223,7 @@ extension `RFC 791 Coder Tests`.`RFC 791 Coder Tests` {
         }
     }
 
-    extension `RFC 791 Coder Tests`.`RFC 791 Coder Tests`.`Total Length Tests` {
+    extension `RFC 791 Coder Tests`.`Total Length Tests` {
 
         @Test
         func `reads two big-endian octets`() throws {
@@ -273,7 +271,7 @@ extension `RFC 791 Coder Tests`.`RFC 791 Coder Tests` {
         }
     }
 
-    extension `RFC 791 Coder Tests`.`RFC 791 Coder Tests`.`Identification Tests` {
+    extension `RFC 791 Coder Tests`.`Identification Tests` {
 
         @Test
         func `reads two big-endian octets`() throws {
@@ -312,7 +310,7 @@ extension `RFC 791 Coder Tests`.`RFC 791 Coder Tests` {
         }
     }
 
-    extension `RFC 791 Coder Tests`.`RFC 791 Coder Tests`.`Flags Tests` {
+    extension `RFC 791 Coder Tests`.`Flags Tests` {
 
         @Test
         func `reads the flags from the top three bits`() throws {
@@ -356,7 +354,7 @@ extension `RFC 791 Coder Tests`.`RFC 791 Coder Tests` {
         }
     }
 
-    extension `RFC 791 Coder Tests`.`RFC 791 Coder Tests`.`Fragment Offset Tests` {
+    extension `RFC 791 Coder Tests`.`Fragment Offset Tests` {
 
         @Test
         func `reads the low thirteen bits of two octets`() throws {
@@ -404,7 +402,7 @@ extension `RFC 791 Coder Tests`.`RFC 791 Coder Tests` {
         }
     }
 
-    extension `RFC 791 Coder Tests`.`RFC 791 Coder Tests`.`TTL Tests` {
+    extension `RFC 791 Coder Tests`.`TTL Tests` {
 
         @Test
         func `reads one octet`() throws {
@@ -434,7 +432,7 @@ extension `RFC 791 Coder Tests`.`RFC 791 Coder Tests` {
         }
     }
 
-    extension `RFC 791 Coder Tests`.`RFC 791 Coder Tests`.`Protocol Tests` {
+    extension `RFC 791 Coder Tests`.`Protocol Tests` {
 
         @Test
         func `reads one octet`() throws {
@@ -466,7 +464,7 @@ extension `RFC 791 Coder Tests`.`RFC 791 Coder Tests` {
         }
     }
 
-    extension `RFC 791 Coder Tests`.`RFC 791 Coder Tests`.`Header Checksum Tests` {
+    extension `RFC 791 Coder Tests`.`Header Checksum Tests` {
 
         @Test
         func `reads two big-endian octets`() throws {

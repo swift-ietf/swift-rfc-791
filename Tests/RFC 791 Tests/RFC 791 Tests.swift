@@ -2,13 +2,11 @@ import Byte
 import RFC_791
 import Testing
 
-extension `RFC 791 Tests`.`RFC 791 Tests` {
-    @Suite
-    struct `RFC 791 Tests` {
-    }
+@Suite
+struct `RFC 791 Tests` {
 }
 
-extension `RFC 791 Tests`.`RFC 791 Tests` {
+extension `RFC 791 Tests` {
     @Suite struct `IPv4 Address Tests` {}
 
     @Suite struct `IPv4 Address Class Tests` {}

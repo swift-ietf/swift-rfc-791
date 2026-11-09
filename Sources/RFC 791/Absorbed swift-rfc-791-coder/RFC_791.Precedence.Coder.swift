@@ -23,10 +23,7 @@
             guard let byte = input.next() else {
                 throw .empty
             }
-            guard let precedence = RFC_791.Precedence(rawValue: byte.bitPattern) else {
-                throw .valueOutOfRange(byte)
-            }
-            return precedence
+            return RFC_791.Precedence(__unchecked: (), rawValue: byte.bitPattern >> 5)
         }
 
         public borrowing func serialize(_ output: Output, into buffer: inout Buffer) throws(Failure) {

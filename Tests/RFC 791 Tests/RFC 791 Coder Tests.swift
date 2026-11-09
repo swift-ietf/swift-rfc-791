@@ -192,17 +192,10 @@
     extension `RFC 791 Coder Tests`.`Precedence Tests` {
 
         @Test
-        func `reads a precedence level`() throws {
-            var input = bytes(0x03)[...]
+        func `reads the precedence from the top three bits`() throws {
+            var input = bytes(0b0111_1100)[...]
             #expect(try RFC_791.Precedence.coder.parse(&input) == .flash)
-        }
-
-        @Test
-        func `rejects a level above seven`() {
-            var input = bytes(0x08)[...]
-            #expect(throws: RFC_791.Precedence.Error.valueOutOfRange(Byte(bitPattern: 0x08))) {
-                try RFC_791.Precedence.coder.parse(&input)
-            }
+            #expect(input.isEmpty)
         }
 
         @Test
@@ -214,11 +207,18 @@
         }
 
         @Test
+        func `writes the precedence at its type of service position`() throws {
+            var buffer: [Byte] = []
+            try RFC_791.Precedence.coder.serialize(RFC_791.Precedence.immediate, into: &buffer)
+            #expect(buffer == bytes(0b0100_0000))
+            #expect(buffer == bytes(RFC_791.TypeOfService(precedence: .immediate).rawValue))
+        }
+
+        @Test
         func `round-trips`() throws {
-            var bytes193: [Byte] = []
-            try RFC_791.Precedence.coder.serialize(RFC_791.Precedence.immediate, into: &bytes193)
-            #expect(bytes193 == bytes(0x02))
-            var input = bytes(0x07)[...]
+            var buffer: [Byte] = []
+            try RFC_791.Precedence.coder.serialize(RFC_791.Precedence.networkControl, into: &buffer)
+            var input = buffer[...]
             #expect(try RFC_791.Precedence.coder.parse(&input) == .networkControl)
         }
     }

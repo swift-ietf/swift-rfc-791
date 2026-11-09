@@ -8,7 +8,7 @@
             _ value: Self,
             into buffer: inout Buffer
         ) where Buffer.Element == Byte {
-            buffer.append(Byte(bitPattern: value.rawValue))
+            buffer.append(Byte(bitPattern: value.rawValue << 5))
         }
     }
 #endif

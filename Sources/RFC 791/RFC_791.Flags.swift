@@ -41,11 +41,11 @@ extension RFC_791.Flags {
 
 extension RFC_791.Flags {
 
-    public static let none = RFC_791.Flags(__unchecked: (), rawValue: 0)
+    public static let none = RFC_791.Flags()
 
-    public static let dontFragment = RFC_791.Flags(__unchecked: (), rawValue: 0b010)
+    public static let dontFragment = RFC_791.Flags(dontFragment: true)
 
-    public static let moreFragments = RFC_791.Flags(__unchecked: (), rawValue: 0b001)
+    public static let moreFragments = RFC_791.Flags(moreFragments: true)
 }
 
 extension RFC_791.Flags: CustomStringConvertible {

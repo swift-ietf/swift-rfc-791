@@ -22,21 +22,21 @@ extension RFC_791.TTL {
 
     public var decremented: RFC_791.TTL? {
         guard rawValue > 0 else { return nil }
-        return RFC_791.TTL(__unchecked: (), rawValue: rawValue - 1)
+        return RFC_791.TTL(rawValue: rawValue - 1)
     }
 }
 
 extension RFC_791.TTL {
 
-    public static let default64 = RFC_791.TTL(__unchecked: (), rawValue: 64)
+    public static let default64 = RFC_791.TTL(rawValue: 64)
 
-    public static let default128 = RFC_791.TTL(__unchecked: (), rawValue: 128)
+    public static let default128 = RFC_791.TTL(rawValue: 128)
 
-    public static let maximum = RFC_791.TTL(__unchecked: (), rawValue: 255)
+    public static let maximum = RFC_791.TTL(rawValue: 255)
 
-    public static let expired = RFC_791.TTL(__unchecked: (), rawValue: 0)
+    public static let expired = RFC_791.TTL(rawValue: 0)
 
-    public static let linkLocal = RFC_791.TTL(__unchecked: (), rawValue: 1)
+    public static let linkLocal = RFC_791.TTL(rawValue: 1)
 }
 
 extension RFC_791.TTL: CustomStringConvertible {

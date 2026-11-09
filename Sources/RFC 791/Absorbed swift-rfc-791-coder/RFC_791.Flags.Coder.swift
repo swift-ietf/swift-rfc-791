@@ -20,10 +20,12 @@
         public typealias Failure = RFC_791.Flags.Error
 
         public borrowing func parse(_ input: inout Input) throws(Failure) -> Output {
+            let start = input.checkpoint
             guard let byte = input.next() else {
                 throw .empty
             }
             guard let flags = RFC_791.Flags(rawValue: byte.bitPattern >> 5) else {
+                input.seek(to: start)
                 throw .reservedBitSet(byte)
             }
             return flags

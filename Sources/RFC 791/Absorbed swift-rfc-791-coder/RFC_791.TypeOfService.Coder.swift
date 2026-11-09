@@ -20,10 +20,12 @@
         public typealias Failure = RFC_791.TypeOfService.Error
 
         public borrowing func parse(_ input: inout Input) throws(Failure) -> Output {
+            let start = input.checkpoint
             guard let byte = input.next() else {
                 throw .empty
             }
             guard let tos = RFC_791.TypeOfService(rawValue: byte.bitPattern) else {
+                input.seek(to: start)
                 throw .reservedBitsSet(byte)
             }
             return tos

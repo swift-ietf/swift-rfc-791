@@ -20,11 +20,13 @@
         public typealias Failure = RFC_791.IHL.Error
 
         public borrowing func parse(_ input: inout Input) throws(Failure) -> Output {
+            let start = input.checkpoint
             guard let byte = input.next() else {
                 throw .empty
             }
             let words = byte.bitPattern & 0x0F
             guard let ihl = RFC_791.IHL(rawValue: words) else {
+                input.seek(to: start)
                 throw .tooSmall(words)
             }
             return ihl

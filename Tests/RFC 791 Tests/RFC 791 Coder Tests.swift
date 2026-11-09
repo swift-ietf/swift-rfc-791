@@ -120,11 +120,12 @@
         }
 
         @Test
-        func `rejects a header shorter than five words`() {
+        func `rejects a header shorter than five words and restores the cursor`() {
             var input = bytes(0x43)[...]
             #expect(throws: RFC_791.IHL.Error.tooSmall(3)) {
                 try RFC_791.IHL.coder.parse(&input)
             }
+            #expect(input.count == 1)
         }
 
         @Test
@@ -160,11 +161,12 @@
         }
 
         @Test
-        func `rejects an octet with reserved bits set`() {
+        func `rejects an octet with reserved bits set and restores the cursor`() {
             var input = bytes(0b0000_0001)[...]
             #expect(throws: RFC_791.TypeOfService.Error.reservedBitsSet(Byte(bitPattern: 0b0000_0001))) {
                 try RFC_791.TypeOfService.coder.parse(&input)
             }
+            #expect(input.count == 1)
         }
 
         @Test
@@ -325,11 +327,12 @@
         }
 
         @Test
-        func `rejects an octet with the reserved bit set`() {
+        func `rejects an octet with the reserved bit set and restores the cursor`() {
             var input = bytes(0b1000_0000)[...]
             #expect(throws: RFC_791.Flags.Error.reservedBitSet(Byte(bitPattern: 0b1000_0000))) {
                 try RFC_791.Flags.coder.parse(&input)
             }
+            #expect(input.count == 1)
         }
 
         @Test
